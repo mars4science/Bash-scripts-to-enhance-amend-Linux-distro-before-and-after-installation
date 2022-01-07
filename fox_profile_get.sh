@@ -9,7 +9,7 @@ source common_arguments_to_scripts.sh
 # -a does not shortcut against second part executing if first part is false;
 # only strangely parathesis for test should be backslashed for proper syntax
 # if [ ! $# -eq 0 -a \( $1 = "--help" -o $1 = "-h" \) ];then
-if [ ! $# -eq 0 ] && [ $1 = "--help" ];then
+if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h" -o $1 = "?" ];then
     echo "Gets Firefox profile from USB (/media/$(id -un)/usb/) tar archive and places as default profile"
     echo "If same path already taken, asks to confirm overwrite. If declined (neither y not Y answer), does not copy"
     echo "usage: $script_name"
@@ -17,12 +17,15 @@ if [ ! $# -eq 0 ] && [ $1 = "--help" ];then
 fi
 # ===== #
 
+# man ls:
+#   -t     sort by modification time, newest first
 
-#path_original=$(pwd)
-
-profile_path=$(ls /media/$(id -un)/usb | grep firefox-browser-profile  | awk --field-separator "-" '{ FS = "-" ; print $4 ; exit }')
+# $profile_path variable is called that name because in firefox ini file the field is named that way
+# select latest backup
+profile_archive_name=$(ls --sort=time /media/$(id -un)/usb | grep firefox-browser-profile | head --lines=1)
+profile_path=$(echo $profile_archive_name | awk --field-separator "-" '{ FS = "-" ; print $4 ; exit }')
 full_profile_path=/home/$(id -un)/.mozilla/firefox/$profile_path
-profile_archive=/media/$(id -un)/usb/firefox-browser-profile-$profile_path-.tar
+profile_archive=/media/$(id -un)/usb/$profile_archive_name
 profiles_ini=/home/$(id -un)/.mozilla/firefox/profiles.ini
 
 if [ ! -d $(dirname "$full_profile_path") ]; then # looks firefox has never been run on that system
@@ -70,7 +73,7 @@ else
 
     tar --extract --file=$profile_archive 
 
-    # by trial and error:    
+    # by trial and error:
     # profile should have word Profile, there should always be Profile0, 
     # looks like profiles should be sequencially numbered
     # two with same number have not resulted in error, but e.g. profile with name number as default cannot be "loaded" with `firefox -P profilename`

@@ -43,7 +43,7 @@ $(find . -maxdepth 1 -type f) \
 ./sessionstore-backups
 # to make in RAM and copy took 00:00:27 vs 00:01:13 directly to USB (two times faster), leave that way
 # however how about data integrity on USB, which way is "safer"?
-cp /media/ramdrive/"$archive_name" /media/$(id -un)/usb
+mv /media/ramdrive/"$archive_name" /media/$(id -un)/usb
 if [ $to_eject = "true" ]; then e_ject usb; fi
 time_end=`date +%s`
 echo
