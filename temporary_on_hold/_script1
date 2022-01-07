@@ -1,0 +1,11 @@
+#!/bin/bash
+for dir in ./*
+do
+	if [ -d ${dir} ]
+ 	then
+		echo "directory: ${dir}"
+		cd ${dir}
+		ls
+		cd ..
+	fi
+done

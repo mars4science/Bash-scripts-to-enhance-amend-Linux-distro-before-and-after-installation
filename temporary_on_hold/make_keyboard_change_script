@@ -1,0 +1,37 @@
+#!/bin/bash
+# keyboard layout toggle set to shift-Fn key on Lenovo
+trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+
+echo '#!/bin/bash' > /usr/local/bin/kbdtog
+echo '# toggle keyboard layouts, list of two below; disables change by GUI panel ' >> /usr/local/bin/kbdtog
+echo 'LANG1="us,ru"' >> /usr/local/bin/kbdtog
+echo 'LANG2="ru,us"' >> /usr/local/bin/kbdtog
+echo '# CURRENT_LANG=$(setxkbmap -query | tail -n 1 | cut -f6 -d ' ') # OLD LINE' >> /usr/local/bin/kbdtog
+echo 'CURRENT_LANG=$(setxkbmap -query | grep "layout" | cut -f6 -d " ")' >> /usr/local/bin/kbdtog
+echo 'if [ "$CURRENT_LANG" = $LANG1 ]; then' >> /usr/local/bin/kbdtog
+echo '    setxkbmap $LANG2' >> /usr/local/bin/kbdtog # was setxkbmap $LANG2,"," but I don't remember why extra comma
+echo 'else' >> /usr/local/bin/kbdtog
+echo '    setxkbmap $LANG1' >> /usr/local/bin/kbdtog
+echo 'fi' >> /usr/local/bin/kbdtog
+
+chmod a+xs /usr/local/bin/kbdtog
+
+# both can be run together on Lint so no if check, not tested on other distros
+# works for Ubuntu Studio 18
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+#gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name "'toggle keyboard layout'"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding "'<Primary><Shift>XF86WakeUp'"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command "'/usr/local/bin/kbdtog'"
+
+# works for Linux Mint 18/19
+gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0']" # custom keybindings path
+gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom0/ binding "['<Shift>WakeUp']" # ['Shift_L']; <Shift>WakeUp somehow makes each key work for binding separately also...
+gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom0/ command '/usr/local/bin/kbdtog'
+gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom0/ name 'toggle keyboard layout'
+
+echo 'now you should edit shortcut via GUI changing keyboard binding to make change permanent and to activate it too'
+
+# gsettings get org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom0/ binding 
+
+#gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom0/ binding "['<Alt><Shift>w']"
