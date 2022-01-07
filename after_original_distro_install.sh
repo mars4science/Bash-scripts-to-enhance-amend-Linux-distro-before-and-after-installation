@@ -37,6 +37,7 @@ $dir_name/common_arguments_to_scripts.sh install
 $dir_name/fan_setup.sh # disable fan is fan control is already enabled
 $dir_name/apt_get.sh install
 $dir_name/r_sync.sh install
+$dir_name/f_ree.sh install
 $dir_name/fox_profile_put.sh install
 $dir_name/fox_profile_get.sh install
 $dir_name/fox_tabs_put.sh install
