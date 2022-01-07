@@ -17,3 +17,6 @@ mv yt-dlp bin
 
 rm manually_settings_transmission_torrents
 
+mv rename_based_on_meta _rename_based_on_meta.sh
+mv read.me _readme.md
+
