@@ -221,6 +221,8 @@ sudo apt-get clean
 # from man bash
 # read [-ers] [-a aname] [-d delim] [-i text] [-n nchars] [-N nchars] [-p prompt] [-t timeout] [-u fd] [name ...]
 #   One  line  is  read from the standard input, or from the file descriptor fd supplied as an argument to the -u option,
+
+echo "Enter names of the packages to process (if not supplied via echo before the run):"
 while read line; do
 
     if [ -n "$line" ];then # allow for empty lines
