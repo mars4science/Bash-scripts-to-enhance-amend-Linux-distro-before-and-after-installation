@@ -49,6 +49,9 @@ $dir_name/t_or.sh install
 # on the first run t_or is expected to copy tor bundle from USB (now partly hardcoded location) to location given by get_software_path.sh
 t_or
 
+$dir_name/firefox-replace.sh
+
+
 # includes making ramdrive now (used in debs install)
 $dir_name/add_ramdisk_and_ramcache_permanently_to_fstab.sh
 $dir_name/disable_swap.sh
