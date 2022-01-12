@@ -33,10 +33,12 @@ script(s) to copy Cinnamon
 - etc.
 - power (maybe Cinnamon): delay(s) (on battery and on AC) before screen blacking
 - show trash on desktop
+- keyboard bindings for screen rotation
 
 - nemo: columns: permissions, owner
 
 - copy Firefox profile vs USB stick
+- firefox ammend scripts for several ids of installs instances in profiles.ini
 
 - sound volume up more - config keys to pactl set-sink-volume 1 +50% and the like
 default buttons increase / reduce volume 5%, so may have only one extra for +50%
@@ -55,7 +57,51 @@ maybe possible to amend those on-screen "notifications" of sound vodume
 
 - tlp_config_battery.sh make to work when two batteries are present
 
-
+- gsettings for networkmanager, [1]
 
 collect errors during scrips runs and write to some install log
+
+
+[1]
+
+Usage:
+  gsettings --version
+  gsettings [--schemadir SCHEMADIR] COMMAND [ARGS…]
+
+Commands:
+  help                      Show this information
+  list-schemas              List installed schemas
+  list-relocatable-schemas  List relocatable schemas
+  list-keys                 List keys in a schema
+  list-children             List children of a schema
+  list-recursively          List keys and values, recursively
+  range                     Queries the range of a key
+  describe                  Queries the description of a key
+  get                       Get the value of a key
+  set                       Set the value of a key
+  reset                     Reset the value of a key
+  reset-recursively         Reset all values in a given schema
+  writable                  Check if a key is writable
+  monitor                   Watch for changes
+
+Use “gsettings help COMMAND” to get detailed help.
+
+
+~$ gsettings list-keys org.gnome.nm-applet
+show-applet
+disable-disconnected-notifications
+disable-wifi-create
+suppress-wireless-networks-available
+disable-vpn-notifications
+disable-connected-notifications
+stamp
+~$ gsettings list-recursively org.gnome.nm-applet
+org.gnome.nm-applet show-applet true
+org.gnome.nm-applet disable-disconnected-notifications true
+org.gnome.nm-applet disable-wifi-create false
+org.gnome.nm-applet suppress-wireless-networks-available false
+org.gnome.nm-applet disable-vpn-notifications false
+org.gnome.nm-applet disable-connected-notifications true
+org.gnome.nm-applet stamp 0
+~$ man nmcli
 
