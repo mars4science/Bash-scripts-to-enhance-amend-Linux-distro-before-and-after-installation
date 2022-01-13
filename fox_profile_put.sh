@@ -10,14 +10,14 @@ if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h"  -o $1 = "?" ];then
     echo "currently per available to script info (/media/$(id -un)/usb/) in tar format."
     echo "  No compression because there were issues of corruption, verification option"
     echo "is available in tar for uncompressed only."
-    echo "  Usage: $script_name [e]"
-    echo "optional "\""e"\"" instructs to try at the end of the script to eject and poweroff usb"
+    echo "  Usage: $script_name [-e]"
+    echo "optional "\""-e"\"" instructs to try at the end of the script to eject and poweroff usb"
     echo "(device that in output of "\""mount"\"" contains "\""usb"\"" word)."
     exit 0
 fi
 # ====== #
 
-if [ ! $# -eq 0 ] && [ $1 = "e" ];then
+if [ ! $# -eq 0 ] && [ $1 = "-e" ];then
     to_eject="true";else to_eject="false";fi
 
 # end firefox process just in case, $ at the end needed to skip firefox.real of tor
