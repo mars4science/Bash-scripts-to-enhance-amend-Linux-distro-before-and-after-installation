@@ -39,9 +39,12 @@ fi
 # if printpath, print local debs path to stdout (used in install_debs.sh)
 if [ $# -eq 1 ]
   then
-    if [ $1 = "-i" ]
+    if [ $1 = "-i" ] # install after download to default path (if not downloaded already)
       then
         set -- '-i' $default_local_debs       
+    elif [ $1 = "-d" ] # download only to default path with default_local_status of dpkg
+      then
+        set -- $default_local_debs $default_local_status
     elif [ $1 = "printpath" ]
       then
         printf "%s" $default_local_debs
