@@ -28,6 +28,13 @@ echo 'sub-color=0.0/1.0/0.0' | sudo tee --append $conf_file
 echo '' | sudo tee --append $conf_file
 echo 'fullscreen=yes' | sudo tee --append $conf_file
 
+echo '/ quit' | sudo tee --append $conf_file # set / key to quit player
+
+exit
+# on live USB live user is made as part of boot process, 
+# this script is developed tp be run at creation of USB time when user home folder does not exist
+# so add all to system wide config
+
 # user specific
 conf_file=/home/$(id -un)/.config/mpv/input.conf
 # user mpv folder may not exist (if mpv has never been run yet)
