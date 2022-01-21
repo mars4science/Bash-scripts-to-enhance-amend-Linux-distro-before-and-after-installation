@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # install scripts etc. from:
-default_source_software_path=/home/$(id -un)/Documents/Projects/Scripts
+default_source_software_path=/home/$(id -un)/Documents/Projects/Scripts-git
 
 # man realink:
 # Note realpath(1) is the preferred command to use for canonicalization functionality.
