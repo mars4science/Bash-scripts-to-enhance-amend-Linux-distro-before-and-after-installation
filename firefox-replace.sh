@@ -23,4 +23,9 @@ sudo tar --extract --file=$ff_archive
 # restore link that the srcipt code as written is supposed to break
 if [ $ff_link_symbolic = "true" ]; then sudo ln -s $ff_installed_folder/firefox $ff_installed_link; fi
 
+# disable updates (inc. reminders)
+sudo mkdir $ff_installed_folder/distribution
+echo '{"policies": {"DisableAppUpdate": true}}' | sudo tee $ff_installed_folder/distribution/policies.json
+
+
 
