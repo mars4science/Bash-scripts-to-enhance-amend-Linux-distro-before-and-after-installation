@@ -193,9 +193,9 @@ install_local(){
         #      True if file exists and is a regular file.
         debconf_values_file=$debs_storage_folder/_debconf-set-selections
         if [ -f $debconf_values_file ]; then
-# not needed as debconf-set-selections can read from a file
+# not needed as debconf-set-selections can read from a file, have not been tested to work before commented:
 #            while IFS= read -r line; do
-#                printf("%s",$line) | sudo debconf-set-selections
+#                printf "%s" $line | sudo debconf-set-selections
 #            done < $debconf_values_file
             sudo debconf-set-selections $debconf_values_file 
         fi
