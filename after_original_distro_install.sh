@@ -82,7 +82,7 @@ $dir_name/y_tube.sh install
 # TODO add config for thinkfan 
 # TODO check what thinkfan do (how interacts with manual control, e.g. via `stopfan`)as it is likely to be installed 
 
-# for our old printer (TODO fix it to enable color output)
+# for our old printer (TODO fix printer to enable color output)
 $dir_name/printer_color_as_gray.sh
 
 # rus locale has been added at install time, but for liveUSB need to add separately
@@ -108,8 +108,12 @@ gsettings set org.nemo.desktop visible-trash-icon true
 gsettings set org.nemo.list-view default-visible-columns "['name', 'size', 'type', 'date_modified', 'owner', 'permissions']"
 gsettings set org.nemo.list-view default-column-order "['name', 'size', 'type', 'date_modified', 'date_created_with_time', 'date_accessed', 'date_created', 'detailed_type', 'group', 'where', 'mime_type', 'date_modified_with_time', 'octal_permissions', 'owner', 'permissions']"
 
-# [2]
+# [2] in _readme.md
 gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/zoom-in/ zoom-in "<Ctrl>equal"
+
+gsettings set org.cinnamon.desktop.screensaver lock-delay 600 # seconds, ??? start delay not found via dconf Editor
+gsettings set org.cinnamon.settings-daemon.plugins.power sleep-display-battery 900 # in seconds
+gsettings set org.cinnamon.settings-daemon.plugins.power sleep-inactive-battery-timeout 1800 # in seconds
 
 # See [1] of _readme.md, also for some reason command (for binding) that have $(xrandr  do not work, only specific with e.g. eDP-1
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1', 'custom2', 'custom3', '__dummy__']"
@@ -142,6 +146,7 @@ gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custo
 
 gsettings set org.nemo.preferences show-hidden-files true
 gsettings set org.nemo.preferences show-open-in-terminal-toolbar true
+
 
 # ========= end of configs / settings =============
 
