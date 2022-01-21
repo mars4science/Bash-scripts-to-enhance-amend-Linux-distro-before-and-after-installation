@@ -31,6 +31,7 @@ Eval6=$?
 # also space before ] is important and needed for syntax 
 
 # on https://wiki.winehq.org/Gecko downloads: bz2 for 5 and xz for 6
+# locations to install to are found by try-and-error on my system (LM 20.2)
 if [ $Eval5 -eq 0 ];then
     path_to_install=/usr/share/wine/gecko
     # man mkdir
@@ -40,13 +41,13 @@ if [ $Eval5 -eq 0 ];then
     find /$path_to_gecko/5.0 -name '*.bz2' -exec sudo tar x -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
     # below checks resuls of ? I guess, not errors on archive extract
     # if [ $? ];then echo "copied gecko to $path_to_install"; else echo "error: maybe NOT copied gecko to $path_to_install"; fi
-    echo "copied gecko to $path_to_install"
+    echo "copied (installed) gecko to $path_to_install"
 elif [ $Eval6 -eq 0 ];then
     path_to_install=/opt/wine-stable/share/wine/gecko
     sudo mkdir --parents $path_to_install
     find $path_to_gecko/6.0 -name '*.xz' -exec sudo tar x -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
     # if [ $? ];then echo "copied gecko to $path_to_install"; else echo "error: maybe NOT copied gecko to $path_to_install"; fi
-    echo "copied gecko to $path_to_install"
+    echo "copied (installed) gecko to $path_to_install"
 else
     echo "---Error: not found suitable wine version to add wine-gecko"
 fi

@@ -2,6 +2,7 @@
 
 # install gecko
 source install_wine-gecko.sh
+source install_wine-mono.sh
 
 # make ini files be opened in GUI (Nemo) via xed again
 # [1], however below is not in .wine when WINEPREFIX is empty (not set), so write as per current understanding:
