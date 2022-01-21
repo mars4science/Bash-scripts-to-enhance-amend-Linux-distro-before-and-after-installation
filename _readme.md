@@ -22,20 +22,21 @@ with
 [ $1 = "--help" -o $1 = "-h"  -o $1 = "?" ]
 
 script(s) to copy Cinnamon 
-- launcher, 
+- launcher,
+- applets, 
 - theame, 
-- shortcuts, 
-- zooming enabled with "cursor pusher contects around", keys to zoom are win+alt+(+/-) and are Ok IMO now,
-- horizontal schrolling enabled,
-- display Hi-DPI scale enable,
-- screensaver start delay, delay before lock
-- russian keyboard layout, switching by ctrl-space (no such option in GUI btw)
+- shortcuts,??? keyboard binings ???
++ - zooming enabled with "cursor pusher contects around", keys to zoom are win+alt+(+/-) and are Ok IMO now,
++ - horizontal schrolling enabled,
++ - display Hi-DPI scale enable,
+(+/-) - screensaver start delay, delay before lock
++ - russian keyboard layout, switching by ctrl-space (no such option in GUI btw) - looks non-present do not work, e.g. tried 'grp\tgrp:ctrl_space_toggle'
 - etc.
 - power (maybe Cinnamon): delay(s) (on battery and on AC) before screen blacking
-- show trash on desktop
-- keyboard bindings for screen rotation
++ - show trash on desktop
++ - keyboard bindings for screen rotation
 
-- nemo: columns: permissions, owner
++ - nemo: columns: permissions, owner
 
 - copy Firefox profile vs USB stick
 - firefox ammend scripts for several ids of installs instances in profiles.ini
@@ -45,15 +46,13 @@ default buttons increase / reduce volume 5%, so may have only one extra for +50%
 on screen though is 100% when buttons pressed if >100%, use pactl list sinks to see actual
 maybe possible to amend those on-screen "notifications" of sound vodume 
 
-- nemo add owner and permissions to visible columns
-
-- gnome terminal change zoom-in key to ctrl+=
++ - gnome terminal change zoom-in key to ctrl+=
 
 - increase font used for boot
 
 - script to print packages discriptions from deb files for all stored.
 
-- set system to shutdown if battery less than 10% (via upower?)
+(+/-) - set system to shutdown if battery less than 10% (via upower?)
 
 - tlp_config_battery.sh make to work when two batteries are present
 
@@ -67,24 +66,6 @@ collect errors during scrips runs and write to some install log
 Usage:
   gsettings --version
   gsettings [--schemadir SCHEMADIR] COMMAND [ARGS…]
-
-Commands:
-  help                      Show this information
-  list-schemas              List installed schemas
-  list-relocatable-schemas  List relocatable schemas
-  list-keys                 List keys in a schema
-  list-children             List children of a schema
-  list-recursively          List keys and values, recursively
-  range                     Queries the range of a key
-  describe                  Queries the description of a key
-  get                       Get the value of a key
-  set                       Set the value of a key
-  reset                     Reset the value of a key
-  reset-recursively         Reset all values in a given schema
-  writable                  Check if a key is writable
-  monitor                   Watch for changes
-
-Use “gsettings help COMMAND” to get detailed help.
 
 
 ~$ gsettings list-keys org.gnome.nm-applet
@@ -104,4 +85,68 @@ org.gnome.nm-applet disable-vpn-notifications false
 org.gnome.nm-applet disable-connected-notifications true
 org.gnome.nm-applet stamp 0
 ~$ man nmcli
+
+/org/cinnamon/desktop/interface/scaling-factor
+
+org.cinnamon.desktop.default-applications.terminal exec-arg '--'
+org.cinnamon.desktop.default-applications.terminal exec 'gnome-terminal'
+
+gsettings set x.dm.slick-greeter clock-format '%H:%M'
+
+gsettings set org.cinnamon.control-center.display show-fractional-scaling-controls true
+gsettings set org.cinnamon.desktop.interface scaling-factor 2
+gsettings set org.cinnamon.desktop.interface text-scaling-factor 1.0
+
+gsettings set org.cinnamon.desktop.a11y.applications screen-magnifier-enabled true
+gsettings set org.cinnamon.desktop.a11y.magnifier mouse-tracking push
+
+gsettings set org.gnome.libgnomekbd.keyboard layouts "['us', 'ru']"
+# gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp', 'grp\tgrp:lalt_lshift_toggle']"
+gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp']"
+
+gsettings set org.cinnamon.settings-daemon.peripherals.touchpad horizontal-scrolling true
+
+gsettings set org.nemo.desktop visible-trash-icon true
+
+gsettings set org.nemo.list-view default-visible-columns "['name', 'size', 'type', 'date_modified', 'owner', 'permissions']"
+gsettings set org.nemo.list-view default-column-order "['name', 'size', 'type', 'date_modified', 'date_created_with_time', 'date_accessed', 'date_created', 'detailed_type', 'group', 'where', 'mime_type', 'date_modified_with_time', 'octal_permissions', 'owner', 'permissions']"
+
+# [2]
+gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/zoom-in/ zoom-in "<Ctrl>equal"
+
+# [1]
+gsettings set  org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1', '__dummy__']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/name "'Display rotate left'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/binding "['<Alt>Left']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/command "'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '{print $1}') --rotate left'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/name "'Display rotate right'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/binding "['<Alt>Right']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/command "'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '{print $1}') --rotate right'"
+
+
+gsettings set org.cinnamon.desktop.keybindings.custom-keybindings.custom1 name "Display rotate right"
+/org/cinnamon/desktop/keybindings/custom-keybindings/custom1/name
+
+org.cinnamon.desktop.screensaver lock-delay 600 # seconds
+??? could not find delay before starting the screensaver
+
+??? vs UPower.conf action 10 ???
+org.gnome.settings-daemon.plugins.power
+/org/gnome/settings-daemon/plugins/power/percentage-action 2
+
+?? even when % is shown, another setting?
+/org/gnome/desktop/interface/show-battery-percentage
+false
+
+/org/gnome/desktop/session/idle-delay
+
+[2] https://askubuntu.com/questions/290159/how-can-i-use-gsettings-to-configure-settings-with-relocatable-schemas
+
+[1]
+https://unix.stackexchange.com/questions/596308/custom-keybindings-for-linux-mint-20-via-gsettings
+below does not work, use dconf write
+gsettings set org.cinnamon.desktop.keybindings.custom-keybindings.custom1 binding "['<Alt>Left']"
+/org/cinnamon/desktop/keybindings/custom-keybindings/custom1/command "xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '{print $1}') --rotate left"
+gsettings set org.cinnamon.desktop.keybindings.custom-keybindings.custom0 name "Display rotate left"
+
 

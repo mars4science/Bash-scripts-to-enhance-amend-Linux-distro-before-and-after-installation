@@ -85,6 +85,66 @@ $dir_name/y_tube.sh install
 # for our old printer (TODO fix it to enable color output)
 $dir_name/printer_color_as_gray.sh
 
+# rus locale has been added at install time, but for liveUSB need to add separately
+sudo locale-gen ru_RU
+sudo locale-gen ru_RU.UTF-8
+
+# ========= cinnamon / desktop / GUI settings ============
+gsettings set org.cinnamon.control-center.display show-fractional-scaling-controls true
+gsettings set org.cinnamon.desktop.interface scaling-factor 2
+gsettings set org.cinnamon.desktop.interface text-scaling-factor 1.0
+
+gsettings set org.cinnamon.desktop.a11y.applications screen-magnifier-enabled true
+gsettings set org.cinnamon.desktop.a11y.magnifier mouse-tracking push
+
+gsettings set org.gnome.libgnomekbd.keyboard layouts "['us', 'ru']"
+# gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp', 'grp\tgrp:lalt_lshift_toggle']"
+gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp']"
+
+gsettings set org.cinnamon.settings-daemon.peripherals.touchpad horizontal-scrolling true
+
+gsettings set org.nemo.desktop visible-trash-icon true
+
+gsettings set org.nemo.list-view default-visible-columns "['name', 'size', 'type', 'date_modified', 'owner', 'permissions']"
+gsettings set org.nemo.list-view default-column-order "['name', 'size', 'type', 'date_modified', 'date_created_with_time', 'date_accessed', 'date_created', 'detailed_type', 'group', 'where', 'mime_type', 'date_modified_with_time', 'octal_permissions', 'owner', 'permissions']"
+
+# [2]
+gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/zoom-in/ zoom-in "<Ctrl>equal"
+
+# See [1] of _readme.md, also for some reason command (for binding) that have $(xrandr  do not work, only specific with e.g. eDP-1
+gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1', 'custom2', 'custom3', '__dummy__']"
+# or dconf write /org/cinnamon/desktop/keybindings/custom-list "['custom0', 'custom1', 'custom2', '__dummy__']"
+echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate normal' | sudo tee $(get_install_path.sh)/display_rotate_normal.sh
+echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate left' | sudo tee $(get_install_path.sh)/display_rotate_left.sh
+echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate right' | sudo tee $(get_install_path.sh)/display_rotate_right.sh
+echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate inverted' | sudo tee $(get_install_path.sh)/display_rotate_inverted.sh
+sudo chmod a+rx $(get_install_path.sh)/display_rotate_normal.sh $(get_install_path.sh)/display_rotate_left.sh $(get_install_path.sh)/display_rotate_right.sh $(get_install_path.sh)/display_rotate_inverted.sh
+ 
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/name "'Display rotate normal'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/binding "['<Super><Alt>Up']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/command "'display_rotate_normal.sh'"
+
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/name "'Display rotate left'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/binding "['<Super><Alt>Left']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/command "'display_rotate_left.sh'"
+
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "'Display rotate right'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Alt>Right']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'display_rotate_right.sh'"
+
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/name "'Display rotate right'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/binding "['<Super><Alt>Down']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'display_rotate_inverted.sh'"
+
+# to activate bindings (for some reason do not work just from populating dconf database from above commands), different order of items in the list
+gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3']"
+# or dconf write /org/cinnamon/desktop/keybindings/custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3']"
+
+gsettings set org.nemo.preferences show-hidden-files true
+gsettings set org.nemo.preferences show-open-in-terminal-toolbar true
+
+# ========= end of configs / settings =============
+
 if [ $running_system = "true" ]; then
 
     # for liveUSB tweaking do not think adds any value or even might cause problems (not tested)
