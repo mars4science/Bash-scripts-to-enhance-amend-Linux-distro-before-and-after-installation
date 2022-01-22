@@ -214,8 +214,11 @@ while read line; do
             1>&2 echo "folder "\`"$debs_storage_folder"\`" exists, not copying of deb files"
             install_local            
         else
-            1>&2 echo "    Package(s)  $line  bwing downloaded..."
-            # download-only of deb packages including rependancies 
+            1>&2 echo "    Package(s)  $line  being downloaded..."
+            # download-only of deb packages including dependencies
+            # TODO see [2] maybe change to apt-get download -o Dir::Cache="./" -o Dir::Cache::archives="./"?
+            # though script is coded to copy anyway and only in case of success, if download to e.g. USB directly, in case of failure
+            # would need to delete from USB, though maybe download to ramdrive?
             sudo apt-get install --download-only --assume-yes $line
 
             # get return status of last command
@@ -352,4 +355,34 @@ exit
 #       executed.  Array variables cannot be given the nameref attribute.  However, nameref variables can reference array variables and subscripted  array  variables.   Namerefs
 #       can  be  unset  using the -n option to the unset builtin.  Otherwise, if unset is executed with the name of a nameref variable as an argument, the variable referenced by
 #       the nameref variable will be unset.
+
+[2]
+https://unix.stackexchange.com/questions/683777/why-apt-get-does-not-download-all-dependencies-in-download-only-mode
+https://stackoverflow.com/questions/13756800/how-to-download-all-dependencies-and-packages-to-directory
+PACKAGES="wget unzip"
+apt-get download $(apt-cache depends --recurse --no-recommends --no-suggests \
+  --no-conflicts --no-breaks --no-replaces --no-enhances \
+  --no-pre-depends ${PACKAGES} | grep "^\w")
+
+
+This script works great.. downloaded the entire dependency tree. I'm wondering if we could also auto-generate a file having the dpkg commands in proper order, so that the packages with no other dependencies load up first? At present it's just a brute-force sudo dpkg -i *.deb several times. – 
+Nikhil VJ
+Mar 24 '18 at 13:51
+1
+@NikhilVJ Once you've downloaded your dependencies you can use apt-get install --no-download <PACKAGE> and it will search only the local cache. It should be able to sort out the dependency order as it normally does though. – 
+TheBeardedQuack
+Nov 20 '18 at 11:58
+1
+Changed your apt-get download line to start like this so that the files are downloaded to the current directory. apt-get download -o Dir::Cache="./" -o Dir::Cache::archives="./" – 
+OwN
+Feb 25 '19 at 6:12
+2
+Why use --no-pre-depends? I think pre-depends is required to be installed. – 
+Steely Wing
+Apr 30 '19 at 8:20
+1
+I found that it downloaded both the amd64 and i386 versions for some packages. To download only the version i needed, I extended the grep with in the following way: grep "^\w" | grep -v "i386" (To ignore the i386 ones) – 
+Gal Avineri
+May 28 '19 at 11:46
+
 
