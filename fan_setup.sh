@@ -2,7 +2,7 @@
 # thinkpad specific
 trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
-sudo cp stopfan $(get_install_path.sh)
+sudo cp bin/stopfan $(get_install_path.sh)
 # sudo chown root /usr/bin/stopfan
 # will be owned by root after copy anyway
 # +xs execute as owner (root)
