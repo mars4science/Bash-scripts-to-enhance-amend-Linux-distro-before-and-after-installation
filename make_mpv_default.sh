@@ -2,6 +2,12 @@
 
 trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
+# changing from making user specific configs to editing system wide
+sudo sed -i -- 's/io.github.celluloid_player.Celluloid.desktop;xplayer.desktop;org.gnome.Totem.desktop/mpv.desktop/' /usr/share/applications/defaults.list
+exit
+
+
+
 # ~ is home, same as /home/$(id -u -n)
 echo '[Default Applications]' > ~/.config/mimeapps.list
 
