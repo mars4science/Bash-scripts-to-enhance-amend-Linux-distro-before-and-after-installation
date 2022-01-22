@@ -21,14 +21,15 @@ change_squash() {
     else
         sudo mkdir $work_path/fin_sq/am
     fi
-    sudo cp ~/Documents/Projects/Scripts/stopfan $work_path/fin_sq/usr/local/bin
+    sudo cp  /media/$(id --user --name)/usb/Projects/Scripts-git/bin/stopfan $work_path/fin_sq/usr/local/bin
     sudo chmod +xs $work_path/fin_sq/usr/local/bin/stopfan
 
     # see https://unix.stackexchange.com/questions/683439/mount-twice-bind-why-some-parameters-change-others-not
     sudo mount -o bind,x-mount.mkdir /media/$(id -un)/usb $work_path/fin_sq/media/root/usb 
     sudo mount -o bind,remount,ro /media/$(id -un)/usb $work_path/fin_sq/media/root/usb
 
-    sudo chroot $work_path/fin_sq /media/root/usb/Projects/Scripts/after_original_distro_install.sh
+    # for chrooted environment path should reflect chroot: media/root, not media/user_name, script developer excepts id to work to give root 
+    sudo chroot $work_path/fin_sq /media/$(id --user --name)/usb/Projects/Scripts-git/after_original_distro_install.sh
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
 }
 
