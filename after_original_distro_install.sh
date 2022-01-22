@@ -76,7 +76,7 @@ $dir_name/add_mpv_config_for_subtitles.sh
 $dir_name/after_wine_install.sh # installs gecko and changes default app for ini files back to xed.desktop
 
 # would try to update from Internet
-$dir_name/setup_youtube-dl.sh
+$dir_name/setup_youtube-downloaders.sh
 $dir_name/y_tube.sh install
 
 # TODO add config for thinkfan 

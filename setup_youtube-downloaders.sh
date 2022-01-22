@@ -3,14 +3,14 @@
 # trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 # alternative to youtube-dl, have read (and saw) work fast when youtube-dl is slow to download
-sudo cp yt-dlp /usr/local/bin
+sudo cp bin/yt-dlp /usr/local/bin
 sudo chmod +x /usr/local/bin/yt-dlp
 
 # to setup proper python for youtube-dl
 sudo ln -s /usr/bin/python3 /usr/local/bin/python
 
 # 2021/12/12 looks like LM 20.2 distro I use contains youtube-dl
-sudo cp youtube-dl /usr/bin # removed /local, not overwrite original from distro, after replacement there is next line error no more
+sudo cp bin/youtube-dl /usr/bin # removed /local, not overwrite original from distro, after replacement there is next line error no more
 # youtube-dl: error: youtube-dl's self-update mechanism is disabled on Debian.
 sudo chmod +x /usr/bin/youtube-dl # just in case there was no youtube-dl in that location
 
@@ -26,7 +26,7 @@ sudo chmod +x /usr/bin/youtube-dl # just in case there was no youtube-dl in that
 # sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
 # would update if device is connected to the internet
 # youtube-dl: error: youtube-dl's self-update mechanism is disabled on Debian.
-echo next is trying to update youtube-dl, I assume it needs internet
+echo next is trying to update youtube-dl, script developer has assumed it needs internet
 sudo youtube-dl --update # even if outputs "ERROR: can't find the current version. Please try again later.", echo $? still 0, so result is seen manual way:
-echo if no errors after "next is trying" line then updated
+echo if no errors after \"next is trying\" line then updated
 
