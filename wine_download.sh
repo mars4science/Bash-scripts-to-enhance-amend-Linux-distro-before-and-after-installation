@@ -12,8 +12,7 @@ if [ $? -ne 0 ]; then
 #    sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ impish main'
     sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main' 
     sudo apt-get update
-fi 
-exit
+fi
 
 echo winehq-stable | apt_get -d
 sudo sed --in-place '/winehq/d' $(grep winehq /etc/apt/sources.list /etc/apt/sources.list.d/* | awk 'BEGIN {FS=":"}{print $1}')
