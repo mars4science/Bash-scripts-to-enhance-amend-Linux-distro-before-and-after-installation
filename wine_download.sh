@@ -15,8 +15,9 @@ if [ $? -ne 0 ]; then
 fi 
 exit
 
-
 echo winehq-stable | apt_get -d
+sudo sed --in-place '/winehq/d' $(grep winehq /etc/apt/sources.list /etc/apt/sources.list.d/* | awk 'BEGIN {FS=":"}{print $1}')
+sudo apt-get update
 
 # https://wiki.winehq.org/Gecko
 path_to_gecko="/media/$(id -un)/usb/LM_20.2/wine-gecko"
