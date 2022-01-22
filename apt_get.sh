@@ -72,6 +72,11 @@ if [ $1 = "-i" ]
     shift
 fi
 
+# make named pipe to collect errors for packets and output all errors at the end
+# mkfifo errors_apt_get
+# named pipes are useful when one need input to hang and wait to output, also it mixes sequence (when sereval outputs echo > pipe and then one read from pipe cat < pipe)
+errors_apt_get=/errors_apt_get
+
 status_path=$2
 
 # -z true if length is 0, -n for !=0
@@ -101,40 +106,7 @@ substitute_status(){
 
 substitute_status
 
-# functions have own parameters, so $1 here, not parameter of the script. Later removed as if trapped is called without parameter. Also:
-# man bash
-#
-#       A shell function, defined as described above under SHELL GRAMMAR, stores a series of commands for later execution.  When the name of a shell function is used as a simple
-#       command name, the list of commands associated with that function name is executed.  Functions are executed in the context of the current shell; no new process is created
-#       to interpret them (contrast this with the execution of a shell script).  When a function is executed, the arguments to the function become the positional parameters dur‐
-#       ing  its  execution.   The special parameter # is updated to reflect the change.  Special parameter 0 is unchanged.  The first element of the FUNCNAME variable is set to
-#       the name of the function while the function is executing.
-
-#       Variables  local  to the function may be declared with the local builtin command.  Ordinarily, variables and their values are shared between the function and its caller.
-#       If a variable is declared local, the variable's visible scope is restricted to that function and its children  (including  the  functions  it  calls).   Local  variables
-#      "shadow"  variables with the same name declared at previous scopes.  For instance, a local variable declared in a function hides a global variable of the same name: ref‐
-#       erences and assignments refer to the local variable, leaving the global variable unmodified.  When the function returns, the global variable is once again visible.
-#
-#       The shell uses dynamic scoping to control a variable's visibility within functions.  With dynamic scoping, visible variables and their values are a  result  of  the  se‐
-#       quence  of  function  calls that caused execution to reach the current function.  The value of a variable that a function sees depends on its value within its caller, if
-#       any, whether that caller is the "global" scope or another shell function.  This is also the value that a local variable declaration "shadows", and the value that is  re‐
-#       stored when the function returns.
-#
-#       For  example,  if a variable var is declared as local in function func1, and func1 calls another function func2, references to var made from within func2 will resolve to
-#       the local variable var from func1, shadowing any global variable named var.
-
-#       A variable can be assigned the nameref attribute using the -n option to the declare or local builtin commands (see the descriptions of declare and local below) to create
-#       a nameref, or a reference to another variable.  This allows variables to be manipulated indirectly.  Whenever the nameref variable is referenced, assigned to, unset,  or
-#       has  its  attributes  modified  (other than using or changing the nameref attribute itself), the operation is actually performed on the variable specified by the nameref
-#       variable's value.  A nameref is commonly used within shell functions to refer to a variable whose name is passed as an argument to the  function.   For  instance,  if  a
-#       variable name is passed to a shell function as its first argument, running
-#              declare -n ref=$1
-#       inside  the function creates a nameref variable ref whose value is the variable name passed as the first argument.  References and assignments to ref, and changes to its
-#       attributes, are treated as references, assignments, and attribute modifications to the variable whose name was passed as $1.  If the control variable in a for  loop  has
-#       the  nameref attribute, the list of words can be a list of shell variables, and a name reference will be established for each word in the list, in turn, when the loop is
-#       executed.  Array variables cannot be given the nameref attribute.  However, nameref variables can reference array variables and subscripted  array  variables.   Namerefs
-#       can  be  unset  using the -n option to the unset builtin.  Otherwise, if unset is executed with the name of a nameref variable as an argument, the variable referenced by
-#       the nameref variable will be unset.
+# [1]
 
 restore_status(){
     if [ -n "$status_path" ]
@@ -208,7 +180,14 @@ install_local(){
         # apt lacks --assume-yes option, so changing to apt-get
         
         # DEBIAN_FRONTEND=noninteractive added for wireshark-qt - see above
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes $debs_storage_folder/*.deb && 1>&2 echo "    Package(s)  $line  installed (at least seems like it)"
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes $debs_storage_folder/*.deb 
+        Eval=$?
+
+        if [ $Eval -eq 0 ];then
+            echo "    Package(s)  $line  installed (at least seems like it)"
+        else
+            echo "Package  $line  NOT installed (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
+        fi
         
         sudo setfacl -x u:_apt /media/$(id -un)
         substitute_status
@@ -254,7 +233,7 @@ while read line; do
                 sudo apt-get clean
                 install_local
             else
-                1>&2 echo "Package  $line  is NOT downloaded, downloaded deb files were not copied from cache to specified location (at least seems like it)"
+                echo "Package  $line  is NOT downloaded, downloaded deb files were not copied from cache to specified location (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
                 sudo apt-get clean
             fi # download success
         fi # existense of folder
@@ -265,6 +244,14 @@ done # reading lines of names of packages
 # restore_status $2
 
 restore_status
+
+if [ -e $errors_apt_get ]; then 
+    echo "=====    Errors during script:     ====="
+    1>&2 cat $errors_apt_get
+    echo "===== End of errors during script: ====="
+    sudo rm $errors_apt_get
+fi
+
 exit
 
 # ------- commments on code --------------------
@@ -328,4 +315,41 @@ exit
 #  File not found - /media/alex/usb/LM_20.2/subtitleeditor/enchant_1.6.0-11.3build1_amd64.deb (13: Permission denied)
 #E: Failed to fetch http://archive.ubuntu.com/ubuntu/pool/universe/e/enchant/libenchant1c2a_1.6.0-11.3build1_amd64.deb  Could not resolve 'archive.ubuntu.com'
 #E: Failed to fetch file:/media/alex/usb/LM_20.2/subtitleeditor/enchant_1.6.0-11.3build1_amd64.deb  File not found - /media/alex/usb/LM_20.2/subtitleeditor/enchant_1.6.0-11.3build1_amd64.deb (13: Permission denied)
+
+
+# [1]
+# functions have own parameters, so $1 here, not parameter of the script. Later removed as if trapped is called without parameter. Also:
+# man bash
+#
+#       A shell function, defined as described above under SHELL GRAMMAR, stores a series of commands for later execution.  When the name of a shell function is used as a simple
+#       command name, the list of commands associated with that function name is executed.  Functions are executed in the context of the current shell; no new process is created
+#       to interpret them (contrast this with the execution of a shell script).  When a function is executed, the arguments to the function become the positional parameters dur‐
+#       ing  its  execution.   The special parameter # is updated to reflect the change.  Special parameter 0 is unchanged.  The first element of the FUNCNAME variable is set to
+#       the name of the function while the function is executing.
+
+#       Variables  local  to the function may be declared with the local builtin command.  Ordinarily, variables and their values are shared between the function and its caller.
+#       If a variable is declared local, the variable's visible scope is restricted to that function and its children  (including  the  functions  it  calls).   Local  variables
+#      "shadow"  variables with the same name declared at previous scopes.  For instance, a local variable declared in a function hides a global variable of the same name: ref‐
+#       erences and assignments refer to the local variable, leaving the global variable unmodified.  When the function returns, the global variable is once again visible.
+#
+#       The shell uses dynamic scoping to control a variable's visibility within functions.  With dynamic scoping, visible variables and their values are a  result  of  the  se‐
+#       quence  of  function  calls that caused execution to reach the current function.  The value of a variable that a function sees depends on its value within its caller, if
+#       any, whether that caller is the "global" scope or another shell function.  This is also the value that a local variable declaration "shadows", and the value that is  re‐
+#       stored when the function returns.
+#
+#       For  example,  if a variable var is declared as local in function func1, and func1 calls another function func2, references to var made from within func2 will resolve to
+#       the local variable var from func1, shadowing any global variable named var.
+
+#       A variable can be assigned the nameref attribute using the -n option to the declare or local builtin commands (see the descriptions of declare and local below) to create
+#       a nameref, or a reference to another variable.  This allows variables to be manipulated indirectly.  Whenever the nameref variable is referenced, assigned to, unset,  or
+#       has  its  attributes  modified  (other than using or changing the nameref attribute itself), the operation is actually performed on the variable specified by the nameref
+#       variable's value.  A nameref is commonly used within shell functions to refer to a variable whose name is passed as an argument to the  function.   For  instance,  if  a
+#       variable name is passed to a shell function as its first argument, running
+#              declare -n ref=$1
+#       inside  the function creates a nameref variable ref whose value is the variable name passed as the first argument.  References and assignments to ref, and changes to its
+#       attributes, are treated as references, assignments, and attribute modifications to the variable whose name was passed as $1.  If the control variable in a for  loop  has
+#       the  nameref attribute, the list of words can be a list of shell variables, and a name reference will be established for each word in the list, in turn, when the loop is
+#       executed.  Array variables cannot be given the nameref attribute.  However, nameref variables can reference array variables and subscripted  array  variables.   Namerefs
+#       can  be  unset  using the -n option to the unset builtin.  Otherwise, if unset is executed with the name of a nameref variable as an argument, the variable referenced by
+#       the nameref variable will be unset.
 
