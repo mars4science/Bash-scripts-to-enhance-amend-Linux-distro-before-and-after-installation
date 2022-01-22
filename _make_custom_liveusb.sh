@@ -52,6 +52,21 @@ change_boot() {
 
     # code to repalce memtest to start with stock iso 
     sudo cp "/media/$(id -un)/usb/LM_20.2/memtest86+/memtest86+-5.31b.bin" $work_path/fin/casper/memtest
+
+
+# TODO add changing initramfs / initrd 
+
+    # change initrd (e.g. change live session user id)
+#    sudo unmkinitramfs $work_path/fin/casper/initrd.lz $work_path/initrd
+
+
+# Clear out debconf database again to avoid confusing ubiquity later.
+
+
+
+
+
+
 }
 
 u_mount(){
@@ -99,9 +114,9 @@ fi
 
 read -p "Choose interactive mode (press i key) to pause at some points, otherwise run unattended (any other key):" -n 1 -r
 echo  # (optional) move to a new line
-if [[ $REPLY =~ ^[II]$ ]]; then interactive_mode="true"; else interactive_mode="false"; fi
+if [[ $REPLY =~ ^[Ii]$ ]]; then interactive_mode="true"; else interactive_mode="false"; fi
 
-mkdir iso to temp fin 
+mkdir iso to temp fin initrd 
 # man mount: The mount command automatically creates a loop device from a regular file if a  filesystem  type  is
 #            not specified or the filesystem is known for libblkid
 sudo mount $original_iso iso #  -o loop
