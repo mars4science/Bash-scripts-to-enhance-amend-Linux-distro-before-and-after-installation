@@ -57,7 +57,7 @@ $dir_name/add_ramdisk_and_ramcache_permanently_to_fstab.sh
 $dir_name/disable_swap.sh
 $dir_name/memory_notify_config.sh
 $dir_name/after_login_config.sh
-$dir_name/display_backlight_control.sh
+$dir_name/display_backlight_control_setup.sh
 
 echo "===== next in a few seconds going to install downloaded debian packages ====="
 sleep 5 # pause n seconds
