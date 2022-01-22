@@ -147,6 +147,8 @@ gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custo
 gsettings set org.nemo.preferences show-hidden-files true
 gsettings set org.nemo.preferences show-open-in-terminal-toolbar true
 
+git config --global color.status.changed yellow
+git config --global color.diff.old yellow
 
 # ========= end of configs / settings =============
 
