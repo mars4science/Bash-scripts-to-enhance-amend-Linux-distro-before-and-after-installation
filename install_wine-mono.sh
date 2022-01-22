@@ -6,10 +6,10 @@ if [ ! -e "$path_to_mono" ]; then echo >&2 "wine-mono path $path_to_mono not fou
 
 wine_version=$(wine --version | awk 'BEGIN {FS = "-"}{print $2}')
 
-wine_path=realpath $(which wine)
-if [ $wine_path = "/opt/wine-stable/bin/wine" ];then
+wine_path="$(realpath $(which wine))"
+if [ "$wine_path" = "/opt/wine-stable/bin/wine" ];then
     path_to_install=/opt/wine-stable/share/wine/gecko
-elif [ $wine_path = "/usr/bin/wine-stable" ];then
+elif [ "$wine_path" = "/usr/bin/wine-stable" ];then
     path_to_install=/usr/share/wine/gecko
 else 
     echo >&2 "---Error: not found suitable wine version ($wine_path) to add wine-mono"; exit 1
