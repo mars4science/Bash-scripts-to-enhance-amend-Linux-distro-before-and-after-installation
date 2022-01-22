@@ -51,3 +51,36 @@ exec /sbin/init
 # TODO add functionality to write the above commands to the logs
 
 # TODO add stopfan to systemd start-up where acpi already works (AFAIK this is the way to disable fan noise during startup, maybe thinkfan would take care of it if installed)
+
+# TODO add / pass a "kernelcore=" parameter to the kernel to be able to free some memory
+# https://unix.stackexchange.com/questions/312312/on-linux-how-can-i-hot-unplug-memory
+# https://www.kernel.org/doc/html/v4.14/admin-guide/kernel-parameters.html
+        kernelcore=     [KNL,X86,IA-64,PPC]
+                        Format: nn[KMGTPE] | "mirror"
+                        This parameter
+                        specifies the amount of memory usable by the kernel
+                        for non-movable allocations.  The requested amount is
+                        spread evenly throughout all nodes in the system. The
+                        remaining memory in each node is used for Movable
+                        pages. In the event, a node is too small to have both
+                        kernelcore and Movable pages, kernelcore pages will
+                        take priority and other nodes will have a larger number
+                        of Movable pages.  The Movable zone is used for the
+                        allocation of pages that may be reclaimed or moved
+                        by the page migration subsystem.  This means that
+                        HugeTLB pages may not be allocated from this zone.
+                        Note that allocations like PTEs-from-HighMem still
+                        use the HighMem zone if it exists, and the Normal
+                        zone if it does not.
+
+                        Instead of specifying the amount of memory (nn[KMGTPE]),
+                        you can specify "mirror" option. In case "mirror"
+                        option is specified, mirrored (reliable) memory is used
+                        for non-movable allocations and remaining memory is used
+                        for Movable pages. nn[KMGTPE] and "mirror" are exclusive,
+                        so you can NOT specify nn[KMGTPE] and "mirror" at the same
+                        time.
+https://unix.stackexchange.com/questions/683761/has-linux-kernel-abandoned-universally-applying-ram-that-isn-t-being-used-for-s
+https://www.kernel.org/doc/html/latest/admin-guide/mm/memory-hotplug.html
+
+
