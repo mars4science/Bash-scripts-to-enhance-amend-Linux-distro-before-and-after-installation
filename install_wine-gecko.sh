@@ -19,6 +19,18 @@ Eval5=$?
 wine --version | grep wine-6
 Eval6=$?
 
+wine --version | grep wine-7
+Eval7=$?
+
+wine_path=realpath $(which wine)
+if [ $wine_path = "/opt/wine-stable/bin/wine" ];then
+    path_to_install=/opt/wine-stable/share/wine/gecko
+elif [ $wine_path = "/usr/bin/wine-stable" ];then
+    path_to_install=/usr/share/wine/gecko
+else 
+    echo >&2 "---Error: not found suitable wine version ($wine_path) to add wine-mono"; exit 1
+fi
+    
 # looks like where is no "wine" way to find out where wine configs are, so just put from experience with Linun Mint:
 
 # man bash
@@ -33,7 +45,6 @@ Eval6=$?
 # on https://wiki.winehq.org/Gecko downloads: bz2 for 5 and xz for 6
 # locations to install to are found by try-and-error on my system (LM 20.2)
 if [ $Eval5 -eq 0 ];then
-    path_to_install=/usr/share/wine/gecko
     # man mkdir
     #  -p, --parents
     #          no error if existing, make parent directories as needed
@@ -42,8 +53,7 @@ if [ $Eval5 -eq 0 ];then
     # below checks resuls of ? I guess, not errors on archive extract
     # if [ $? ];then echo "copied gecko to $path_to_install"; else echo "error: maybe NOT copied gecko to $path_to_install"; fi
     echo "copied (installed) gecko to $path_to_install"
-elif [ $Eval6 -eq 0 ];then
-    path_to_install=/opt/wine-stable/share/wine/gecko
+elif [ $Eval6 -eq 0 -o $Eval7 -eq 0 ];then # 6 mono is latest as of 2022/1/21
     sudo mkdir --parents $path_to_install
     find $path_to_gecko/6.0 -name '*.xz' -exec sudo tar x -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
     # if [ $? ];then echo "copied gecko to $path_to_install"; else echo "error: maybe NOT copied gecko to $path_to_install"; fi
