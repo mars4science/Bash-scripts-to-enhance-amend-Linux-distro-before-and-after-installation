@@ -22,7 +22,7 @@ Eval6=$?
 wine --version | grep wine-7
 Eval7=$?
 
-wine_path=realpath $(which wine)
+wine_path=$(realpath $(which wine))
 if [ $wine_path = "/opt/wine-stable/bin/wine" ];then
     path_to_install=/opt/wine-stable/share/wine/gecko
 elif [ $wine_path = "/usr/bin/wine-stable" ];then
