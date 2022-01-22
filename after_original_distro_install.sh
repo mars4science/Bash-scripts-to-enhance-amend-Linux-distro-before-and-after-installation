@@ -147,8 +147,13 @@ gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custo
 gsettings set org.nemo.preferences show-hidden-files true
 gsettings set org.nemo.preferences show-open-in-terminal-toolbar true
 
+# change hardly visible red to yellow in git output. To see all available places to change color, type git config --global color. and tab
+# list of colors in "git help config"
 git config --global color.status.changed yellow
 git config --global color.diff.old yellow
+
+# to open srt (subtitles) in xed, not subtitle editor by default
+echo 'application/x-subrip=xed.desktop' | sudo tee --append /usr/share/applications/defaults.list
 
 # ========= end of configs / settings =============
 
