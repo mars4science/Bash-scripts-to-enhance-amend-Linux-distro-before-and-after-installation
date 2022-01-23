@@ -56,8 +56,10 @@ $dir_name/firefox-replace.sh
 $dir_name/add_ramdisk_and_ramcache_permanently_to_fstab.sh
 $dir_name/disable_swap.sh
 $dir_name/memory_notify_config.sh
-$dir_name/after_login_config.sh
 $dir_name/display_backlight_control_setup.sh
+
+# user specific
+$dir_name/after_login_config.sh
 
 echo "===== next in a few seconds going to install downloaded debian packages ====="
 sleep 5 # pause n seconds
@@ -81,6 +83,9 @@ $dir_name/y_tube.sh install
 
 # TODO add config for thinkfan 
 # TODO check what thinkfan do (how interacts with manual control, e.g. via `stopfan`)as it is likely to be installed 
+
+# user specific
+$dir_name/transmittion_setup.sh
 
 # for our old printer (TODO fix printer to enable color output)
 $dir_name/printer_color_as_gray.sh
