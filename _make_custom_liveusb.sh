@@ -79,7 +79,7 @@ change_boot() {
 }
 
 u_mount(){
-    if [ -e "$mount_path" ]; then sudo umount $mount_path; fi
+    if [ -e "$1" ]; then sudo umount "$1"; fi
 }
 
 un_mount_in_squashfs(){
@@ -87,16 +87,16 @@ un_mount_in_squashfs(){
 #     mount_path=fin_sq/proc;  if [ -n "$(findmnt | grep "\""$mount_path"\"" | head -n 1)" ]; then sudo umount $mount_path; fi
 # quoting as above does not work, see my question on unix.se
     mount_path=fin_sq/proc;  if [ -n "$(findmnt | grep $mount_path | head -n 1)" ]; then sudo umount $mount_path; fi
-    mount_path=fin_sq/media/ramdrive;  u_mount
-    mount_path=fin_sq/media/root/usb;  u_mount
-    mount_path=fin_sq/media/root/scripts;  u_mount
+    u_mount fin_sq/media/ramdrive
+    u_mount fin_sq/media/root/usb
+    u_mount fin_sq/media/root/Scripts
 }
 
 un_mount_in_work_path(){
-    mount_path=fin_sq; u_mount
-    mount_path=fin; u_mount
-    mount_path=iso_sq; u_mount
-    mount_path=iso; u_mount
+    u_mount fin_sq
+    u_mount fin
+    u_mount iso_sq
+    u_mount iso
 }
 
 un_mount(){
