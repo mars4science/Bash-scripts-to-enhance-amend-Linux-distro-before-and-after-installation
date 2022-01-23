@@ -107,6 +107,7 @@ un_mount(){
 # the rest is coded to work "universally" (w/out per distro modifications)
 
 # x ("x") not needed because with "" strings are not empty, if first expression is not true, second is not evaluated IIRC
+# TODO add "" around $work_path on next line
 if [ -e "$work_path" ] && [ "$(ls $work_path)" != "" ]; then
     # https://stackoverflow.com/questions/1885525/how-do-i-prompt-a-user-for-confirmation-in-bash-script
     read -p "! $work_path exists and not empty, abort (n), proceed (y), try deleting contents within it (d)? " -n 1 -r
@@ -116,7 +117,13 @@ if [ -e "$work_path" ] && [ "$(ls $work_path)" != "" ]; then
     if [[ $REPLY =~ ^[Dd]$ ]]; then
         un_mount
         sudo rm -R $work_path/*
-        delay=5; echo ending script in $delay seconds; sleep $delay; exit 0;
+        Eval=$?
+        delay=5
+        if [ $Eval -ne 0 ]; then 
+            echo "Deleting contents unsuccessful (per return code);this script is written to end in $delay seconds"; sleep $delay; exit 1;
+        fi
+        echo "Deleting contents successful (per return code); this script is written to continue in $delay seconds"; sleep $delay;
+        cd "$work_path"
     fi    
 else
     mkdir --parents $work_path && cd $_
