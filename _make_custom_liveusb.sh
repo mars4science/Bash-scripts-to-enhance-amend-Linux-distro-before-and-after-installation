@@ -6,13 +6,15 @@
 
 # ---- auto script  ----- #
 
-distro_label="LM_20.2_fan_ram_memtest"
+distro_label="LM_20.2_AM_ram_memtest"
 # original_iso=/media/$(id -un)/btrfs-1/all/ubuntu-20.04.3-desktop-amd64.iso
 # original_iso=/media/$(id -un)/btrfs-1/all/LM20.2_fan_memtest.iso
 original_iso=/media/data/Software/distros/linuxmint-20.2-cinnamon-64bit.iso
 if [ ! -e $original_iso ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi 
 
 work_path=/media/ramdrive/custom_iso
+
+script_path="$(dirname "$(realpath "$0")")"
 
 # write commands what do amend in resulting live system
 change_squash() {
@@ -21,15 +23,21 @@ change_squash() {
     else
         sudo mkdir $work_path/fin_sq/am
     fi
-    sudo cp  /media/$(id --user --name)/usb/Projects/Scripts-git/bin/stopfan $work_path/fin_sq/usr/local/bin
+    sudo cp $script_path/bin/stopfan $work_path/fin_sq/usr/local/bin
     sudo chmod +xs $work_path/fin_sq/usr/local/bin/stopfan
 
     # see https://unix.stackexchange.com/questions/683439/mount-twice-bind-why-some-parameters-change-others-not
-    sudo mount -o bind,x-mount.mkdir /media/$(id -un)/usb $work_path/fin_sq/media/root/usb 
-    sudo mount -o bind,remount,ro /media/$(id -un)/usb $work_path/fin_sq/media/root/usb
+    sudo mount -o bind,x-mount.mkdir /media/$(id --user --name)/usb $work_path/fin_sq/media/root/usb
+    sudo mount -o bind,remount,ro /media/$(id --user --name)/usb $work_path/fin_sq/media/root/usb
 
-    # for chrooted environment path should reflect chroot: media/root, not media/user_name, script developer excepts id to work to give root 
-    sudo chroot $work_path/fin_sq /media/$(id --user --name)/usb/Projects/Scripts-git/after_original_distro_install.sh
+    # to run scripts located in the same folder where script run by chroot is located
+    sudo mount -o bind,x-mount.mkdir $script_path $work_path/fin_sq/media/root/Scripts
+    sudo mount -o bind,remount,ro $script_path $work_path/fin_sq/media/root/Scripts
+
+    # for chrooted environment path should reflect chroot: media/root, not media/user_name, script developer expects id to work to give root
+    # /media/root works in chrooted because of bind mounts above
+#    sudo chroot $work_path/fin_sq /media/$(id --user --name)/usb/Projects/Scripts-git/after_original_distro_install.sh
+    sudo chroot $work_path/fin_sq /media/root/Scripts/after_original_distro_install.sh
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
 }
 
@@ -81,6 +89,7 @@ un_mount_in_squashfs(){
     mount_path=fin_sq/proc;  if [ -n "$(findmnt | grep $mount_path | head -n 1)" ]; then sudo umount $mount_path; fi
     mount_path=fin_sq/media/ramdrive;  u_mount
     mount_path=fin_sq/media/root/usb;  u_mount
+    mount_path=fin_sq/media/root/scripts;  u_mount
 }
 
 un_mount_in_work_path(){
@@ -163,6 +172,8 @@ if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - $(stat --printf="%s" fin/cas
     read -p "Any other key to open sub-shell to pause and add more free memory manually"  -n 1 -r
     echo  # (optional) move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # unmounting tmpfs frees memory, although files in it are to be deleted by code on next line (rm)
+        # but could be faster and not sure how tmpfs works in chrooted
         if [ -d fin_sq/media/ramdrive ]; then sudo umount fin_sq/media/ramdrive; fi
         sudo rm -R fin_sq/*
     else
