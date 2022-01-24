@@ -23,5 +23,7 @@ echo 'tmpfs /home/'$(id -u -n)'/.cache tmpfs size=5%,noauto,user,noatime 0 0' | 
 sudo sed --in-place --regexp-extended -- 's/errors=remount-ro/errors=remount-ro,noatime/' /etc/fstab
 
 # ram drive is needed for some install scripts later
+# also developer found out during liveUSB boot /etc/fstab file in squashfs gets overshadowed,
+# so next line is "user specfic" (to be run after boot)
 sudo mount tmpfs /media/ramdrive -t tmpfs -o size=100%,rw,noatime,x-mount.mkdir
 

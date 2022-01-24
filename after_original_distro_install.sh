@@ -55,7 +55,10 @@ $dir_name/firefox-replace.sh
 
 
 # includes making ramdrive now (used in debs install)
-$dir_name/add_ramdisk_and_ramcache_permanently_to_fstab.sh
+# also kind of user specific as during liveUSB boot /etc/fstab file in squashfs gets overshadowed,
+# so ramdrive need to be made after boot (one way to try is to run that script) if needed
+$dir_name/add_ramdisk_and_ramcache.sh
+
 $dir_name/disable_swap.sh
 $dir_name/memory_notify_config.sh
 $dir_name/display_backlight_control_setup.sh
@@ -90,7 +93,7 @@ $dir_name/y_tube.sh install
 echo 'application/x-subrip=xed.desktop' | sudo tee --append /usr/share/applications/defaults.list
 
 # user specific
-$dir_name/transmittion_setup.sh
+$dir_name/transmission_setup.sh
 
 # change git config, e.g. colors of output for better visibility  
 $dir_name/git_config.sh
