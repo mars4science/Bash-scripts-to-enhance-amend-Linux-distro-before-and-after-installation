@@ -92,6 +92,9 @@ echo 'application/x-subrip=xed.desktop' | sudo tee --append /usr/share/applicati
 # user specific
 $dir_name/transmittion_setup.sh
 
+# change git config, e.g. colors of output for better visibility  
+$dir_name/git_config.sh
+
 # for our old printer (TODO fix printer to enable color output)
 $dir_name/printer_color_as_gray.sh
 
@@ -101,6 +104,7 @@ sudo locale-gen ru_RU.UTF-8
 
 # ========= cinnamon / desktop / GUI settings ============
 # as of 2022/01/24 do not work during liveUSB iso alteration
+# user specific in such case
 $dir_name/dconf_config.sh
 
 # ========= end of configs / settings =============

@@ -2,12 +2,15 @@
 # trap 'err=$?; echo >&2 "Exiting on error $err"; sleep 10; exit $err' ERR
 
 # per knowledge of depeloper current code when run during liveUSB iso alteration produces errors, hence check before run
-&>/dev/null gsettings get org.cinnamon.desktop.interface scaling-factor
+# interestingly "get"/"read" works, however "set"/"write" produces errors
+# &>/dev/null gsettings set org.cinnamon.desktop.interface scaling-factor 1
+# changed check to `dconf write` as gsettings exits with 0 (outputs warning) [1]
+&>/dev/null dconf write /org/cinnamon/desktop/interface/scaling-factor 1
 if [ $? -ne 0 ]; then
     1>&2 echo "-!- Per code and knowledge of the deleloper at time of this script was written,"
     1>&2 echo "-!- there is am indication that attempts to change dconf database here woould fail; aborting dconf_config"
     exit 1
-fi 
+fi
 
 # ========= cinnamon / desktop / GUI settings ============
 gsettings set org.cinnamon.control-center.display show-fractional-scaling-controls true
@@ -23,7 +26,7 @@ gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggl
 
 gsettings set org.cinnamon.settings-daemon.peripherals.touchpad horizontal-scrolling true
 
-gsettings set org.nemo.desktop visible-trash-icon true
+gsettings set org.nemo.desktop trash-icon-visible true
 
 gsettings set org.nemo.list-view default-visible-columns "['name', 'size', 'type', 'date_modified', 'owner', 'permissions']"
 gsettings set org.nemo.list-view default-column-order "['name', 'size', 'type', 'date_modified', 'date_created_with_time', 'date_accessed', 'date_created', 'detailed_type', 'group', 'where', 'mime_type', 'date_modified_with_time', 'octal_permissions', 'owner', 'permissions']"
@@ -68,9 +71,17 @@ gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custo
 gsettings set org.nemo.preferences show-hidden-files true
 gsettings set org.nemo.preferences show-open-in-terminal-toolbar true
 
-# change hardly visible red to yellow in git output. To see all available places to change color, type git config --global color. and tab
-# list of colors in "git help config"
-git config --global color.status.changed yellow
-git config --global color.diff.old yellow
+exit
+
+[1]
+# dconf write /org/cinnamon/desktop/interface/scaling-factor 1
+error: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
+root@alex-ThinkPad-slim:/# echo $?
+1
+root@alex-ThinkPad-slim:/# gsettings set org.cinnamon.desktop.interface scaling-factor 1
+
+(process:242481): dconf-WARNING **: 08:34:30.432: failed to commit changes to dconf: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
+root@alex-ThinkPad-slim:/# echo $?
+0
 
 
