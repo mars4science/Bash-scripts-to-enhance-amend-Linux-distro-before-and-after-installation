@@ -23,9 +23,19 @@ change_squash() {
     else
         sudo mkdir $work_path/fin_sq/am
     fi
+
+    # copy user specific scripts to be run later (later expected to be moved to initrd change in change_boot() functoion)
+    sudo cp $script_path/dconf_config.sh $work_path/fin_sq/am
+    sudo cp $script_path/after_login_config.sh $work_path/fin_sq/am
+    sudo cp $script_path/transmittion_setup.sh $work_path/fin_sq/am
+    sudo mkdir --parents $work_path/fin_sq/am/settings/transmission
+    sudo cp $script_path/settings/transmission/*.json $work_path/fin_sq/am/settings/transmission
+
+    # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp $script_path/bin/stopfan $work_path/fin_sq/usr/local/bin
     sudo chmod +xs $work_path/fin_sq/usr/local/bin/stopfan
 
+    # to install debs and other files need to have path to them inside chrooted environment
     # see https://unix.stackexchange.com/questions/683439/mount-twice-bind-why-some-parameters-change-others-not
     sudo mount -o bind,x-mount.mkdir /media/$(id --user --name)/usb $work_path/fin_sq/media/root/usb
     sudo mount -o bind,remount,ro /media/$(id --user --name)/usb $work_path/fin_sq/media/root/usb
@@ -83,7 +93,7 @@ u_mount(){
 }
 
 un_mount_in_squashfs(){
-    # proc path exists before scipt, mount_path is relative, so grep, not just `findmnt "$mount_path"`
+    # proc path exists before script, mount_path is relative, so grep, not just `findmnt "$mount_path"`
 #     mount_path=fin_sq/proc;  if [ -n "$(findmnt | grep "\""$mount_path"\"" | head -n 1)" ]; then sudo umount $mount_path; fi
 # quoting as above does not work, see my question on unix.se
     mount_path=fin_sq/proc;  if [ -n "$(findmnt | grep $mount_path | head -n 1)" ]; then sudo umount $mount_path; fi
@@ -161,8 +171,8 @@ change_squash
 if [ "$interactive_mode" = "true" ]; then
     echo "Next in addition to now hardcoded changes one can modify system in $work_path/fin for boot time and"
     echo "in $work_path/fin_sq for resulting live system."
-    echo "now code to invoke new bash; type "\""exit"\"" to continue the srcipt and build new iso"
-    bash -i
+    echo "now code to invoke bash in chrooted environment; type "\""exit"\"" to continue the srcipt and build new iso"
+    sudo chroot $work_path/fin_sq
 fi
 
 # After done with modifications making new `squashfs` file, needs to be free space there  
