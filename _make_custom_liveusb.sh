@@ -27,10 +27,12 @@ change_squash() {
     # copy user specific scripts to be run later (later expected to be moved to initrd change in change_boot() functoion)
     sudo cp $script_path/dconf_config.sh $work_path/fin_sq/am
     sudo cp $script_path/after_login_config.sh $work_path/fin_sq/am
-    sudo cp $script_path/transmittion_setup.sh $work_path/fin_sq/am
+    sudo cp $script_path/transmission_setup.sh $work_path/fin_sq/am
     sudo mkdir --parents $work_path/fin_sq/am/settings/transmission
     sudo cp $script_path/settings/transmission/*.json $work_path/fin_sq/am/settings/transmission
-
+    sudo cp $script_path/add_ramdisk_and_ramcache.sh $work_path/fin_sq/am
+    sudo cp $script_path/user_specific.sh $work_path/fin_sq/am
+    
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp $script_path/bin/stopfan $work_path/fin_sq/usr/local/bin
     sudo chmod +xs $work_path/fin_sq/usr/local/bin/stopfan
