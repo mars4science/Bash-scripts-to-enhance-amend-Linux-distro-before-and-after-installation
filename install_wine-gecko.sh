@@ -28,7 +28,7 @@ if [ $wine_path = "/opt/wine-stable/bin/wine" ];then
 elif [ $wine_path = "/usr/bin/wine-stable" ];then
     path_to_install=/usr/share/wine/gecko
 else 
-    echo >&2 "---Error: not found suitable wine version ($wine_path) to add wine-mono"; exit 1
+    echo >&2 "---Error: not found suitable wine path (found: $wine_path) to add wine-mono"; exit 1
 fi
     
 # looks like where is no "wine" way to find out where wine configs are, so just put from experience with Linun Mint:
@@ -60,5 +60,6 @@ elif [ $Eval6 -eq 0 -o $Eval7 -eq 0 ];then # 6 mono is latest as of 2022/1/21
     echo "copied (installed) gecko to $path_to_install"
 else
     echo "---Error: not found suitable wine version to add wine-gecko"
+    wine --version
 fi
 
