@@ -8,9 +8,9 @@ wine_version=$(wine --version | awk 'BEGIN {FS = "-"}{print $2}')
 
 wine_path="$(realpath $(which wine))"
 if [ "$wine_path" = "/opt/wine-stable/bin/wine" ];then
-    path_to_install=/opt/wine-stable/share/wine/gecko
+    path_to_install=/opt/wine-stable/share/wine/mono
 elif [ "$wine_path" = "/usr/bin/wine-stable" ];then
-    path_to_install=/usr/share/wine/gecko
+    path_to_install=/usr/share/wine/mono
 else 
     echo >&2 "---Error: not found suitable wine path (found: $wine_path) to add wine-mono"; exit 1
 fi
