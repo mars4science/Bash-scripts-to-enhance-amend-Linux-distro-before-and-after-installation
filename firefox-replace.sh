@@ -9,7 +9,7 @@ ff_installed_link=$(which firefox)
 if [ -h $ff_installed_link ]; then ff_link_symbolic=true; else ff_link_symbolic=false; fi
 
 ff_installed_folder=$(dirname $(realpath $ff_installed_link))
-software_path_root=/media/$(id -un)/usb
+software_path_root=/media/$(id -un)/usb/LM_20.2
 ff_archive_name=$(ls --sort=time $software_path_root | grep firefox- | head --lines=1)
 ff_archive=$software_path_root/$ff_archive_name
 
