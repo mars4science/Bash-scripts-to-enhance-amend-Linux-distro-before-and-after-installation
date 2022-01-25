@@ -7,6 +7,9 @@ result is described by script names, plus
 - link is made in home to ramdisk
 - for keyboard shortcut, to make change permanent and to activate it, you need to edit created keyboard shortcut via GUI changing keyboard binding 
 
+TODO 
+investigate why for liveUSB tlp config of wifi off during boot is not honored 
+
 TODO
 use org.cinnamon.* soemthing to store info, e.g. paths
 maybe understand how trap is working in bash scripts, why some errors are caught, some are not
