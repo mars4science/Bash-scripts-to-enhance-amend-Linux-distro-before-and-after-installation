@@ -11,4 +11,4 @@ $dir_name/add_ramdisk_and_ramcache.sh
 $dir_name/after_login_config.sh
 $dir_name/transmission_setup.sh
 $dir_name/dconf_config.sh
-
+$dir_name/after_wine_run.sh

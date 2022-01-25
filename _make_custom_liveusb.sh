@@ -6,7 +6,7 @@
 
 # ---- auto script  ----- #
 
-distro_label="LM_20.2_AM_ram_memtest"
+distro_label="LM_20.2_AM_light"
 # original_iso=/media/$(id -un)/btrfs-1/all/ubuntu-20.04.3-desktop-amd64.iso
 # original_iso=/media/$(id -un)/btrfs-1/all/LM20.2_fan_memtest.iso
 original_iso=/media/data/Software/distros/linuxmint-20.2-cinnamon-64bit.iso
@@ -31,8 +31,9 @@ change_squash() {
     sudo mkdir --parents $work_path/fin_sq/am/settings/transmission
     sudo cp $script_path/settings/transmission/*.json $work_path/fin_sq/am/settings/transmission
     sudo cp $script_path/add_ramdisk_and_ramcache.sh $work_path/fin_sq/am
+    sudo cp $script_path/after_wine_run.sh $work_path/fin_sq/am
     sudo cp $script_path/user_specific.sh $work_path/fin_sq/am
-    
+
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp $script_path/bin/stopfan $work_path/fin_sq/usr/local/bin
     sudo chmod +xs $work_path/fin_sq/usr/local/bin/stopfan
