@@ -20,6 +20,8 @@ echo 'Shift+RIGHT no-osd seek  1 exact' | sudo tee --append $conf_file
 echo '#Shift+LEFT  no-osd seek -1 exact' | sudo tee --append $conf_file
 echo '#Shift+UP    no-osd seek  5 exact' | sudo tee --append $conf_file
 echo '#Shift+DOWN no-osd seek -5 exact' | sudo tee --append $conf_file
+echo '' | sudo tee --append $conf_file
+echo '/ quit' | sudo tee --append $conf_file # set / key to quit player
 
 conf_file=/etc/mpv/mpv.conf
 echo 'sub-font-size=15' | sudo tee --append $conf_file
@@ -27,8 +29,6 @@ echo 'sub-color=0.0/1.0/0.0' | sudo tee --append $conf_file
 
 echo '' | sudo tee --append $conf_file
 echo 'fullscreen=yes' | sudo tee --append $conf_file
-
-echo '/ quit' | sudo tee --append $conf_file # set / key to quit player
 
 exit
 # on live USB live user is made as part of boot process, 
