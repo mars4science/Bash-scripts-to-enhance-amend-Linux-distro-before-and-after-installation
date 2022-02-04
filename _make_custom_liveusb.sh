@@ -33,6 +33,7 @@ change_squash() {
     sudo cp $script_path/add_ramdisk_and_ramcache.sh $work_path/fin_sq/am
     sudo cp $script_path/after_wine_run.sh $work_path/fin_sq/am
     sudo cp $script_path/user_specific.sh $work_path/fin_sq/am
+    sudo cp $script_path/run_at_boot_uid_change.sh $work_path/fin_sq/am
 
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp $script_path/bin/stopfan $work_path/fin_sq/usr/local/bin
@@ -60,11 +61,11 @@ change_boot() {
     # [2]
     # for UEFI boot
     # 	linux	/casper/vmlinuz  file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=${iso_path} toram --
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram --/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/boot/grub/grub.cfg
 
     # for legacy boot
     #   append  file=/cdrom/preseed/linuxmint.seed boot=casper initrd=/casper/initrd.lz toram --
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram --/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/isolinux/isolinux.cfg
 
     echo | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
     echo "set timeout_style=menu" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
