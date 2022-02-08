@@ -105,6 +105,9 @@ $dir_name/printer_color_as_gray.sh
 sudo locale-gen ru_RU
 sudo locale-gen ru_RU.UTF-8
 
+# add applets/desklets software to Cinnamon
+$dir_name/cinnamon_add_software.sh
+
 # ========= cinnamon / desktop / GUI settings ============
 # as of 2022/01/24 do not work during liveUSB iso alteration
 # user specific in such case
