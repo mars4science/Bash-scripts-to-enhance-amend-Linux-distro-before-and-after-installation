@@ -21,7 +21,8 @@
 # for install and update arguments
 source common_arguments_to_scripts.sh
 
-default_local_debs="/media/$(id -un)/usb/LM_20.2/debs"
+software_path_root=/media/$(id -un)/usb/LM_20.2
+default_local_debs="$software_path_root/debs"
 #default_local_debs="/media/$(id -un)/usb/LM_20.tmp"
 #default_local_status="/home/$(id -un)/Documents/dpkg_orig_status"
 default_local_status="/media/$(id -un)/usb/dpkg_orig_status"
