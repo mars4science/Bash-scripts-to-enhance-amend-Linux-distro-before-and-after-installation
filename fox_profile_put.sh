@@ -5,20 +5,25 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 source common_arguments_to_scripts.sh
 
 # help
-if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h"  -o $1 = "?" ];then
-    echo "  Puts default Firefox profile on USB (/media/user_name/usb/), "
-    echo "currently per available to script info (/media/$(id -un)/usb/) in tar format."
-    echo "  No compression because there were issues of corruption, verification option"
-    echo "is available in tar for uncompressed only."
-    echo "  Usage: $script_name [-e]"
-    echo "optional "\""-e"\"" instructs to try at the end of the script to eject and poweroff usb"
-    echo "(device that in output of "\""mount"\"" contains "\""usb"\"" word)."
-    exit 0
-fi
+help_message="  Puts default Firefox profile on USB (/media/user_name/usb/),
+currently per available to script info (/media/$(id -un)/usb/) in tar format.
+  No compression because there were issues of corruption, verification option
+is available in tar for uncompressed only.
+  Usage: $script_name [-e]
+optional "\""-e"\"" instructs to try at the end of the script to eject and poweroff usb
+(device that in output of "\""mount"\"" contains "\""usb"\"" word).\n"
 # ====== #
 
-if [ ! $# -eq 0 ] && [ $1 = "-e" ];then
-    to_eject="true";else to_eject="false";fi
+if [ ! $# -eq 0 ];then
+    if [ $1 = "-e" ];then
+        to_eject="true"
+    else
+        1>&2 echo "Unexpected agrument, $script_name --help is envisioned to display info how to use the script" 
+        exit 1
+    fi
+else 
+    to_eject="false"
+fi
 
 # end firefox process just in case, $ at the end needed to skip firefox.real of tor
 pkill firefox$ || pkill GeckoMain || echo there were no firefox processes to end, continue with the script

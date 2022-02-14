@@ -42,6 +42,13 @@ if [[ ! $# -eq 0 && $1 = "update" ]];then
   # setuid bit is prohibited for scripts 
 fi
 
+# outputs help message (variable is to be set in the scripts have sourced this one to overwrite one set here)
+help_message="This is a script to be sourced in other scripts"
+if [ ! $# -eq 0 ] && [ $1 = "help" -o $1 = "--help" -o $1 = "-h"  -o $1 = "?" ];then
+    printf "$help_message"
+    exit 0
+fi
+
 # ===== end of common scripts arguments ===== #
 
 # some previous thoughts about checking for timestamps during update run
