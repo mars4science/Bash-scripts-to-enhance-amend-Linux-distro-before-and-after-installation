@@ -51,6 +51,11 @@ $dir_name/t_or.sh install
 # on the first run t_or is expected to copy tor bundle from USB (now partly hardcoded location) to location given by get_software_path.sh
 t_or
 
+$dir_name/k_iwix.sh install
+# on the first run k_iwix is expected to copy kiwix appimage from USB (now partly hardcoded location) to location given by get_software_path.sh
+k_iwix
+
+
 $dir_name/firefox-replace.sh
 
 
