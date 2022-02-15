@@ -2,7 +2,9 @@
 # thinkpad specific
 trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
-sudo cp bin/stopfan $(get_install_path.sh)
+software_path_root=/media/$(id -un)/usb/LM_20.2
+
+sudo cp "$software_path_root"/bin/stopfan $(get_install_path.sh)
 # sudo chown root /usr/bin/stopfan
 # will be owned by root after copy anyway
 # +xs execute as owner (root)

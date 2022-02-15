@@ -3,14 +3,15 @@
 # trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 # alternative to youtube-dl, have read (and saw) work fast when youtube-dl is slow to download
-sudo cp bin/yt-dlp /usr/local/bin
+software_path_root=/media/$(id -un)/usb/LM_20.2
+sudo cp "$software_path_root"/bin/yt-dlp /usr/local/bin
 sudo chmod +x /usr/local/bin/yt-dlp
 
 # to setup proper python for youtube-dl
 sudo ln -s /usr/bin/python3 /usr/local/bin/python
 
 # 2021/12/12 looks like LM 20.2 distro I use contains youtube-dl
-sudo cp bin/youtube-dl /usr/bin # removed /local, not overwrite original from distro, after replacement there is next line error no more
+sudo cp "$software_path_root"/bin/youtube-dl /usr/bin # removed /local, not overwrite original from distro, after replacement there is next line error no more
 # youtube-dl: error: youtube-dl's self-update mechanism is disabled on Debian.
 sudo chmod +x /usr/bin/youtube-dl # just in case there was no youtube-dl in that location
 

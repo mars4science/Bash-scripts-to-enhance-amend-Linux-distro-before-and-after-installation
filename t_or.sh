@@ -14,11 +14,12 @@ source_path="$(get_software_path.sh)"/tor.tar.xz
 # if does not exist locally, then copy
 # man bash
 # -a file True if file exists.; -h file True if file exists and is a symbolic link. -e file True if file exists.;
-# -a for some reason is not negated properly...
-if [ ! -e $source_path ]; then
+# -a f is not negated properly as -a is also a binary and somehow binary takes precedence
+# see https://unix.stackexchange.com/questions/676608/bash-negation-of-a-file-exists-does-not-change-result-whereas-for-e-chang
+if [ ! -e "$source_path" ]; then
     if [ ! -d $(dirname "$source_path") ]; then sudo mkdir $(dirname "$source_path"); fi
-    copyfrom_path="/media/$(id -un)/usb/LM_20.2/tor-browser-linux64-10.5.10_en-US.tar.xz"
-    #copyfrom_path="/media/$(id -un)/usb/LM_20.2/tor-browser-linux64-9.5.3_en-US.tar.xz"
+    software_path_root=/media/$(id -un)/usb/LM_20.2
+    copyfrom_path="$software_path_root/tor-browser-linux64-10.5.10_en-US.tar.xz"
     if [ ! -e "$copyfrom_path" ]; then echo >&2 "tor path $copyfrom_path not found, exiting with error"; exit 1; fi
     sudo cp "$copyfrom_path" $(dirname "$source_path")
     sudo ln -s $(dirname "$source_path")/$(basename "$copyfrom_path") $source_path
