@@ -62,6 +62,7 @@ $dir_name/add_ramdisk_and_ramcache.sh
 $dir_name/disable_swap.sh
 $dir_name/memory_notify_config.sh
 $dir_name/display_backlight_control_setup.sh
+$dir_name/bash_functions.sh
 
 # user specific
 $dir_name/after_login_config.sh
