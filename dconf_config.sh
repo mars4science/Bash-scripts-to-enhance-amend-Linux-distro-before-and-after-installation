@@ -14,9 +14,15 @@ fi
 
 # ========= cinnamon / desktop / GUI settings ============
 gsettings set org.cinnamon.control-center.display show-fractional-scaling-controls true
-gsettings set org.cinnamon.desktop.interface scaling-factor 2
-gsettings set org.cinnamon.desktop.interface text-scaling-factor 1.0
+dpm=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4/$(NF-1)}') # dots per millimeter, rounded as bash test works with integers only
+# at least gave "integer expression expected" for [ 3.4 -eq 45 ] 
+dpi=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4/$(NF-1)*2.54}') # dots per inch, rounded
+horizontal_relosution=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4}')
 
+if [ $dpm -ge 8 ] && [ $horizontal_relosution -ge 2000 ];then # maybe will be run on small displays, not change default scaling in such case
+    gsettings set org.cinnamon.desktop.interface scaling-factor 2
+    gsettings set org.cinnamon.desktop.interface text-scaling-factor 1.0
+fi
 gsettings set org.cinnamon.desktop.a11y.applications screen-magnifier-enabled true
 gsettings set org.cinnamon.desktop.a11y.magnifier mouse-tracking push
 
@@ -76,6 +82,18 @@ gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custo
 
 gsettings set org.nemo.preferences show-hidden-files true
 gsettings set org.nemo.preferences show-open-in-terminal-toolbar true
+
+# sounds
+dconf write /org/cinnamon/sounds/login-enabled false
+dconf write /org/cinnamon/sounds/close-enabled false
+dconf write /org/cinnamon/sounds/logout false
+dconf write /org/cinnamon/sounds/maximize false
+dconf write /org/cinnamon/sounds/unmaximize false
+dconf write /org/cinnamon/sounds/minimize false
+dconf write /org/cinnamon/sounds/switch false
+dconf write /org/cinnamon/sounds/tile false
+dconf write /org/cinnamon/sounds/plug false
+dconf write /org/cinnamon/sounds/unplug true
 
 exit
 
