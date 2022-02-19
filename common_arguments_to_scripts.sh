@@ -10,6 +10,10 @@
 #              sively; all but the last component must exist
 script_path="$(realpath "$0")"
 
+# used for checking whether to display help message
+parameter_1st=$1
+parameter_qty=$#
+
 # not only file name, can remove suffix too
 script_name=$(basename $script_path .sh)
 
@@ -18,7 +22,7 @@ script_name=$(basename $script_path .sh)
 
 install_path=$(get_install_path.sh)
 source_path=$(get_source_path.sh)/$script_name.sh
-common_help="usage: "\""$script_name update"\"" - to update script itself from "\""$source_path"\"
+common_help="Also for: "\""$script_name update"\"" programmed response is updating script itself from "\""$source_path"\""\n"
 
 # need to install and update it, so next line would stands in the way
 # if [ $script_name = "common_arguments_to_scripts" ]; then echo "common_arguments_to_scripts.sh is not supposed to be run on its own, exiting"; exit 1; fi
@@ -43,12 +47,18 @@ if [[ ! $# -eq 0 && $1 = "update" ]];then
 fi
 
 # outputs help message (variable is to be set in the scripts have sourced this one to overwrite one set here)
-help_message="This is a script to be sourced in other scripts"
-if [ ! $# -eq 0 ] && [ $1 = "help" -o $1 = "--help" -o $1 = "-h"  -o $1 = "?" ];then
-    printf "$help_message"
-    exit 0
+if [ "x$help_message" = x ]; then # variable not set and/or empty
+help_message="  This is a script to be sourced in other scripts.
+  If you see it not running common_arguments_to_scripts it probably means the script you run sourced common_arguments_to_scripts but not set help_message variable.\n"
 fi
 
+# one parameter expected
+display_help (){
+    if [ ! $parameter_qty -eq 0 ] && [ "$parameter_1st" = "help" -o "$parameter_1st" = "--help" -o "$parameter_1st" = "-h"  -o "$parameter_1st" = "?" ];then
+        printf "$1"
+        exit 0
+    fi
+}
 # ===== end of common scripts arguments ===== #
 
 # some previous thoughts about checking for timestamps during update run

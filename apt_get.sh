@@ -1,25 +1,26 @@
 #!/bin/bash
 
-# script reads from standard input
-# /home/alex/Documents/Projects/Scripts/apt_get.sh -i /media/alex/usb/LM_20.2/debs /home/alex/Documents/dpkg_orig_status
-
-# usage: 
-# script_name [-i] location_to_store [dpkg_status_file_location] < filename
-# or echo -e 'package_unqualified_name[\npackage_unqualified_name]' | script_name [-i] location_to_store [dpkg_status_file_location]
-# -i means install right after downloaded
-
-# script downloads deb packages with dependancies and stores them locally
-# read lines expected to be names of packages (not fully qualified) from standard input, use 
-# 1st argument used as location for downloaded files
-
 # apt-config output see man apt-config
 # $() command substitution see man bash 
 # now in /var/cache/apt/archives but made hopefully more future proof
 
 #if [ ! -f $script_path ]; then
 
-# for install and update arguments
+# for install, update arguments, help message output
 source common_arguments_to_scripts.sh
+# help
+help_message="  The Script is written to read from standard input.
+  Script is written to download deb packages with dependancies and stores them locally.
+  Lines to be read are expected to be names of packages (not fully qualified) from standard input, use 
+  1st argument (if not omitted) that is not -d, -i or for help used as location for downloaded files.
+
+  Example: $script_name -i /media/alex/usb/LM_20.2/debs /home/alex/Documents/dpkg_orig_status
+  usage: $script_name [-i | -d ] [location_to_store] [dpkg_status_file_location] < filename
+  or echo -e 'package_unqualified_name[\npackage_unqualified_name] etc' | $script_name [-i | -d] [location_to_store] [dpkg_status_file_location]
+  -i means install right after downloaded.
+  -d means download only to default path with default_local_status of dpkg.\n"
+display_help "$help_message$common_help"
+# ===== #
 
 software_path_root=/media/$(id -un)/usb/LM_20.2
 default_local_debs="$software_path_root/debs"
@@ -49,10 +50,6 @@ if [ $# -eq 1 ]
     elif [ $1 = "printpath" ]
       then
         printf "%s" $default_local_debs
-        exit
-    elif [ $1 = "-h" -o $1 = "--help" -o $1 = "?" ]
-      then
-        echo "Under development, see code as it is a bash script, at start there is a short description, idea to add code here to echo it"
         exit
     fi
 fi

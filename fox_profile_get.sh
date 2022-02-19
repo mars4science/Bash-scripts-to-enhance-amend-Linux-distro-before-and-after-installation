@@ -4,18 +4,12 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 # ====== #
 source common_arguments_to_scripts.sh
-
 # help
-# -a does not shortcut against second part executing if first part is false;
-# only strangely parathesis for test should be backslashed for proper syntax
-# if [ ! $# -eq 0 -a \( $1 = "--help" -o $1 = "-h" \) ];then
-if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h" -o $1 = "?" ];then
-    echo "Gets Firefox profile from USB (/media/$(id -un)/usb/) tar archive and places as default profile"
-    echo "If same path already taken, asks to confirm overwrite. If declined (neither y not Y answer), does not copy"
-    echo "usage: $script_name"
-    exit 0
-fi
-# ===== #
+help_message="  Gets Firefox profile from USB (/media/$(id -un)/usb/) tar archive and places as default profile.
+  If same path already taken, asks to confirm overwrite. If declined (neither y not Y answer), does not copy.
+  Usage: $script_name\n"
+display_help "$help_message$common_help"
+# ====== #
 
 # man ls:
 #   -t     sort by modification time, newest first

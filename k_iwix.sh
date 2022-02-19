@@ -2,6 +2,18 @@
 
 # for install and update arguments
 source common_arguments_to_scripts.sh
+# help
+help_message="  Runs kiwix appimage with some variables set as a workaround to libGL error (see footnote 1 in the script).
+  Usage: $script_name\n"
+display_help "$help_message$common_help"
+# ====== #
+
+# help
+if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h"  -o $1 = "?" ];then
+    echo ""
+    echo "$common_help"
+    exit 0
+fi
 
 # add script to $PATH in case run from GUI from source folder for the first time on a device
 if [ ! -e $install_path/$script_name ]; then 
@@ -10,12 +22,7 @@ if [ ! -e $install_path/$script_name ]; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then $script_path install; exit; fi # [2]
 fi
 
-# help
-if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h"  -o $1 = "?" ];then
-    echo "runs kiwix appimage with some variables set as a workaround to libGL error (see footnote 1 in the script)"
-    echo "$common_help"
-    exit 0
-fi
+
 
 # if does not exist locally, then copy
 source_path="$(get_software_path.sh)"/kiwix-desktop.appimage

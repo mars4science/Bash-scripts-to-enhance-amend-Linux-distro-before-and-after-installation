@@ -4,14 +4,18 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 # TODO think about hardcoded copyfrom_path
 
-# for "install" and "update" arguments
-source common_arguments_to_scripts.sh
-
-# ------------------------------------------------------------------------------
 run_path=/media/ramdrive
 source_path="$(get_software_path.sh)"/tor.tar.xz
 
-# if does not exist locally, then copy
+# for "install" and "update" arguments
+source common_arguments_to_scripts.sh
+# help
+help_message="  Runs tor browser from $run_path (first extracts that application from archive expected to be located in $source_path).
+  Usage: $script_name\n"
+display_help "$help_message$common_help"
+# ====== #
+
+# if does not exist locally, then copy (not expected to be run interactively therefore not listed in help message)
 # man bash
 # -a file True if file exists.; -h file True if file exists and is a symbolic link. -e file True if file exists.;
 # -a f is not negated properly as -a is also a binary and somehow binary takes precedence

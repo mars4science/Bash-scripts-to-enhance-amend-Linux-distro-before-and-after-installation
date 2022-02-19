@@ -1,14 +1,13 @@
 #!/bin/bash
 
 # to delete usually unneeded files in memory gets low on booted to RAM system
+
 # ====== #
 source common_arguments_to_scripts.sh
-
-if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h" -o $1 = "?" ];then
-    echo "For current user: deletes caches, empties Trash, deletes wine user files/data in user prefix folder"
-    echo "usage: $script_name"
-    exit 0
-fi
+# help
+help_message="  For current user: deletes caches, empties Trash, deletes wine user files/data in user prefix folder.
+  Usage: $script_name\n"
+display_help "$help_message$common_help"
 # ===== #
 
 remove_if_exists() {

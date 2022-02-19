@@ -7,15 +7,11 @@ ff_path=/home/$(id -un)/.mozilla/firefox
 
 # ====== #
 source common_arguments_to_scripts.sh
-
 # help
-if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h"  -o $1 = "?" ];then
-    echo "Puts tabs backup of default Firefox profile in tar format to: $backups_path"
-    echo "if path is given as argument, tabs files are backed up to that location"
-    echo "usage: $script_name [path]"
-    echo "$common_help"
-    exit 0
-fi
+help_message="  Puts tabs backup of default Firefox profile in tar format to: $backups_path.
+  if path is given as argument, tabs files are backed up to that location.
+  Usage: $script_name [path]\n"
+display_help "$help_message$common_help" 
 # ====== #
 
 # used with . and w/out realpath it put archive in a profile folder

@@ -9,6 +9,13 @@ params=" --write-description --write-auto-sub --sub-langs en-en,en " # encounter
 
 # for install and update arguments
 source common_arguments_to_scripts.sh
+# help
+help_message="  calls yt-dlp $params [formats in accordance with args] URL
+Args l for 720 quality and h for 1440p quality.
+if path is given as argument, it is passed to tabs files are backed up to that location.
+  Usage: $script_name [l|h] URL\n"
+display_help "$help_message$common_help"
+# ====== #
 
 # add script to $PATH in case run from GUI from source folder for the first time on a device
 if [ ! -e $install_path/$script_name ]; then 
@@ -16,17 +23,6 @@ if [ ! -e $install_path/$script_name ]; then
     echo # (optional) move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]; then $script_path install; exit; fi # [2]
 fi
-
-# help
-if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h"  -o $1 = "?" ];then
-    echo "calls yt-dlp $params [formats in accordance with args] URL"
-    echo "args l for 720 quality and h for 1440p quality"
-#    echo "if path is given as argument, it is passed to tabs files are backed up to that location"
-    echo "usage: $script_name [l|h] URL"
-    echo "$common_help"
-    exit 0
-fi
-# ====== #
 
 params_add=" -- "
 if [ $# -eq 2 ]; then

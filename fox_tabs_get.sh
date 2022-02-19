@@ -12,20 +12,21 @@ backups_path=/media/$(id -un)/usb
 
 # ====== #
 source common_arguments_to_scripts.sh
+# help
+help_message="  Puts default Firefox profile on USB, currently per available to script info into /media/$(id -un)/usb/ in tar format.
+  No compression because there were issues of corruption, verification option is available in tar for uncompressed only.
+  Usage: $script_name [-e]
+  optional "\""-e"\"" instructs to try at the end of the script to eject and poweroff usb (device that in output of "\""mount"\"" contains "\""usb"\"" word).\n"
+display_help "$help_message$common_help"
+# ====== #
 
 # help
-# -a does not shortcut against second part executing if first part is false;
-# only strangely parathesis for test should be backslashed for proper syntax
-# if [ ! $# -eq 0 -a \( $1 = "--help" -o $1 = "-h" \) ];then
-if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h"  -o $1 = "?" ];then
-    echo "Gets Firefox tabs from tar archive with "\""firefox-browser-sessionstore-backups"\"" in the name"
-    echo "in "\""$backups_path"\"" and places in default profile"
-    echo "in place of sessionstore-backups/recovery.jsonlz4, previous recovery.jsonlz4 replaces recovery.baklz4"
-    echo "which is Firefox backup of recovery. To make Firefox use recovery, Firefox need to be [abnormally] terminated"
-    echo "therefore if not running, it is first started, then terminated."
-    echo "usage: $script_name"
-    exit 0
-fi
+help_message="  Gets Firefox tabs from tar archive with "\""firefox-browser-sessionstore-backups"\"" in the name
+in "\""$backups_path"\"" and places in default profile
+in place of sessionstore-backups/recovery.jsonlz4, previous recovery.jsonlz4 replaces recovery.baklz4
+which is Firefox backup of recovery. To make Firefox use recovery, Firefox need to be [abnormally] terminated
+therefore if not running, it is first started, then terminated.
+  Usage: $script_name\n"
 # ===== #
 
 profiles_ini=/home/$(id -un)/.mozilla/firefox/profiles.ini

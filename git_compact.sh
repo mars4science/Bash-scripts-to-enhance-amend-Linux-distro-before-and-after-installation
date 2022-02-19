@@ -7,7 +7,6 @@
 # git config --bool core.bare false
 # git checkout anybranch
 
-
 trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 # https://stackoverflow.com/questions/20348097/bash-extract-string-before-a-colon
@@ -15,12 +14,10 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 # for "install" and "update" arguments
 source common_arguments_to_scripts.sh
-
 # help
-if [ $1 = "--help" -o $1 = "-h" ];then
-    echo "usage: run $script_name when in working tree of a repository"
-    exit 0
-fi
+help_message="  Usage: run $script_name when in working tree of a repository\n"
+display_help "$help_message$common_help"
+# ====== #
 
 # https://stackoverflow.com/questions/70252065/how-to-return-to-bare-repository-for-compact-storage-undo-a-checkout-in-git/70253143#70253143
 # maybe below line would work and would be enough
