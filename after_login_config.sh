@@ -22,6 +22,13 @@ if [ -e /home/$(id -u -n)/.profile ]; then
     echo '' >> /home/$(id -u -n)/.profile
 fi
 
+# adding bookmarks, i.e. to ramdrive
+# adding bookmarks to Nemo is programmed based on try-and-error and https://forums.linuxmint.com/viewtopic.php?t=170398
+bookmarks_file=/home/$(id -u -n)/.config/gtk-3.0/bookmarks
+if [ -e "$bookmarks_file" ]; then
+    echo 'file:///media/ramdrive ramdrive' >> "$bookmarks_file"
+fi
+
 exit
 
 -----
