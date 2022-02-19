@@ -2,8 +2,25 @@
 
 trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
+# trailing / would prevent proper pruning in find commands
+local_path=/home/$(id -un)/Documents/Projects/Scripts
+remote_path=/media/$(id -un)/usb/Projects/Scripts
+
+# https://unix.stackexchange.com/questions/12203/rsync-failed-to-set-permissions-on-error-with-rsync-a-or-p-option/126489
+options="--archive --verbose --recursive --update --progress --backup --suffix=`date +'.%Y-%m-%d_%H-%M-%S.bak'` --no-owner --no-group --no-perms"
+
 # for "install" and "update" arguments
 source common_arguments_to_scripts.sh
+# help
+help_message="  Written to run rsync with options (current date/time is taken, below is example to dsiplay format):
+$options
+Between two hardcoded in the script paths (see below), both ways (one after another):
+$local_path 
+$remote_path
+  Usage: $script_name \n"
+display_help "$help_message$common_help"
+# ====== #
+
 
 # below does not work if many .bak files, so using find for now.
 #    if [ -f $local_path/*.bak ]; then mv $local_path/*.bak $local_path/prevs; fi
@@ -13,9 +30,6 @@ source common_arguments_to_scripts.sh
 # man chown.2
 # Only a privileged process (Linux: one with the CAP_CHOWN capability) may change the owner of a file.
 # therefore use --no-owner, --no-group cause owner change is of uncertain value
-
-# https://unix.stackexchange.com/questions/12203/rsync-failed-to-set-permissions-on-error-with-rsync-a-or-p-option/126489
-options="--archive --verbose --recursive --update --progress --backup --suffix=`date +'.%Y-%m-%d_%H-%M-%S.bak'` --no-owner --no-group --no-perms"
 
 do_sync(){
     if [ -d $remote_path ]; then 
@@ -133,10 +147,6 @@ do_sync(){
         echo $remote_path is not available
     fi
 }
-
-# trailing / would prevent proper pruning in find commands
-local_path=/home/$(id -un)/Documents/Projects/Scripts
-remote_path=/media/$(id -un)/usb/Projects/Scripts
 
 # adding check that most recent r_sync is run
 # the check assumes first set of local/remote point to scripts
