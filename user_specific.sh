@@ -12,3 +12,6 @@ $dir_name/after_login_config.sh
 $dir_name/transmission_setup.sh
 $dir_name/dconf_config.sh
 $dir_name/after_wine_run.sh
+
+# change git config, e.g. colors of output for better visibility  
+$dir_name/git_config.sh

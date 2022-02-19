@@ -98,12 +98,6 @@ $dir_name/y_tube.sh install
 # to open srt (subtitles) in xed, not subtitle editor by default
 echo 'application/x-subrip=xed.desktop' | sudo tee --append /usr/share/applications/defaults.list
 
-# user specific
-$dir_name/transmission_setup.sh
-
-# change git config, e.g. colors of output for better visibility  
-$dir_name/git_config.sh
-
 # for our old printer (TODO fix printer to enable color output)
 $dir_name/printer_color_as_gray.sh
 
