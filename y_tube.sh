@@ -17,13 +17,6 @@ if path is given as argument, it is passed to tabs files are backed up to that l
 display_help "$help_message$common_help"
 # ====== #
 
-# add script to $PATH in case run from GUI from source folder for the first time on a device
-if [ ! -e $install_path/$script_name ]; then 
-    read -p "script not installed, install (y)? overwise (e.g. n) run?" -n 1 -r
-    echo # (optional) move to a new line
-    if [[ $REPLY =~ ^[Yy]$ ]]; then $script_path install; exit; fi # [2]
-fi
-
 params_add=" -- "
 if [ $# -eq 2 ]; then
     case $1 in
@@ -52,16 +45,6 @@ program1 | tee >(program2) >(program3)
 yt-dlp --list-formats https://www.youtube.com/watch?v=IrBlWB2bxQU | tee >(grep --extended-regexp "^22" ) >(grep --extended-regexp "^18";aaa="sss") >/dev/null
 echo $aaa # empty as expected, grep was run in a subshell, so see above: decided not to check
 ---
-[2]
-help read
-Only the characters found in $IFS are recognized as word
-    delimiters.
-
-If no NAMEs are supplied, the line read is stored in the REPLY variable.
--r	do not allow backslashes to escape any characters
--n nchars	return after reading NCHARS characters rather than waiting
-    		for a newline, but honor a delimiter if fewer than
-    		NCHARS characters are read before the delimiter
 
 man bash
 [[ expression ]]

@@ -10,13 +10,6 @@ help_message="  Runs kiwix appimage with some variables set as a workaround to l
 display_help "$help_message$common_help"
 # ====== #
 
-# add script to $PATH in case run from GUI from source folder for the first time on a device
-if [ ! -e "$install_path/$script_name" ]; then
-    read -p "script not installed, install (y)? overwise (e.g. n) run?" -n 1 -r
-    echo # (optional) move to a new line
-    if [[ $REPLY =~ ^[Yy]$ ]]; then $script_path install; exit; fi # [2]
-fi
-
 # if does not exist locally, then copy
 app_name="kiwix-desktop.appimage"
 link_path="$(get_software_path.sh)/$app_name"

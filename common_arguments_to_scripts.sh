@@ -52,6 +52,13 @@ help_message="  This is a script to be sourced in other scripts.
   If you see it not running common_arguments_to_scripts it probably means the script you run sourced common_arguments_to_scripts but not set help_message variable.\n"
 fi
 
+# add script to $PATH in case run from GUI from source folder for the first time on a device
+if [ ! -e "$install_path/$script_name" ]; then
+    read -p "script not installed, install (y)? overwise (e.g. n) run?" -n 1 -r # see help read
+    echo # (optional) move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]; then $script_path install; exit; fi
+fi
+
 # one parameter expected
 display_help (){
     if [ ! $parameter_qty -eq 0 ] && [ "$parameter_1st" = "help" -o "$parameter_1st" = "--help" -o "$parameter_1st" = "-h"  -o "$parameter_1st" = "?" ];then
@@ -59,8 +66,4 @@ display_help (){
         exit 0
     fi
 }
-# ===== end of common scripts arguments ===== #
 
-# some previous thoughts about checking for timestamps during update run
-# if [ $0 -nt $install_path ]; then
-# if [ ! -f $script_path ]; then
