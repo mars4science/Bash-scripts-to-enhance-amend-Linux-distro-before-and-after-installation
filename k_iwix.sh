@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO change hardcoded location of kiwix file to copy from
+
 # for install and update arguments
 source common_arguments_to_scripts.sh
 # help
@@ -8,39 +10,31 @@ help_message="  Runs kiwix appimage with some variables set as a workaround to l
 display_help "$help_message$common_help"
 # ====== #
 
-# help
-if [ ! $# -eq 0 ] && [ $1 = "--help" -o $1 = "-h"  -o $1 = "?" ];then
-    echo ""
-    echo "$common_help"
-    exit 0
-fi
-
 # add script to $PATH in case run from GUI from source folder for the first time on a device
-if [ ! -e $install_path/$script_name ]; then 
+if [ ! -e "$install_path/$script_name" ]; then
     read -p "script not installed, install (y)? overwise (e.g. n) run?" -n 1 -r
     echo # (optional) move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]; then $script_path install; exit; fi # [2]
 fi
 
-
-
 # if does not exist locally, then copy
-source_path="$(get_software_path.sh)"/kiwix-desktop.appimage
+app_name="kiwix-desktop.appimage"
+link_path="$(get_software_path.sh)/$app_name"
 
-if [ ! -e "$source_path" ]; then
-    if [ ! -d $(dirname "$source_path") ]; then sudo mkdir $(dirname "$source_path"); fi
+if [ ! -e "$link_path" ]; then
+    if [ ! -d $(dirname "$link_path") ]; then sudo mkdir $(dirname "$link_path"); fi
     software_path_root="/media/$(id -un)/usb/LM_20.2"
     copyfrom_path="$software_path_root/kiwix-desktop_x86_64_2.1.0.appimage"
     if [ ! -e "$copyfrom_path" ]; then echo >&2 "tor path $copyfrom_path not found, exiting with error"; exit 1; fi
-    sudo cp "$copyfrom_path" $(dirname "$source_path")
-    sudo ln -s $(dirname "$source_path")/$(basename "$copyfrom_path") $source_path
-    echo copied and linked tor to "$source_path", run script again run
+    sudo cp "$copyfrom_path" $(dirname "$link_path")
+    sudo ln -s $(dirname "$link_path")/$(basename "$copyfrom_path") $link_path
+    echo "Copied and linked $app_name to $link_path, run script again to run kiwix."
     exit 0
 fi
 
 # either of the below two variable assignments works as a workaround, [1]:
-# MESA_LOADER_DRIVER_OVERRIDE=i965 "$(get_software_path.sh)"/kiwix-desktop.appimage
-LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6 "$(get_software_path.sh)"/kiwix-desktop.appimage
+# MESA_LOADER_DRIVER_OVERRIDE=i965 "$link_path"
+LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6 "$link_path"
 
 exit
 
