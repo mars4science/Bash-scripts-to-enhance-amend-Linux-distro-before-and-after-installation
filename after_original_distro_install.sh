@@ -108,22 +108,16 @@ sudo locale-gen ru_RU.UTF-8
 # add applets/desklets software to Cinnamon
 $dir_name/cinnamon_add_software.sh
 
-# ========= cinnamon / desktop / GUI settings ============
-# as of 2022/01/24 do not work during liveUSB iso alteration
-# user specific in such case
-$dir_name/dconf_config.sh
+# for liveUSB customization via chroot only
+if [ $running_system = "false" ]; then
+    # setup systemd service to configure user liveUSB account: "mint" (dconf, bashrc, etc) after systemd start but before user login
+    $dir_name/systemd_targets_config.sh
+fi
 
-# user specific, changes default app for ini files back to xed.desktop
-$dir_name/after_wine_run.sh
-
-
-
-
-# ========= end of configs / settings =============
-
+# for system running after install or running liveUSB 
 if [ $running_system = "true" ]; then
 
-    # for liveUSB tweaking do not think adds any value or even might cause problems (not tested)
+    # for running liveUSB tweaking do not think adds any value or even might cause problems (not tested)
     if [ $(mount|grep overlay|awk '{print $1}') = "/cow" ]; then
         echo "liveUSB kind of detected, would not tweak boot as not tested for persitent liveUSB"
     else
@@ -133,6 +127,8 @@ if [ $running_system = "true" ]; then
         # to be run at the end of setup as renames /var directory which would effect some previous steps
         $dir_name/run_at_boot_config.sh
     fi
+
+    $dir_name/user_specific.sh
 
     # to leave terminal open with interactive bash if started from GUI
     # ps output list processes' paths as called (relative), so use "$0" 

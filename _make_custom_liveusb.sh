@@ -24,7 +24,7 @@ change_squash() {
         sudo mkdir $work_path/fin_sq/am
     fi
 
-    # copy user specific scripts to be run later (later expected to be moved to initrd change in change_boot() functoion)
+    # copy user specific scripts to be run later (later some [maybe all expect dconf_config as maybe it requires systemd running] expected to be moved to initrd change in change_boot() function)
     sudo cp $script_path/dconf_config.sh $work_path/fin_sq/am
     sudo cp $script_path/after_login_config.sh $work_path/fin_sq/am
     sudo cp $script_path/transmission_setup.sh $work_path/fin_sq/am
@@ -34,6 +34,7 @@ change_squash() {
     sudo cp $script_path/after_wine_run.sh $work_path/fin_sq/am
     sudo cp $script_path/user_specific.sh $work_path/fin_sq/am
     sudo cp $script_path/run_at_boot_uid_change.sh $work_path/fin_sq/am
+    sudo cp $script_path/systemd_to_run_as_user.sh $work_path/fin_sq/am
 
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp $script_path/bin/stopfan $work_path/fin_sq/usr/local/bin

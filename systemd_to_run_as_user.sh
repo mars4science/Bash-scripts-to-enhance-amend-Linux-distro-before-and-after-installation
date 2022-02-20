@@ -1,0 +1,16 @@
+#!/bin/bash
+# trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+
+sudo  -i -u mint bash <<-EOF
+    exec dbus-run-session -- bash /am/user_specific.sh
+EOF
+
+exit
+
+# Comments
+dbus-run-session is needed as script expected to contain commands to write to dconf database
+here-document (man bash) maybe for better formatting
+
+https://unix.stackexchange.com/questions/687514/how-to-change-dconf-settings-in-chrooted-mode-via-terminal
+https://askubuntu.com/questions/655238/as-root-i-can-use-su-to-make-dconf-changes-for-another-user-how-do-i-actually/1302886
+
