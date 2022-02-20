@@ -86,14 +86,14 @@ gsettings set org.nemo.preferences show-open-in-terminal-toolbar true
 # sounds
 dconf write /org/cinnamon/sounds/login-enabled false
 dconf write /org/cinnamon/sounds/close-enabled false
-dconf write /org/cinnamon/sounds/logout false
-dconf write /org/cinnamon/sounds/maximize false
-dconf write /org/cinnamon/sounds/unmaximize false
-dconf write /org/cinnamon/sounds/minimize false
-dconf write /org/cinnamon/sounds/switch false
-dconf write /org/cinnamon/sounds/tile false
-dconf write /org/cinnamon/sounds/plug false
-dconf write /org/cinnamon/sounds/unplug true
+dconf write /org/cinnamon/sounds/logout-enabled false
+dconf write /org/cinnamon/sounds/maximize-enabled false
+dconf write /org/cinnamon/sounds/unmaximize-enabled false
+dconf write /org/cinnamon/sounds/minimize-enabled false
+dconf write /org/cinnamon/sounds/switch-enabled false
+dconf write /org/cinnamon/sounds/tile-enabled false
+dconf write /org/cinnamon/sounds/plug-enabled false
+dconf write /org/cinnamon/sounds/unplug-enabled true
 
 exit
 
