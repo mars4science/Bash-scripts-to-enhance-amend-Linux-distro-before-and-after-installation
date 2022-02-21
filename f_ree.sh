@@ -19,6 +19,9 @@ remove_if_exists ~/.wine
 remove_if_exists ~/.local/share/wineprefixes
 remove_if_exists ~/.local/share/Trash
 
+# end Windows (wine) processes after deleting Windows disks (~./wine) 
+ps -e -f | grep '\.exe' | grep ' [C|Z]:\\' | awk '{print $2}' | xargs kill
+
 exit
 
 # ============= comments below ================== #
