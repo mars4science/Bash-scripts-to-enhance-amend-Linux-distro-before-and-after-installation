@@ -55,9 +55,10 @@ $dir_name/k_iwix.sh install
 # on the first run k_iwix is expected to copy kiwix appimage from USB (now partly hardcoded location) to location given by get_software_path.sh
 k_iwix
 
-
 $dir_name/firefox-replace.sh
 
+# install phython scripts, i.e. files.py
+$dir_name/Utils_misc_install.sh
 
 # includes making ramdrive now (used in debs install)
 # also kind of user specific as during liveUSB boot /etc/fstab file in squashfs gets overshadowed,
