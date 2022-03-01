@@ -16,7 +16,7 @@ link_path="$(get_software_path.sh)/$app_name"
 
 if [ ! -e "$link_path" ]; then
     if [ ! -d $(dirname "$link_path") ]; then sudo mkdir $(dirname "$link_path"); fi
-    software_path_root="/media/$(id -un)/usb/LM_20.2"
+    if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
     copyfrom_path="$software_path_root/kiwix-desktop_x86_64_2.1.0.appimage"
     if [ ! -e "$copyfrom_path" ]; then echo >&2 "tor path $copyfrom_path not found, exiting with error"; exit 1; fi
     sudo cp "$copyfrom_path" $(dirname "$link_path")

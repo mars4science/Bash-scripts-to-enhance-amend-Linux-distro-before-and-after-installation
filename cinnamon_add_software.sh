@@ -2,7 +2,7 @@
 # trap 'err=$?; echo >&2 "Exiting on error $err"; sleep 10; exit $err' ERR
 
 # add applets/desklets software to Cinnamon
-software_path_root=/media/$(id -un)/usb/LM_20.2
+if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
 sudo cp --recursive $software_path_root/cinnamon-applets/* /usr/share/cinnamon/applets
 
 exit

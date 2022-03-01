@@ -29,6 +29,9 @@ if [ $running_system = "true" ]; then
     nmcli radio all off
 fi
 
+if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.3 ; fi
+export software_path_root
+
 # used by the rest of scripts when run with install / update arguments 
 # paths are harcoded in these two scripts
 $dir_name/get_install_path.sh install

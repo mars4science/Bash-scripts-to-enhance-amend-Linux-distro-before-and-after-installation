@@ -3,7 +3,7 @@
 # trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 # alternative to youtube-dl, have read (and saw) work fast when youtube-dl is slow to download
-software_path_root=/media/$(id -un)/usb/LM_20.2
+if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
 sudo cp "$software_path_root"/bin/yt-dlp /usr/local/bin
 sudo chmod +x /usr/local/bin/yt-dlp
 

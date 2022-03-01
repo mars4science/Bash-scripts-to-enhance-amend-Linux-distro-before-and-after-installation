@@ -22,7 +22,7 @@ help_message="  The Script is written to read from standard input.
 display_help "$help_message$common_help"
 # ===== #
 
-software_path_root=/media/$(id -un)/usb/LM_20.2
+if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
 default_local_debs="$software_path_root/debs"
 #default_local_debs="/media/$(id -un)/usb/LM_20.tmp"
 #default_local_status="/home/$(id -un)/Documents/dpkg_orig_status"

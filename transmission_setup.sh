@@ -2,7 +2,7 @@
 # copy configs that set upload speed limit and seeding limits.
 
 # if current user is root (e.g. chrooted duriong liveUSB creation), then ~ would exist, but not /home/$(id -u -n)
-software_path_root=/media/$(id -un)/usb/LM_20.2
+if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
 if [ -e /home/$(id -u -n) ]; then
     # the json files originally had acces rights -rw-------, but copy via different users' accounts ids have to add access to others,
     # so (not tested yet) copy without attributes and set file mode bits later

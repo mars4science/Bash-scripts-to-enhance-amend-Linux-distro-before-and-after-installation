@@ -74,8 +74,11 @@ change_boot() {
     echo "  set timeout=5" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
     echo "fi" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
 
-    # code to repalce memtest to start with stock iso 
-    sudo cp "/media/$(id -un)/usb/LM_20.2/memtest86+/memtest86+-5.31b.bin" $work_path/fin/casper/memtest
+    # code to repalce memtest to start with stock iso
+    # path looks like need to be changed in after_original_distro_install.sh too because after_ is programmed to be run in chrooted environment
+    if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.3 ; fi
+    export software_path_root
+    sudo cp "${software_path_root}/memtest86+/memtest86+-5.31b.bin" $work_path/fin/casper/memtest
 
 
 # TODO add changing initramfs / initrd 
