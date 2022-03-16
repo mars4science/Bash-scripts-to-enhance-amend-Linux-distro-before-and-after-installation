@@ -17,7 +17,7 @@ display_help "$help_message$common_help"
 # used with . and w/out realpath it put archive in a profile folder
 if [ $# -eq 1 ];then backups_path="$(realpath $1)"; fi
 
-profile_path=$(cat $ff_path/profiles.ini | grep Default | head --lines=1 | awk --field-separator "=" '{ FS = "=" ; print $2 ; exit }') 
+profile_path=$(cat $ff_path/profiles.ini | grep ^Default | grep --invert-match "Default=1" | head --lines=1 | awk --field-separator "=" '{ FS = "=" ; print $2 ; exit }') 
 
 cd $ff_path/$profile_path
 

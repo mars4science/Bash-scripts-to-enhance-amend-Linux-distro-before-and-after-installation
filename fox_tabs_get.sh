@@ -30,7 +30,7 @@ therefore if not running, it is first started, then terminated.
 # ===== #
 
 profiles_ini=/home/$(id -un)/.mozilla/firefox/profiles.ini
-profile_path=$(cat $profiles_ini | grep Default | awk --field-separator "=" '{ FS = "=" ; print $2 ; exit }') 
+profile_path=$(cat $profiles_ini | grep ^Default | grep --invert-match "Default=1" | awk --field-separator "=" '{ FS = "=" ; print $2 ; exit }') 
 full_profile_path=/home/$(id -un)/.mozilla/firefox/$profile_path
 
 # -t     sort by modification time, newest first : man ls

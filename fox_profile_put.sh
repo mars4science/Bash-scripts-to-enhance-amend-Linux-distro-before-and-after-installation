@@ -27,7 +27,7 @@ pkill firefox$ || pkill GeckoMain || echo there were no firefox processes to end
 
 # path_original=$(pwd)
 
-profile_path=$(cat /home/$(id -un)/.mozilla/firefox/profiles.ini | grep Default | head --lines=1 | awk --field-separator "=" '{ FS = "=" ; print $2 ; exit }') 
+profile_path=$(cat /home/$(id -un)/.mozilla/firefox/profiles.ini | grep ^Default | grep --invert-match "Default=1" | head --lines=1 | awk --field-separator "=" '{ FS = "=" ; print $2 ; exit }') 
 
 cd /home/$(id -un)/.mozilla/firefox/$profile_path
 
