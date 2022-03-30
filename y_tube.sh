@@ -1,6 +1,6 @@
 #!/bin/bash
 
-params=" --write-description --write-auto-sub --sub-langs en-en,en " # encountered both "en-en" and "en"
+params=" --write-info-json --write-description --write-auto-sub --sub-langs en-en,en " # encountered both "en-en" and "en"
 
 # TODO default location, current folder for now
 # for downloaded data
