@@ -6,7 +6,7 @@
 
 # ---- auto script  ----- #
 
-distro_label="LM_20.2_AM_light"
+distro_label="LM_20.2_AM_full_v_1.0"
 # original_iso=/media/$(id -un)/btrfs-1/all/ubuntu-20.04.3-desktop-amd64.iso
 # original_iso=/media/$(id -un)/btrfs-1/all/LM20.2_fan_memtest.iso
 original_iso=/media/data/Software/distros/linuxmint-20.2-cinnamon-64bit.iso
@@ -60,23 +60,53 @@ change_squash() {
 change_boot() {
     # modify boot config
     # [2]
-    # for UEFI boot
+    # ======= for UEFI boot =======
     # 	linux	/casper/vmlinuz  file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=${iso_path} toram --
+    # duplicate first menu entry two times, \s\S needed as in perl . does not include end of line   
+    perl -0777e 'while(<>){s/(menuentry[\s\S]*?\n\}\n)/\1\1\1/;print "$_"}' $work_path/fin/boot/grub/grub.cfg | 1>/dev/null sudo tee $work_path/fin/boot/grub/grub.cfg_tmp
+    sudo mv --force $work_path/fin/boot/grub/grub.cfg_tmp $work_path/fin/boot/grub/grub.cfg
+    # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/boot/grub/grub.cfg
-
-    # for legacy boot
-    #   append  file=/cdrom/preseed/linuxmint.seed boot=casper initrd=/casper/initrd.lz toram --
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/isolinux/isolinux.cfg
-
+    sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit to RAM, verbose (UEFI: all menu entries)"/' $work_path/fin/boot/grub/grub.cfg
+    # change second manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, verbose"/' $work_path/fin/boot/grub/grub.cfg
+    # change third menu entry to add custom init script, 0,/ needed to edit first occurence only
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// quiet splash init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/boot/grub/grub.cfg
+    # add timeout to start first meny entry automatically (for some reason default script cfg does not have it)
     echo | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
     echo "set timeout_style=menu" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
-    echo 'if [ "${timeout}" = 0 ]; then' | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
-    echo "  set timeout=5" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
-    echo "fi" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
+#    echo 'if [ "${timeout}" = 0 ]; then' | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
+    echo "set timeout=5" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
+#    echo "fi" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
+
+    # ======= for legacy boot =======
+    #   append  file=/cdrom/preseed/linuxmint.seed boot=casper initrd=/casper/initrd.lz toram --
+    # edit menu title
+    sudo sed --in-place -- 's/\(menu title\).*/\1 Linux Mint 20.2 64-bit based (legacy boot)/' $work_path/fin/isolinux/isolinux.cfg
+    # duplicate first menu entry two times, \s\S needed as in perl . does not include end of line   
+    perl -0777e 'while(<>){s/(label[\s\S]*?--\n)(menu default\n)/\1\2\1\1/;print "$_"}' $work_path/fin/isolinux/isolinux.cfg | 1>/dev/null sudo tee $work_path/fin/isolinux/isolinux.cfg_tmp    
+    sudo mv --force $work_path/fin/isolinux/isolinux.cfg_tmp $work_path/fin/isolinux/isolinux.cfg
+    # edit in-place, add two more rows number of rows in the menu
+    perl -i -pe 's/(MENU ROWS )([0-9]+)/$1.($2+2)/e' $work_path/fin/isolinux/isolinux.cfg
+
+    # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
+    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label ram/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (to RAM, verbose)/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    # change second manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
+    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label verbose/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (verbose)/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    # change third menu entry to add custom init script, 0,/ needed to edit first occurence only
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// quiet splash init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    # edit timeout
+    sudo sed --in-place -- 's/\(timeout\).*/\1 50/' $work_path/fin/isolinux/isolinux.cfg
+
 
     # code to repalce memtest to start with stock iso
     # path looks like need to be changed in after_original_distro_install.sh too because after_ is programmed to be run in chrooted environment
-    if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.3 ; fi
+    if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
     export software_path_root
     sudo cp "${software_path_root}/memtest86+/memtest86+-5.31b.bin" $work_path/fin/casper/memtest
 
