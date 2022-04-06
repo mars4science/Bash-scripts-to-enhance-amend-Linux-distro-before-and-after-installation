@@ -95,6 +95,16 @@ dconf write /org/cinnamon/sounds/tile-enabled false
 dconf write /org/cinnamon/sounds/plug-enabled false
 dconf write /org/cinnamon/sounds/unplug-enabled true
 
+# add cinnamon applets to right lower panel (to the left of all the rest - clock, wifi etc.)
+# does not result in panal change for some reason
+# TODO find out the reasons to the above
+dconf read /org/cinnamon/enabled-applets
+sleep 10
+applets_orig=`dconf read /org/cinnamon/enabled-applets`
+applets_changed=`echo $applets_orig | perl -pe "s/]/, 'panel1:right:0:mem-monitor-text@datanom.net:100', 'panel1:right:0:temperature@fevimu:101']/"`
+dconf write /org/cinnamon/enabled-applets "['']"
+dconf write /org/cinnamon/enabled-applets \""$applets_changed"\"
+
 exit
 
 [1]
