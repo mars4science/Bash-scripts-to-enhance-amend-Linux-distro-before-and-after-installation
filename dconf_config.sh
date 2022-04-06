@@ -74,7 +74,7 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command
 # <Primary> was Ctrl on some thinkpad
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/name "'Volume Up'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/binding "['<Primary>u']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'pactl set-sink-volume 0 +25%'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'pactl set-sink-volume @DEFAULT_SINK@ +25%'"
 
 # to activate bindings (for some reason do not work just from populating dconf database from above commands), different order of items in the list
 gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3']"
