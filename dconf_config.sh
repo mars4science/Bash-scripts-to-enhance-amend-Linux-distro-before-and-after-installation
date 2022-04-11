@@ -101,7 +101,7 @@ dconf write /org/cinnamon/sounds/unplug-enabled true
 dconf read /org/cinnamon/enabled-applets
 sleep 10
 applets_orig=`dconf read /org/cinnamon/enabled-applets`
-applets_changed=`echo $applets_orig | perl -pe "s/]/, 'panel1:right:0:mem-monitor-text@datanom.net:100', 'panel1:right:0:temperature@fevimu:101']/"`
+applets_changed=`echo $applets_orig | perl -pe "s/]/, 'panel1:right:0:mem-monitor-text\@datanom.net:100', 'panel1:right:0:temperature\@fevimu:101']/"`
 dconf write /org/cinnamon/enabled-applets "['']"
 dconf write /org/cinnamon/enabled-applets \""$applets_changed"\"
 
