@@ -15,7 +15,7 @@ or system-wide one:
 /usr/share/cinnamon/applets
 
 # TODO
-There is an outstanding issue of settings, not done yet.
+There is an outstanding issue of settings, not fully done yet, started work in cinnamon_config_software.sh
 Configs/settings are in the form of folders with json files in:
 /home/mint/.cinnamon/configs
  

@@ -108,6 +108,7 @@ sudo locale-gen ru_RU.UTF-8
 
 # add applets/desklets software to Cinnamon
 $dir_name/cinnamon_add_software.sh
+$dir_name/cinnamon_config_software.sh
 
 # for liveUSB customization via chroot only
 if [ $running_system = "false" ]; then
