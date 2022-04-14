@@ -95,17 +95,22 @@ dconf write /org/cinnamon/sounds/tile-enabled false
 dconf write /org/cinnamon/sounds/plug-enabled false
 dconf write /org/cinnamon/sounds/unplug-enabled true
 
+sleep 10
+exit
+
 # add cinnamon applets to right lower panel (to the left of all the rest - clock, wifi etc.)
 # does not result in panal change for some reason
-# TODO find out the reasons to the above
-dconf read /org/cinnamon/enabled-applets
-sleep 10
+# DONE: find out the reasons to the above, see below:
+# result depend on speed of boot process, based on response to created github issue moved panel edit to
+# editing /usr/share/glib-2.0/schemas org.cinnamon.gschema.xml or 10_cinnamon.gschema.override
+# in cinnamon_config.sh
 applets_orig=`dconf read /org/cinnamon/enabled-applets`
-applets_changed=`echo $applets_orig | perl -pe "s/]/, 'panel1:right:0:mem-monitor-text\@datanom.net:100', 'panel1:right:0:temperature\@fevimu:101']/"`
+applets_changed=`echo $applets_orig | perl -pe 's/(right:)([0-9]+)/$1.($2+2)/eg' | perl -pe "s/]/, 'panel1:right:0:mem-monitor-text\@datanom.net:100', 'panel1:right:1:temperature\@fevimu:101']/"`
 dconf write /org/cinnamon/enabled-applets "['']"
-dconf write /org/cinnamon/enabled-applets \""$applets_changed"\"
+gsettings set org.cinnamon enabled-applets "['']"
+dconf write /org/cinnamon/enabled-applets "$applets_changed"
 
-exit
+
 
 [1]
 # dconf write /org/cinnamon/desktop/interface/scaling-factor 1
