@@ -36,6 +36,7 @@ change_squash() {
     sudo cp $script_path/settings/transmission/*.json $work_path/fin_sq/am/settings/transmission
     sudo cp $script_path/add_ramdisk_and_ramcache.sh $work_path/fin_sq/am
     sudo cp $script_path/after_wine_run.sh $work_path/fin_sq/am
+    sudo cp $script_path/git_config.sh $work_path/fin_sq/am
     sudo cp $script_path/user_specific.sh $work_path/fin_sq/am
     sudo cp $script_path/run_at_boot_uid_change.sh $work_path/fin_sq/am
     sudo cp $script_path/systemd_to_run_as_user.sh $work_path/fin_sq/am
