@@ -72,12 +72,12 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/binding
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'display_rotate_inverted.sh'"
 
 # <Primary> was Ctrl on some thinkpad
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/name "'Volume Up'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/binding "['<Primary>u']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'pactl set-sink-volume @DEFAULT_SINK@ +25%'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/name "'Volume Up'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/binding "['<Primary>u']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/command "'pactl set-sink-volume @DEFAULT_SINK@ +25%'"
 
 # to activate bindings (for some reason do not work just from populating dconf database from above commands), different order of items in the list
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3']"
+gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4']"
 # or dconf write /org/cinnamon/desktop/keybindings/custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4']"
 
 gsettings set org.nemo.preferences show-hidden-files true
