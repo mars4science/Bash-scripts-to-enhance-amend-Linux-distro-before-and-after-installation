@@ -110,6 +110,9 @@ sudo locale-gen ru_RU.UTF-8
 $dir_name/cinnamon_add_software.sh
 $dir_name/cinnamon_config.sh
 
+# to fix bug on X1 carbon gen 6
+$dir_name/systemd_on_resume_config.sh
+
 # for liveUSB customization via chroot only
 if [ $running_system = "false" ]; then
     # setup systemd service to configure user liveUSB account: "mint" (dconf, bashrc, etc) after systemd start but before user login
