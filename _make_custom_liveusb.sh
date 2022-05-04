@@ -181,11 +181,11 @@ if [ -e "$work_path" ] && [ "$(ls $work_path)" != "" ]; then
         un_mount
         sudo rm -R $work_path/*
         Eval=$?
-        delay=5
+        delay=0
         if [ $Eval -ne 0 ]; then 
             echo "Deleting contents unsuccessful (per return code);this script is written to end in $delay seconds"; sleep $delay; exit 1;
         fi
-        echo "Deleting contents successful (per return code); this script is written to continue in $delay seconds"; sleep $delay;
+        echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
         cd "$work_path"
     fi    
 else
@@ -268,7 +268,7 @@ bash -i
 
 # now delete intermediary data
 un_mount_in_work_path
-sudo rm -R iso to temp fin iso_sq fin_sq temp_sq to_sq
+sudo rm -R iso to temp fin iso_sq fin_sq temp_sq to_sq initrd
 echo "This line is after code to delete working files"
 
 # to leave terminal open with interactive bash if started from GUI
