@@ -6,7 +6,7 @@
 
 # ---- auto script  ----- #
 
-distro_label="LM_20.2_AM_full_v_1.0"
+distro_label="LM_20.2_AM_full_v_1.1"
 # original_iso=/media/$(id -un)/btrfs-1/all/ubuntu-20.04.3-desktop-amd64.iso
 # original_iso=/media/$(id -un)/btrfs-1/all/LM20.2_fan_memtest.iso
 original_iso=/media/data/Software/distros/linuxmint-20.2-cinnamon-64bit.iso
