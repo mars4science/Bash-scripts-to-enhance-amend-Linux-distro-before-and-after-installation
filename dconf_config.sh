@@ -89,7 +89,7 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/command
 # screen lock binding, TODO check if xscreensaver deamon is started when ISO is booted with its debs installed
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/name "'Screen lock'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/binding "['<Super><Alt>l']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/command "'xscreensaver-command -lock'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/command "'sh -c \'xscreensaver-command -lock || xscreensaver-command -pref\''"
 
 # to activate bindings (for some reason do not work just from populating dconf database from above commands), different order of items in the list
 gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7']"
