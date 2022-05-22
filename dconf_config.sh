@@ -47,7 +47,7 @@ gsettings set org.cinnamon.settings-daemon.plugins.power sleep-inactive-battery-
 
 # See [1] of _readme.md, also for some reason command (for binding) that have $(xrandr do not work, only specific with e.g. eDP-1,
 # therefore changed script code to make shell files and bind to them - it resulted in being able to use keys to rotate system's display
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', '__dummy__']"
+gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', '__dummy__']"
 # or dconf write /org/cinnamon/desktop/keybindings/custom-list "['custom0', 'custom1', 'custom2', '__dummy__']"
 echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate normal' | sudo tee $(get_install_path.sh)/display_rotate_normal.sh
 echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate left' | sudo tee $(get_install_path.sh)/display_rotate_left.sh
@@ -71,10 +71,10 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/name "'
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/binding "['<Super><Alt>Down']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'display_rotate_inverted.sh'"
 
-# <Primary> was Ctrl on some thinkpad
+# <Primary> was Ctrl on some thinkpad, set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/name "'Volume Up'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/binding "['<Primary>u']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/command "'pactl set-sink-volume @DEFAULT_SINK@ +25%'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/command "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'"
 
 # fix TrackPoint issue om carbon X1 gen 6
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/name "'TrackPoint X1G6 fix'"
@@ -91,8 +91,17 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/name "'
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/binding "['<Super><Alt>l']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/command "'sh -c \'xscreensaver-command -lock || xscreensaver-command -pref\''"
 
+# set custom monitor brightness adjustments
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/name "'Brightness up'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/binding "['MonBrightnessUp']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/command "'night +1'"
+
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/name "'Brightness down'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/binding "['MonBrightnessDown']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/command "'night -1'"
+
 # to activate bindings (for some reason do not work just from populating dconf database from above commands), different order of items in the list
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7']"
+gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9']"
 # or dconf write /org/cinnamon/desktop/keybindings/custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4']"
 
 gsettings set org.nemo.preferences show-hidden-files true
