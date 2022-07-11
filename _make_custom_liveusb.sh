@@ -9,7 +9,7 @@
 data_inputs_root=/media/$(id --user --name)/usb
 work_path=/media/ramdrive
 
-distro_label="LM_20.2_AM_full_v_1.0"
+distro_label="LM_20.2_AM_full_v_1.1"
 original_iso=/media/data/Distros/linuxmint-20.2-cinnamon-64bit.iso
 # TODO path software_path_root looks like need to be set in after_original_distro_install.sh too because after_ is programmed to be run in chrooted environment
 if [ "x${software_path_root}" = "x" ] ; then software_path_root="$data_inputs_root/LM_20.2" ; fi
@@ -43,6 +43,7 @@ change_squash() {
     sudo cp $script_path/user_specific.sh $work_path/fin_sq/am
     sudo cp $script_path/run_at_boot_uid_change.sh $work_path/fin_sq/am
     sudo cp $script_path/systemd_to_run_as_user.sh $work_path/fin_sq/am
+    sudo cp $script_path/set_color_profile.sh $work_path/fin_sq/am
 
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp $script_path/bin/stopfan $work_path/fin_sq/usr/local/bin

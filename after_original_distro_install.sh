@@ -111,6 +111,10 @@ sudo locale-gen ru_RU.UTF-8
 $dir_name/cinnamon_add_software.sh
 $dir_name/cinnamon_config.sh
 
+# copy additional color profiles
+sudo cp "${software_path_root}/color-profiles/"* /usr/share/color/icc/colord
+
+
 # to fix bug on X1 carbon gen 6 (seems not to fix the issue, maybe investigate further, for now resorted to using custom key bindings
 $dir_name/systemd_on_resume_config.sh
 

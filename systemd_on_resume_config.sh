@@ -53,6 +53,10 @@ horizontal_relosution=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f
 if [ $dpm -ge 8 ] && [ $horizontal_relosution -ge 2000 ];then # maybe will be run on small displays, not change default scaling in such case
     gsettings set org.cinnamon.desktop.interface scaling-factor 2
 fi
+
+# temporary to set color profiles until found a way to run on boot
+/am/set_color_profile.sh
+
     ;;
 esac
 EOF
