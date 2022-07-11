@@ -11,6 +11,9 @@ work_path=/media/ramdrive
 
 distro_label="LM_20.2_AM_full_v_1.0"
 original_iso=/media/data/Distros/linuxmint-20.2-cinnamon-64bit.iso
+# TODO path software_path_root looks like need to be set in after_original_distro_install.sh too because after_ is programmed to be run in chrooted environment
+if [ "x${software_path_root}" = "x" ] ; then software_path_root="$data_inputs_root/LM_20.2" ; fi
+
 if [ ! -e $original_iso ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi 
 # ---- parameters end ---- #
 
@@ -120,11 +123,7 @@ change_boot() {
     sudo sed --in-place -- 's/\(timeout\).*/\1 50/' $work_path/fin/isolinux/isolinux.cfg
 
     # code to repalce memtest to start with stock iso
-    # path looks like need to be changed in after_original_distro_install.sh too because after_ is programmed to be run in chrooted environment
-    if [ "x${software_path_root}" = "x" ] ; then software_path_root="$data_inputs_root/LM_20.2" ; fi
-    # export software_path_root # is it needed?
     sudo cp "${software_path_root}/memtest86+/memtest86+-5.31b.bin" $work_path/fin/casper/memtest
-
 
 # TODO add changing initramfs / initrd 
 
@@ -133,12 +132,6 @@ change_boot() {
 
 
 # Clear out debconf database again to avoid confusing ubiquity later.
-
-
-
-
-
-
 }
 
 u_mount(){

@@ -2,8 +2,12 @@
 # trap 'err=$?; echo >&2 "Exiting on error $err"; sleep 10; exit $err' ERR
 
 # initialy was developed to apply changes after install of GNU/Linux, later used during alteration of liveUSB iso
-
 # TODO separate into system wide and user specific scripts (user specific be run for each user)
+
+# ---- parameters ---- #
+if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
+export software_path_root
+# ---- parameters end ---- #
 
 current_dir=`pwd`
 full_path=`realpath $0` # man realpath : Print the resolved absolute file name;
@@ -28,9 +32,6 @@ if [ $running_system = "true" ]; then
     # TODO add for bluetooth, could not find how w/out tlp 2021/12/5
     nmcli radio all off
 fi
-
-if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
-export software_path_root
 
 # used by the rest of scripts when run with install / update arguments 
 # paths are harcoded in these two scripts
