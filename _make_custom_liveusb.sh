@@ -3,16 +3,16 @@
 # trap 'err=$?; echo >&2 "Exiting on error $err"; sleep 10; exit $err' ERR
 
 # ---- manual way is after auto script  ----- #
-
 # ---- auto script  ----- #
 
-distro_label="LM_20.2_AM_full_v_1.1"
-# original_iso=/media/$(id -un)/btrfs-1/all/ubuntu-20.04.3-desktop-amd64.iso
-# original_iso=/media/$(id -un)/btrfs-1/all/LM20.2_fan_memtest.iso
-original_iso=/media/data/Software/distros/linuxmint-20.2-cinnamon-64bit.iso
-if [ ! -e $original_iso ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi 
+# ---- parameters ---- #
+data_inputs_root=/media/$(id --user --name)/usb
+work_path=/media/ramdrive
 
-work_path=/media/ramdrive/custom_iso
+distro_label="LM_20.2_AM_full_v_1.0"
+original_iso=/media/data/Distros/linuxmint-20.2-cinnamon-64bit.iso
+if [ ! -e $original_iso ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi 
+# ---- parameters end ---- #
 
 script_path="$(dirname "$(realpath "$0")")"
 
@@ -47,8 +47,8 @@ change_squash() {
 
     # to install debs and other files need to have path to them inside chrooted environment
     # see https://unix.stackexchange.com/questions/683439/mount-twice-bind-why-some-parameters-change-others-not
-    sudo mount -o bind,x-mount.mkdir /media/$(id --user --name)/usb $work_path/fin_sq/media/root/usb
-    sudo mount -o bind,remount,ro /media/$(id --user --name)/usb $work_path/fin_sq/media/root/usb
+    sudo mount -o bind,x-mount.mkdir "$data_inputs_root" $work_path/fin_sq/media/root/usb
+    sudo mount -o bind,remount,ro "$data_inputs_root" $work_path/fin_sq/media/root/usb
 
     # to run scripts located in the same folder where script run by chroot is located
     sudo mount -o bind,x-mount.mkdir $script_path $work_path/fin_sq/media/root/Scripts
@@ -121,8 +121,8 @@ change_boot() {
 
     # code to repalce memtest to start with stock iso
     # path looks like need to be changed in after_original_distro_install.sh too because after_ is programmed to be run in chrooted environment
-    if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
-    export software_path_root
+    if [ "x${software_path_root}" = "x" ] ; then software_path_root="$data_inputs_root/LM_20.2" ; fi
+    # export software_path_root # is it needed?
     sudo cp "${software_path_root}/memtest86+/memtest86+-5.31b.bin" $work_path/fin/casper/memtest
 
 
