@@ -67,7 +67,7 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "'
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Alt>Right']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'display_rotate_right.sh'"
 
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/name "'Display rotate right'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/name "'Display rotate upsidedown'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/binding "['<Super><Alt>Down']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'display_rotate_inverted.sh'"
 
