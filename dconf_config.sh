@@ -36,6 +36,10 @@ gsettings set org.nemo.desktop trash-icon-visible true
 
 gsettings set org.nemo.list-view default-visible-columns "['name', 'size', 'type', 'date_modified', 'owner', 'permissions']"
 gsettings set org.nemo.list-view default-column-order "['name', 'size', 'type', 'date_modified', 'date_created_with_time', 'date_accessed', 'date_created', 'detailed_type', 'group', 'where', 'mime_type', 'date_modified_with_time', 'octal_permissions', 'owner', 'permissions']"
+gsettings set org.nemo.search search-visible-columns "['name', 'where', 'date_modified', 'size', 'type', 'owner', 'permissions']"
+
+gsettings set org.nemo.preferences default-folder-viewer 'list-view'
+gsettings set org.nemo.icon-view default-zoom-level 'largest'
 
 # [2] in _readme.md, 
 # does not work, maybe "legacy" was a hint for that, developer wants to find another way to change zoom-in for terminal
