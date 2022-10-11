@@ -44,6 +44,8 @@ gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/k
 gsettings set org.cinnamon.desktop.screensaver lock-delay 600 # seconds, ??? start delay not found via dconf Editor
 gsettings set org.cinnamon.settings-daemon.plugins.power sleep-display-battery 900 # in seconds
 gsettings set org.cinnamon.settings-daemon.plugins.power sleep-inactive-battery-timeout 1800 # in seconds
+gsettings set org.cinnamon.settings-daemon.plugins.power idle-dim-time 300 # in seconds, dim screen after becoming idle; timeout
+gsettings set org.cinnamon.settings-daemon.plugins.power idle-brightness 10 # in %
 
 # See [1] of _readme.md, also for some reason command (for binding) that have $(xrandr do not work, only specific with e.g. eDP-1,
 # therefore changed script code to make shell files and bind to them - it resulted in being able to use keys to rotate system's display
