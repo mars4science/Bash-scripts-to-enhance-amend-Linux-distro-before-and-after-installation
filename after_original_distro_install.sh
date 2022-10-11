@@ -125,6 +125,10 @@ $dir_name/systemd_on_resume_config.sh
 if [ $running_system = "false" ]; then
     # setup systemd service to configure user liveUSB account: "mint" (dconf, bashrc, etc) after systemd start but before user login
     $dir_name/systemd_targets_config.sh
+
+    # fix liveUSB absense of kernel file in /boot (broken links in /boot in at least LM 20.2, get full name with version of the kernel from them via grep)
+    # kernel in /boot needed for e.g. libguestfs-tools
+    sudo ln -s /cdrom/casper/vmlinuz /boot/$(ls -l /boot | grep "vmlinuz " | awk '{print $11}')
 fi
 
 # for system running after install or running liveUSB 
