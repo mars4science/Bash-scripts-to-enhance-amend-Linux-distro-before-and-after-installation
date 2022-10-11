@@ -10,7 +10,7 @@
 # ---- parameters ---- #
 
 data_inputs_root=/media/$(id --user --name)/usb
-work_path=/media/mint/usb/custom_iso
+work_path=/media/ramdrive
 
 distro_label="LM_20.2_AM_full_v_1.0"
 original_iso="$data_inputs_root"/LM_20.2/linuxmint-20.2-cinnamon-64bit.iso
