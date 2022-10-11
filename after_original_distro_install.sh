@@ -74,6 +74,9 @@ $dir_name/memory_notify_config.sh
 $dir_name/display_backlight_control_setup.sh
 $dir_name/bash_functions.sh
 
+# enable packet forwarding for IPv4, IPv6
+$dir_name/networking_tweaks.sh
+
 echo "===== next in a few seconds going to install downloaded debian packages ====="
 sleep 5 # pause n seconds
 
