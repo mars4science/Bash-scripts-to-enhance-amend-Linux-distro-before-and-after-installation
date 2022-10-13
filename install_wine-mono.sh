@@ -16,12 +16,12 @@ else
 fi
 
 # mono version for wine versions taken from table on https://wiki.winehq.org/Mono
-if [ $wine_version = "7.0" ];then
+if [ "$wine_version" = "7.0" ];then
     sudo mkdir --parents $path_to_install
     find $path_to_mono/7.0.0 -name wine-mono-7.0.0-x86.tar.xz -exec sudo tar x -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
     # if [ $? ];then echo "copied mono to $path_to_install"; else echo "error: maybe NOT copied mono to $path_to_install"; fi
     echo "copied (installed) mono to $path_to_install"
-elif [ $wine_version = "6.0.1" ];then
+elif [ "$wine_version" = "6.0.1" ];then
     sudo mkdir --parents $path_to_install
     find $path_to_mono/5.1.1 -name wine-mono-5.1.1-x86.tar.xz -exec sudo tar x -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
     # if [ $? ];then echo "copied mono to $path_to_install"; else echo "error: maybe NOT copied mono to $path_to_install"; fi
