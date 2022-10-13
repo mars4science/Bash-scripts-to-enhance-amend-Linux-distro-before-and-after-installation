@@ -34,6 +34,8 @@ else
     echo "file:///media/ramdrive Ramdrive" > "$bookmarks_file"
     echo "file:///home/$(id -u -n)/Documents" >> "$bookmarks_file"
     echo "file:///home/$(id -u -n)/Downloads" >> "$bookmarks_file"
+    echo "file:///home/$(id -u -n)/Pictures" >> "$bookmarks_file"
+
 fi
 
 exit
