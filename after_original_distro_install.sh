@@ -40,6 +40,7 @@ $dir_name/get_source_path.sh install
 
 $dir_name/common_arguments_to_scripts.sh install
 
+$dir_name/binaries_install.sh # to copy misc binaries to location in $PATH
 $dir_name/fan_setup.sh # disable fan is fan control is already enabled
 $dir_name/apt_get.sh install
 $dir_name/r_sync.sh install
