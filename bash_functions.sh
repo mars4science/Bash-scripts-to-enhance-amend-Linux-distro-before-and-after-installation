@@ -38,25 +38,39 @@ echo '}; export -f e_ject' | sudo tee --append /etc/bash.bashrc
 
 echo '' | sudo tee --append /etc/bash.bashrc
 
-# commant to remount ro
+# command to remount ro
 echo '' | sudo tee --append /etc/bash.bashrc
-echo 'mnt_ro() {' | sudo tee --append /etc/bash.bashrc
+echo 'mntro() {' | sudo tee --append /etc/bash.bashrc
 echo '    dev=$(mount | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')' | sudo tee --append /etc/bash.bashrc
 echo '    echo $dev | grep " " # check if space is present, then two or more lines were selected' | sudo tee --append /etc/bash.bashrc
 echo '    if [ $? -eq 0 ]; then echo "Two or more mounts matched, please pass more specific parameter"; return; fi' | sudo tee --append /etc/bash.bashrc
 echo '    if [ -z $dev ]; then echo "No mounts contaning phrase [$1] found"; return; fi' | sudo tee --append /etc/bash.bashrc
 echo '    sudo mount -o remount,ro $dev;' | sudo tee --append /etc/bash.bashrc
-echo '}; export -f mnt_ro' | sudo tee --append /etc/bash.bashrc
+echo '}; export -f mntro' | sudo tee --append /etc/bash.bashrc
 echo '' | sudo tee --append /etc/bash.bashrc
 
-# commant to remount rw
+# command to remount rw
 echo '' | sudo tee --append /etc/bash.bashrc
-echo 'mnt_rw() {' | sudo tee --append /etc/bash.bashrc
+echo 'mntrw() {' | sudo tee --append /etc/bash.bashrc
 echo '    dev=$(mount | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')' | sudo tee --append /etc/bash.bashrc
 echo '    echo $dev | grep " " # check if space is present, then two or more lines were selected' | sudo tee --append /etc/bash.bashrc
 echo '    if [ $? -eq 0 ]; then echo "Two or more mounts matched, please pass more specific parameter"; return; fi' | sudo tee --append /etc/bash.bashrc
 echo '    if [ -z $dev ]; then echo "No mounts contaning phrase [$1] found"; return; fi' | sudo tee --append /etc/bash.bashrc
 echo '    sudo mount -o remount,rw $dev;' | sudo tee --append /etc/bash.bashrc
-echo '}; export -f mnt_ro' | sudo tee --append /etc/bash.bashrc
+echo '}; export -f mntrw' | sudo tee --append /etc/bash.bashrc
+echo '' | sudo tee --append /etc/bash.bashrc
+
+# run geth offline
+echo '' | sudo tee --append /etc/bash.bashrc
+echo 'gethh() {' | sudo tee --append /etc/bash.bashrc
+echo '    echo - Starting geth console in offine mode' | sudo tee --append /etc/bash.bashrc
+echo '    echo - To generate and sign transaction to send 0.5 as 16th transaction use e.g.:' | sudo tee --append /etc/bash.bashrc
+echo '    echo > personal.signTransaction\({from: eth.accounts[0], to: \"0x40_hex_symbols_address\", value: web3.toWei\(0.5, \"ether\"\), nonce: 15, gas: 21000, gasPrice: 5},\"password_set_during_import\"\)' | sudo tee --append /etc/bash.bashrc
+echo '    echo - To send transaction e.g. copy \"raw:\" field from output and use MyCrypto' | sudo tee --append /etc/bash.bashrc
+echo '    echo - To generate address from secret key run from bash:' | sudo tee --append /etc/bash.bashrc
+echo '    echo $ geth --password file_with_password_to_set.txt account import file_with_key.txt' | sudo tee --append /etc/bash.bashrc
+echo '    sleep 3' | sudo tee --append /etc/bash.bashrc
+echo '    geth --nodiscover --maxpeers 0 console' | sudo tee --append /etc/bash.bashrc
+echo '}; export -f gethh' | sudo tee --append /etc/bash.bashrc
 echo '' | sudo tee --append /etc/bash.bashrc
 
