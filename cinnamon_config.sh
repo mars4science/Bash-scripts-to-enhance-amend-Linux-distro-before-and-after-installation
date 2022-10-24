@@ -19,3 +19,6 @@ changed_panel=`grep 'panel1:right:' /usr/share/glib-2.0/schemas/org.cinnamon.gsc
 echo "enabled-applets=$changed_panel" | sudo tee --append "$schema_override_file" > /dev/null
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas
 
+# edit applications in menu
+sudo sudo sed --in-place '/Keywords=/Keywords=Tables;/' /usr/share/applications/libreoffice-calc.desktop # add search keyword for LibreOffice Calc
+
