@@ -38,7 +38,7 @@ if [ ! -d $(dirname "$full_profile_path") ]; then # looks firefox has never been
     if [ $i -eq 10 ]; then echo "Takes long to start firefox, maybe run the script later?"; exit; fi
 fi
 # end firefox process, $ at the end needed to skip firefox.real of tor
-pkill firefox$ || pkill GeckoMain || echo there were no firefox processes to end, continue with the script
+pkill firefox$ || pkill firefox-bin$ ||pkill GeckoMain || echo there were no firefox processes to end, continue with the script
 
 if [ -d $full_profile_path ]; then
 

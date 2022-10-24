@@ -23,7 +23,7 @@ else
 fi
 
 # end firefox process just in case, $ at the end needed to skip firefox.real of tor
-pkill firefox$ || pkill GeckoMain || echo there were no firefox processes to end, continue with the script
+pkill firefox$ || pkill firefox-bin$ || pkill GeckoMain || echo there were no firefox processes to end, continue with the script
 
 # path_original=$(pwd)
 
