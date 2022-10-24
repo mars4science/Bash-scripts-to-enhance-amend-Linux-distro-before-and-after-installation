@@ -5,11 +5,6 @@ default_local_software_path=/usr/local/bin
 
 # script_path=$0 # $0 gives full (?"or relative path"? where have I read that?: footnote [1], might be some issues with symbolic links)
 
-# man realink:
-# Note realpath(1) is the preferred command to use for canonicalization functionality.
-#       -f, --canonicalize
-#              canonicalize  by  following  every  symlink in every component of the given name recur‐
-#              sively; all but the last component must exist
 script_path="$(realpath "$0")"
 
 # not only file name, can remove suffix too

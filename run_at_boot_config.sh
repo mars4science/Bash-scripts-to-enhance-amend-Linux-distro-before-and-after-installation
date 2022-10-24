@@ -29,6 +29,7 @@ exit
 # to be added to grub menu entry(-ies) at the end of linux line in the form of init=boot_script_path
 
 # https://www.urbanautomaton.com/blog/2014/09/09/redirecting-bash-script-output-to-syslog/
+
 # exec 1> >(logger -s -t $(basename $script_path)) 2>&1
 # above seems not to work, hypothesis is that logger job has not started at time of script run
 
@@ -54,6 +55,7 @@ exec /sbin/init
 
 # TODO add / pass a "kernelcore=" parameter to the kernel to be able to free some memory
 # https://unix.stackexchange.com/questions/312312/on-linux-how-can-i-hot-unplug-memory
+
 # https://www.kernel.org/doc/html/v4.14/admin-guide/kernel-parameters.html
         kernelcore=     [KNL,X86,IA-64,PPC]
                         Format: nn[KMGTPE] | "mirror"
@@ -80,6 +82,8 @@ exec /sbin/init
                         for Movable pages. nn[KMGTPE] and "mirror" are exclusive,
                         so you can NOT specify nn[KMGTPE] and "mirror" at the same
                         time.
+(c) Copyright The kernel development community. 
+
 https://unix.stackexchange.com/questions/683761/has-linux-kernel-abandoned-universally-applying-ram-that-isn-t-being-used-for-s
 https://www.kernel.org/doc/html/latest/admin-guide/mm/memory-hotplug.html
 

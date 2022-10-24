@@ -61,18 +61,4 @@ From gtk-launch documentation:
 
     gtk-launch takes at least one argument, the name of the application to launch. The name should match application desktop file name, as residing in /usr/share/application, with or without the '.desktop' suffix.
 
-
-
-
 https://askubuntu.com/questions/5172/running-a-desktop-file-in-the-terminal
-
-#man bash
-# file1 -nt file2
-#      True if file1 is newer (according to modification date) than file2, or if file1 exists and file2 does not.
-# file1 -ot file2
-#      True if file1 is older than file2, or if file2 exists and file1 does not.
-
-# man rsync
-# A trailing slash on the source changes this behavior to avoid creating an additional directory  level
-# at  the destination.  You can think of a trailing / on a source as meaning "copy the contents of this
-# directory" as opposed to "copy the directory by name"

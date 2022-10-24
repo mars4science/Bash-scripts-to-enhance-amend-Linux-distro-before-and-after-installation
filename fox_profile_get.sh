@@ -93,4 +93,3 @@ exit
 # does & at the end needed?
 firefox -no-remote -P name_of_profile 
 
-

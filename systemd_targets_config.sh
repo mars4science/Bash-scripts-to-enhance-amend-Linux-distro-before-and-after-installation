@@ -30,4 +30,4 @@ systemctl enable $service_file_name
 
 exit
 
-https://unix.stackexchange.com/questions/47695/how-to-write-startup-script-for-systemd/687324
+# https://unix.stackexchange.com/questions/47695/how-to-write-startup-script-for-systemd/687324

@@ -46,14 +46,4 @@ yt-dlp --list-formats https://www.youtube.com/watch?v=IrBlWB2bxQU | tee >(grep -
 echo $aaa # empty as expected, grep was run in a subshell, so see above: decided not to check
 ---
 
-man bash
-[[ expression ]]
-       An  additional  binary operator, =~, is available, with the same precedence as == and !=.  When it is used, the string to the right of the operator
-       is considered a POSIX extended regular expression and matched accordingly (as in regex(3)).  The return value is 0 if the string matches  the  pat‐
-       tern,  and  1 otherwise.  If the regular expression is syntactically incorrect, the conditional expression's return value is 2.  If the nocasematch
-       shell option is enabled, the match is performed without regard to the case of alphabetic characters.  Any part of the  pattern  may  be  quoted  to
-       force  the  quoted  portion  to be matched as a string.  Bracket expressions in regular expressions must be treated carefully, since normal quoting
-       characters lose their meanings between brackets.  If the pattern is stored in a shell variable, quoting the variable expansion  forces  the  entire
-       pattern  to  be matched as a string.  Substrings matched by parenthesized subexpressions within the regular expression are saved in the array vari‐
-       able BASH_REMATCH.  The element of BASH_REMATCH with index 0 is the portion of the string matching the entire regular expression.  The  element  of
-       BASH_REMATCH with index n is the portion of the string matching the nth parenthesized subexpression.
+

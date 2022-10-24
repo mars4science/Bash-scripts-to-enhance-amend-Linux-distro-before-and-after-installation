@@ -306,18 +306,6 @@ exit
 
 # https://stackoverflow.com/questions/148451/how-to-use-sed-to-replace-only-the-first-occurrence-in-a-file
 
-The first two parameters 0 and /Apple/ are the range specifier. The s/Apple/Banana/ is what is executed within that range. So in this case "within the range of the beginning (0) up to the first instance of Apple, replace Apple with Banana. Only the first Apple will be replaced.
-
-Background: In traditional sed the range specifier is also "begin here" and "end here" (inclusive). However the lowest "begin" is the first line (line 1), and if the "end here" is a regex, then it is only attempted to match against on the next line after "begin", so the earliest possible end is line 2. So since range is inclusive, smallest possible range is "2 lines" and smallest starting range is both lines 1 and 2 (i.e. if there's an occurrence on line 1, occurrences on line 2 will also be changed, not desired in this case). GNU sed adds its own extension of allowing specifying start as the "pseudo" line 0 so that the end of the range can be line 1, allowing it a range of "only the first line" if the regex matches the first line.
-
-Or a simplified version (an empty RE like // means to re-use the one specified before it, so this is equivalent):
-
-sed '0,/Apple/{s//Banana/}' input_filename
-
-And the curly braces are optional for the s command, so this is also equivalent:
-
-----
-
 
 
 
@@ -434,7 +422,7 @@ Size of boot image is 80 sectors -> genisoimage: Error - boot image 'fin/isolinu
 
 ---
 
-My answers here:
+See:
 https://unix.stackexchange.com/questions/675211/mkisofs-error-boot-image-efibot-img-not-an-allowable-size/679412#679412
 https://unix.stackexchange.com/questions/80305/mounting-a-squashfs-filesystem-in-read-write/679365#679365
 

@@ -16,6 +16,6 @@ $dir_name/after_wine_run.sh
 # change git config, e.g. colors of output for better visibility  
 $dir_name/git_config.sh
 
-# now profile added only for T480s 
+# now color profile added only for T480s 
 # TODO seems does not work by running by systemd on boot WantedBy=multi-user.target -> find out other way to run on boot
 # $dir_name/set_color_profile.sh

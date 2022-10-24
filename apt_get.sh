@@ -102,8 +102,6 @@ substitute_status(){
 
 substitute_status
 
-# [1]
-
 restore_status(){
     if [ -n "$status_path" ]
       then
@@ -212,7 +210,7 @@ while read line; do
         else
             1>&2 echo "    Package(s)  $line  being downloaded..."
             # download-only of deb packages including dependencies
-            # TODO see [2] maybe change to apt-get download -o Dir::Cache="./" -o Dir::Cache::archives="./"?
+            # TODO see [1] maybe change to apt-get download -o Dir::Cache="./" -o Dir::Cache::archives="./"?
             # though script is coded to copy anyway and only in case of success, if download to e.g. USB directly, in case of failure
             # would need to delete from USB, though maybe download to ramdrive?
             sudo apt-get install --download-only --assume-yes $line
@@ -263,6 +261,7 @@ exit
 
 
 # from man bash:
+# Bash is Copyright (C) 1989-2018 by the Free Software Foundation, Inc.
 # ?      Expands to the exit status of the most recently executed foreground pipeline.
 # The  `$'  character  introduces  parameter  expansion,  command substitution, or arithmetic expansion.  
 # The parameter name or symbol to be expanded may be enclosed in braces, which are optional but serve 
@@ -271,6 +270,7 @@ exit
 
 
 # from man bash:
+# Bash is Copyright (C) 1989-2018 by the Free Software Foundation, Inc.
 #       if list; then list; [ elif list; then list; ] ... [ else list; ] fi
 #              The if list is executed.  If its exit status is zero, the then list is executed.  Otherwise, each elif list is executed in turn, and  if  its  exit  status  is
 #              zero, the corresponding then list is executed and the command completes.  Otherwise, the else list is executed, if present.  The exit status is the exit status
@@ -301,84 +301,14 @@ exit
 #
 #       See the description of the test builtin command (section SHELL BUILTIN COMMANDS below) for the handling of parameters (i.e.  missing parameters).
 
-
-# *3
-# sudo apt-get install $debs_storage_folder/*.deb && 1>&2 echo "    Package(s)  $line  installed"
-#Note, selecting 'enchant' instead of '/media/alex/usb/LM_20.2/subtitleeditor/enchant_1.6.0-11.3build1_amd64.deb'
-#Err:1 http://archive.ubuntu.com/ubuntu focal/universe amd64 libenchant1c2a amd64 1.6.0-11.3build1
-#Err:1 http://archive.ubuntu.com/ubuntu focal/universe amd64 libenchant1c2a amd64 1.6.0-11.3build1
-#  Could not resolve 'archive.ubuntu.com'
-#Ign:2 http://archive.ubuntu.com/ubuntu focal/universe amd64 enchant amd64 1.6.0-11.3build1
-#Get:2 http://archive.ubuntu.com/ubuntu focal/universe amd64 enchant amd64 1.6.0-11.3build1 [12,4 kB]
-#Err:2 http://archive.ubuntu.com/ubuntu focal/universe amd64 enchant amd64 1.6.0-11.3build1
-#  File not found - /media/alex/usb/LM_20.2/subtitleeditor/enchant_1.6.0-11.3build1_amd64.deb (13: Permission denied)
-#E: Failed to fetch http://archive.ubuntu.com/ubuntu/pool/universe/e/enchant/libenchant1c2a_1.6.0-11.3build1_amd64.deb  Could not resolve 'archive.ubuntu.com'
-#E: Failed to fetch file:/media/alex/usb/LM_20.2/subtitleeditor/enchant_1.6.0-11.3build1_amd64.deb  File not found - /media/alex/usb/LM_20.2/subtitleeditor/enchant_1.6.0-11.3build1_amd64.deb (13: Permission denied)
-
-
-# [1]
-# functions have own parameters, so $1 here, not parameter of the script. Later removed as if trapped is called without parameter. Also:
-# man bash
-#
-#       A shell function, defined as described above under SHELL GRAMMAR, stores a series of commands for later execution.  When the name of a shell function is used as a simple
-#       command name, the list of commands associated with that function name is executed.  Functions are executed in the context of the current shell; no new process is created
-#       to interpret them (contrast this with the execution of a shell script).  When a function is executed, the arguments to the function become the positional parameters dur‐
-#       ing  its  execution.   The special parameter # is updated to reflect the change.  Special parameter 0 is unchanged.  The first element of the FUNCNAME variable is set to
-#       the name of the function while the function is executing.
-
-#       Variables  local  to the function may be declared with the local builtin command.  Ordinarily, variables and their values are shared between the function and its caller.
-#       If a variable is declared local, the variable's visible scope is restricted to that function and its children  (including  the  functions  it  calls).   Local  variables
-#      "shadow"  variables with the same name declared at previous scopes.  For instance, a local variable declared in a function hides a global variable of the same name: ref‐
-#       erences and assignments refer to the local variable, leaving the global variable unmodified.  When the function returns, the global variable is once again visible.
-#
-#       The shell uses dynamic scoping to control a variable's visibility within functions.  With dynamic scoping, visible variables and their values are a  result  of  the  se‐
-#       quence  of  function  calls that caused execution to reach the current function.  The value of a variable that a function sees depends on its value within its caller, if
-#       any, whether that caller is the "global" scope or another shell function.  This is also the value that a local variable declaration "shadows", and the value that is  re‐
-#       stored when the function returns.
-#
-#       For  example,  if a variable var is declared as local in function func1, and func1 calls another function func2, references to var made from within func2 will resolve to
-#       the local variable var from func1, shadowing any global variable named var.
-
-#       A variable can be assigned the nameref attribute using the -n option to the declare or local builtin commands (see the descriptions of declare and local below) to create
-#       a nameref, or a reference to another variable.  This allows variables to be manipulated indirectly.  Whenever the nameref variable is referenced, assigned to, unset,  or
-#       has  its  attributes  modified  (other than using or changing the nameref attribute itself), the operation is actually performed on the variable specified by the nameref
-#       variable's value.  A nameref is commonly used within shell functions to refer to a variable whose name is passed as an argument to the  function.   For  instance,  if  a
-#       variable name is passed to a shell function as its first argument, running
-#              declare -n ref=$1
-#       inside  the function creates a nameref variable ref whose value is the variable name passed as the first argument.  References and assignments to ref, and changes to its
-#       attributes, are treated as references, assignments, and attribute modifications to the variable whose name was passed as $1.  If the control variable in a for  loop  has
-#       the  nameref attribute, the list of words can be a list of shell variables, and a name reference will be established for each word in the list, in turn, when the loop is
-#       executed.  Array variables cannot be given the nameref attribute.  However, nameref variables can reference array variables and subscripted  array  variables.   Namerefs
-#       can  be  unset  using the -n option to the unset builtin.  Otherwise, if unset is executed with the name of a nameref variable as an argument, the variable referenced by
-#       the nameref variable will be unset.
-
-[2]
+[1]
 https://unix.stackexchange.com/questions/683777/why-apt-get-does-not-download-all-dependencies-in-download-only-mode
 https://stackoverflow.com/questions/13756800/how-to-download-all-dependencies-and-packages-to-directory
+
 PACKAGES="wget unzip"
 apt-get download $(apt-cache depends --recurse --no-recommends --no-suggests \
   --no-conflicts --no-breaks --no-replaces --no-enhances \
   --no-pre-depends ${PACKAGES} | grep "^\w")
 
-
-This script works great.. downloaded the entire dependency tree. I'm wondering if we could also auto-generate a file having the dpkg commands in proper order, so that the packages with no other dependencies load up first? At present it's just a brute-force sudo dpkg -i *.deb several times. – 
-Nikhil VJ
-Mar 24 '18 at 13:51
-1
-@NikhilVJ Once you've downloaded your dependencies you can use apt-get install --no-download <PACKAGE> and it will search only the local cache. It should be able to sort out the dependency order as it normally does though. – 
-TheBeardedQuack
-Nov 20 '18 at 11:58
-1
-Changed your apt-get download line to start like this so that the files are downloaded to the current directory. apt-get download -o Dir::Cache="./" -o Dir::Cache::archives="./" – 
-OwN
-Feb 25 '19 at 6:12
-2
-Why use --no-pre-depends? I think pre-depends is required to be installed. – 
-Steely Wing
-Apr 30 '19 at 8:20
-1
-I found that it downloaded both the amd64 and i386 versions for some packages. To download only the version i needed, I extended the grep with in the following way: grep "^\w" | grep -v "i386" (To ignore the i386 ones) – 
-Gal Avineri
-May 28 '19 at 11:46
 
 

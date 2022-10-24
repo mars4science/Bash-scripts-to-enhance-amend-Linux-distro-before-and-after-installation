@@ -2,7 +2,9 @@
 
 #### Disclaimer: some scripts produce modified ISO files which might no longer be considered original distros and might have no legal rights to be called by original names and distributed with original labels and other contents. Only personal use for testing is implied. 
 
-#### Licences: FSF GPL 2.0, FSF GPL 3.0.
+#### Copyright (c) 2009-present, Alex Martianov. All rights reserved. 
+
+#### Licences: GNU GPL 2.0, GNU GPL 3.0.
 
 Run _make_custom_liveusb.sh to amend liveUSB iso.
 

@@ -158,6 +158,7 @@ exit
 
 # TODO reload ./bashrc
 # https://stackoverflow.com/questions/2518127/how-to-reload-bashrc-settings-without-logging-out-and-back-in-again
+
 # source ~/.bashrc # to update changes in running terminal
 # above line make changes only in bash running the script which exits after script completion
 # maybe some combination with exec "$BASH" or exec scriptname - what I've tried did not work as hoped for as of now ...
@@ -165,7 +166,7 @@ exit
 
 [1]
 
-root@alex-ThinkPad-slim:/# ps
+root@alex:/# ps
 Error, do this: mount -t proc proc /proc
-root@alex-ThinkPad-slim:/# mount
+root@alex:/# mount
 mount: failed to read mtab: No such file or directory

@@ -6,7 +6,7 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 sudo sed -i -- 's/io.github.celluloid_player.Celluloid.desktop;xplayer.desktop;org.gnome.Totem.desktop/mpv.desktop/' /usr/share/applications/defaults.list
 exit
 
-
+# other ways below?
 
 # ~ is home, same as /home/$(id -u -n)
 echo '[Default Applications]' > ~/.config/mimeapps.list

@@ -1,11 +1,7 @@
-    #!/bin/bash
+#!/bin/bash
 
 # to download all branches
 # https://stackoverflow.com/questions/67699/how-to-clone-all-remote-branches-in-git/7216269#7216269
-# git clone --mirror path/to/original path/to/dest/.git
-# cd path/to/dest
-# git config --bool core.bare false
-# git checkout anybranch
 
 trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 

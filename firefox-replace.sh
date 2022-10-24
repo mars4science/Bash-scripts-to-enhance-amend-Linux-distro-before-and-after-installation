@@ -31,5 +31,3 @@ if [ "$ff_link_symbolic" = "true" ]; then sudo ln --symbolic --force $ff_install
 sudo mkdir $ff_installed_folder/distribution
 echo '{"policies": {"DisableAppUpdate": true}}' | 1>/dev/null sudo tee $ff_installed_folder/distribution/policies.json
 
-
-

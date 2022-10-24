@@ -145,9 +145,9 @@ dconf write /org/cinnamon/enabled-applets "$applets_changed"
 [1]
 # dconf write /org/cinnamon/desktop/interface/scaling-factor 1
 error: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
-root@alex-ThinkPad-slim:/# echo $?
+root@alex:/# echo $?
 1
-root@alex-ThinkPad-slim:/# gsettings set org.cinnamon.desktop.interface scaling-factor 1
+root@alex:/# gsettings set org.cinnamon.desktop.interface scaling-factor 1
 
 (process:242481): dconf-WARNING **: 08:34:30.432: failed to commit changes to dconf: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
 root@alex-ThinkPad-slim:/# echo $?
