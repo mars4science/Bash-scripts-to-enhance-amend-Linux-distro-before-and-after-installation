@@ -12,7 +12,7 @@
 data_inputs_root=/media/$(id --user --name)/usb
 work_path=/media/ramdrive
 
-distro_label="LM_20.2_AM_full_v_2.0"
+distro_label="LM_20.2_AM_full_v_1.1"
 original_iso="$data_inputs_root"/LM_20.2/linuxmint-20.2-cinnamon-64bit.iso
 if [ ! -e $original_iso ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi 
 
