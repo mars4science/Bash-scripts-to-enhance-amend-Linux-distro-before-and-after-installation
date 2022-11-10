@@ -19,12 +19,16 @@ remove_if_exists ~/.wine
 remove_if_exists ~/.local/share/wineprefixes
 remove_if_exists ~/.local/share/Trash
 
-firefox_profile_path=$(cat /home/$(id -un)/.mozilla/firefox/profiles.ini | grep ^Default | grep --invert-match "Default=1" | head --lines=1 | awk --field-separator "=" '{ FS = "=" ; print $2 ; exit }')
-remove_if_exists ~/.mozilla/firefox/$firefox_profile_path/storage
+ff_profiles="/home/$(id -un)/.mozilla/firefox/profiles.ini"
+if [ -e "$ff_profiles" ]; then
+    firefox_profile_path=$(cat /home/$(id -un)/.mozilla/firefox/profiles.ini | grep ^Default | grep --invert-match "Default=1" | head --lines=1 | awk --field-separator "=" '{ FS = "=" ; print $2 ; exit }')
+    remove_if_exists ~/.mozilla/firefox/$firefox_profile_path/storage
+fi
 sudo rm --force --recursive /var/log/*
 
-# end Windows (wine) processes after deleting Windows disks (~./wine) 
-ps -e -f | grep '\.exe' | grep ' [C|Z]:\\' | awk '{print $2}' | xargs kill
+# end Windows (wine) processes after deleting Windows disks (~./wine)
+# often there are none, so 2>/dev/null to prevent an error displayed
+ps -e -f | grep '\.exe' | grep ' [C|Z]:\\' | awk '{print $2}' | 2>/dev/null xargs kill
 
 exit
 
