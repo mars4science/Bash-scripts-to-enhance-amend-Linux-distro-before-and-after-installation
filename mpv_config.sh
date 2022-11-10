@@ -11,21 +11,24 @@ echo 'ALT+j add sub-scale -0.1' | sudo tee --append $conf_file
 echo '' | sudo tee --append $conf_file
 echo '## Seek units are in seconds, but note that these are limited by keyframes' | sudo tee --append $conf_file
 echo 'RIGHT no-osd seek  3 exact' | sudo tee --append $conf_file
-echo 'LEFT  no-osd seek -3 exact' | sudo tee --append $conf_file
+echo 'LEFT  no-osd seek -1 exact' | sudo tee --append $conf_file
 echo '#UP    seek  60' | sudo tee --append $conf_file
 echo '#DOWN  seek -60' | sudo tee --append $conf_file
 echo '# Do smaller, always exact (non-keyframe-limited), seeks with shift.' | sudo tee --append $conf_file
 echo "# Don't show them on the OSD (no-osd)." | sudo tee --append $conf_file
-echo 'Shift+RIGHT no-osd seek  1 exact' | sudo tee --append $conf_file
-echo '#Shift+LEFT  no-osd seek -1 exact' | sudo tee --append $conf_file
-echo '#Shift+UP    no-osd seek  5 exact' | sudo tee --append $conf_file
-echo '#Shift+DOWN no-osd seek -5 exact' | sudo tee --append $conf_file
+echo 'Shift+RIGHT no-osd seek  5 exact' | sudo tee --append $conf_file
+echo 'Shift+LEFT  no-osd seek -5 exact' | sudo tee --append $conf_file
+echo 'Shift+UP    no-osd seek  -60 exact' | sudo tee --append $conf_file
+echo 'Shift+DOWN no-osd seek 60 exact' | sudo tee --append $conf_file
 echo '' | sudo tee --append $conf_file
 echo '/ quit' | sudo tee --append $conf_file # set / key to quit player
 
 conf_file=/etc/mpv/mpv.conf
-echo 'sub-font-size=15' | sudo tee --append $conf_file
-echo 'sub-color=0.0/1.0/0.0' | sudo tee --append $conf_file
+echo 'sub-font-size=45' | sudo tee --append $conf_file
+echo 'sub-color=0.0/1.0/1.0/0.2' | sudo tee --append $conf_file
+echo 'sub-border-size=10' | sudo tee --append $conf_file
+echo 'sub-border-color=0.0/0.0/0.0/0.2' | sudo tee --append $conf_file
+echo 'sub-pos=70' | sudo tee --append $conf_file
 
 echo '' | sudo tee --append $conf_file
 echo 'fullscreen=yes' | sudo tee --append $conf_file
