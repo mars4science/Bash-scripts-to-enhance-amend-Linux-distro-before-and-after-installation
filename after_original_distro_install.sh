@@ -21,10 +21,23 @@ cd `dirname $0`
 # "true" is just a string, bash test uses binary or unary operators, they return true, but true value cannot be written explicitly as I've understood many times again and again
 if [ -e /proc/mounts ]; then running_system="true"; 
   else 
-    echo "This line is where code is written to process liveUSB iso file creation"; 
-    sleep 3;
-    running_system="false"; 
-    sudo mount -t proc proc /proc; 
+    echo "This line is where code is written to process liveUSB iso file creation"
+    sleep 3
+    running_system="false";
+    sudo mount -t proc proc /proc
+    sudo mount -t devtmpfs devtmpfs /dev
+    sudo mount -t devpts devpts /dev/pts
+
+    # some locales are added at install time, but it is a code branch for liveUSB
+    sudo locale-gen ru_RU
+    sudo locale-gen ru_RU.UTF-8
+    sudo locale-gen ru_RU.KOI8-R
+    sudo locale-gen ru_RU.CP1251
+    sudo locale-gen uk_UA
+    sudo locale-gen uk_UA.UTF-8
+
+sleep 10
+
 fi
 
 if [ $running_system = "true" ]; then
@@ -106,10 +119,6 @@ echo 'application/x-subrip=xed.desktop' | sudo tee --append /usr/share/applicati
 
 # for our old printer (TODO fix printer to enable color output)
 $dir_name/printer_color_as_gray.sh
-
-# rus locale has been added at install time, but for liveUSB need to add separately
-sudo locale-gen ru_RU
-sudo locale-gen ru_RU.UTF-8
 
 # add applets/desklets software to Cinnamon
 $dir_name/cinnamon_add_software.sh
