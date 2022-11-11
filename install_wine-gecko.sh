@@ -5,7 +5,7 @@
 # trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 # here non-zero status is processed other way
 
-path_to_gecko="/media/$(id -un)/usb/LM_20.2/wine-gecko"
+path_to_gecko="${software_path_root}/wine-gecko"
 # man bash -e file True if file exists
 if [ ! -e "$path_to_gecko" ]; then echo >&2 "wine-gecko path $path_to_gecko not found, exiting with error"; exit 1; fi
 

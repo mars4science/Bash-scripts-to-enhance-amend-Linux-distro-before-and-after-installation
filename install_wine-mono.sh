@@ -1,6 +1,6 @@
 #!/bin/bash
 
-path_to_mono="/media/$(id -un)/usb/LM_20.2/wine-mono"
+path_to_mono="${software_path_root}/wine-mono"
 # man bash -e file True if file exists
 if [ ! -e "$path_to_mono" ]; then echo >&2 "wine-mono path $path_to_mono not found, exiting with error"; exit 1; fi
 
