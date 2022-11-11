@@ -2,22 +2,24 @@
 
 # trap 'err=$?; echo >&2 "Exiting on error $err"; sleep 10; exit $err' ERR
 
-# ---- manual way is after auto script  ----- #
-
 # ---- auto script  ----- #
+# ---- manual way is after auto script (note: manual outdated, auto up-to-date)  ----- #
 
 
 # ---- parameters ---- #
+distro_label="LM_20.2_AM_full_v_1.2" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
-data_inputs_root=/media/$(id --user --name)/usb
-work_path=/media/ramdrive
+software_path_root=/media/$(id --user --name)/usb/LM_20.2 # the script is written to look for software to take from there
+work_path=/media/ramdrive # the script is written to create temporary files and resulting ISO there (free space "expected")
 
-distro_label="LM_20.2_AM_full_v_1.1"
-original_iso="$data_inputs_root"/LM_20.2/linuxmint-20.2-cinnamon-64bit.iso
-if [ ! -e $original_iso ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi 
-
+original_iso="${software_path_root}"/linuxmint-20.2-cinnamon-64bit.iso # the script is written to look there for original ISO
 # ---- parameters end ---- #
 
+
+if [ ! -e "$original_iso" ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi
+
+# as after_original_distro_install.sh to be run in chrooted environment there is code to map (via mount) software_path_root to  path_to_software_in_chroot - where above mentioned script is written to look for software
+path_to_software_in_chroot="/software_to_add"
 
 script_path="$(dirname "$(realpath "$0")")"
 
@@ -38,7 +40,7 @@ change_squash() {
     sudo cp $script_path/after_login_config.sh $work_path/fin_sq/am
     sudo cp $script_path/transmission_setup.sh $work_path/fin_sq/am
     sudo mkdir --parents $work_path/fin_sq/am/transmission-settings
-    sudo cp $script_path/settings/transmission/*.json $work_path/fin_sq/am/transmission-settings
+    sudo cp "${software_path_root}"/settings/transmission/*.json $work_path/fin_sq/am/transmission-settings
     sudo cp $script_path/add_ramdisk_and_ramcache.sh $work_path/fin_sq/am
     sudo cp $script_path/after_wine_run.sh $work_path/fin_sq/am
     sudo cp $script_path/git_config.sh $work_path/fin_sq/am
@@ -48,22 +50,19 @@ change_squash() {
     sudo cp $script_path/set_color_profile.sh $work_path/fin_sq/am
 
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
-    sudo cp $script_path/bin/stopfan $work_path/fin_sq/usr/local/bin
+    sudo cp "${software_path_root}"/bin/stopfan $work_path/fin_sq/usr/local/bin
     sudo chmod +xs $work_path/fin_sq/usr/local/bin/stopfan
 
     # to install debs and other files need to have path to them inside chrooted environment
     # see https://unix.stackexchange.com/questions/683439/mount-twice-bind-why-some-parameters-change-others-not
-    sudo mount -o bind,x-mount.mkdir "$data_inputs_root" $work_path/fin_sq/media/root/usb
-    sudo mount -o bind,remount,ro "$data_inputs_root" $work_path/fin_sq/media/root/usb
+    sudo mount -o bind,x-mount.mkdir "${software_path_root}" $work_path/fin_sq"${path_to_software_in_chroot}"
+    sudo mount -o bind,remount,ro "${software_path_root}" $work_path/fin_sq"${path_to_software_in_chroot}"
 
-    # to run scripts located in the same folder where script run by chroot is located
+    # to run script(s) via chroot need path to them inside chrooted environment
     sudo mount -o bind,x-mount.mkdir $script_path $work_path/fin_sq/media/root/Scripts
     sudo mount -o bind,remount,ro $script_path $work_path/fin_sq/media/root/Scripts
 
-    # for chrooted environment path should reflect chroot: media/root, not media/user_name, script developer expects id to work to give root
-    # /media/root works in chrooted because of bind mounts above
-#    sudo chroot $work_path/fin_sq /media/$(id --user --name)/usb/Projects/Scripts-git/after_original_distro_install.sh
-    sudo chroot $work_path/fin_sq /media/root/Scripts/after_original_distro_install.sh
+    sudo chroot $work_path/fin_sq /bin/bash -c "software_path_root=${path_to_software_in_chroot}; export software_path_root; /media/root/Scripts/after_original_distro_install.sh"
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
 }
 
@@ -73,7 +72,7 @@ change_boot() {
     # [2]
     # ======= for UEFI boot =======
     # 	linux	/casper/vmlinuz  file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=${iso_path} toram --
-    # duplicate first menu entry three times, \s\S needed as in perl . does not include end of line   
+    # duplicate first menu entry three times, \s\S needed as in perl . (dot) does not include end of line
     perl -0777e 'while(<>){s/(menuentry[\s\S]*?\n\}\n)/\1\1\1\1/;print "$_"}' $work_path/fin/boot/grub/grub.cfg | 1>/dev/null sudo tee $work_path/fin/boot/grub/grub.cfg_tmp
     sudo mv --force $work_path/fin/boot/grub/grub.cfg_tmp $work_path/fin/boot/grub/grub.cfg
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
@@ -126,15 +125,12 @@ change_boot() {
     sudo sed --in-place -- 's/\(timeout\).*/\1 50/' $work_path/fin/isolinux/isolinux.cfg
 
     # code to repalce memtest to start with stock iso
-    # path looks like need to be changed in after_original_distro_install.sh too because after_ is programmed to be run in chrooted environment
-    if [ "x${software_path_root}" = "x" ] ; then software_path_root="$data_inputs_root/LM_20.2" ; fi
-    # export software_path_root # is it needed?
     sudo cp "${software_path_root}/memtest86+/memtest86+-5.31b.bin" $work_path/fin/casper/memtest
 
 
 # TODO add changing initramfs / initrd 
 
-    # change initrd (e.g. change live session user id)
+    # change initrd (e.g. change live session user id - DONE)
 #    sudo unmkinitramfs $work_path/fin/casper/initrd.lz $work_path/initrd
 
 
@@ -143,16 +139,17 @@ change_boot() {
 }
 
 u_mount(){
-    if [ -e "$1" ]; then sudo umount "$1"; fi
+    # proc path exists before script, mount_path is relative, so grep, not just `findmnt "$mount_path"` and current folder is "expected" to be $work_path
+    # no need to escape " inside command substitution as double quotes preserve literal meaning of qouble quotes (man bash: search for "QUOTING")
+    if [ -n "$(findmnt | grep "$1" | head -n 1)" ]; then sudo umount "$1"; fi
 }
 
 un_mount_in_squashfs(){
-    # proc path exists before script, mount_path is relative, so grep, not just `findmnt "$mount_path"`
-#     mount_path=fin_sq/proc;  if [ -n "$(findmnt | grep "\""$mount_path"\"" | head -n 1)" ]; then sudo umount $mount_path; fi
-# quoting as above does not work, see my question on unix.se
-    mount_path=fin_sq/proc;  if [ -n "$(findmnt | grep $mount_path | head -n 1)" ]; then sudo umount $mount_path; fi
+    u_mount fin_sq/dev/pts
+    u_mount fin_sq/dev
+    u_mount fin_sq/proc
     u_mount fin_sq/media/ramdrive
-    u_mount fin_sq/media/root/usb
+    u_mount fin_sq"${path_to_software_in_chroot}"
     u_mount fin_sq/media/root/Scripts
 }
 
@@ -177,8 +174,8 @@ if [ -e "$work_path" ] && [ "$(ls $work_path)" != "" ]; then
     read -p "! $work_path exists and not empty, abort (n), proceed (y), try deleting contents within it (d)? " -n 1 -r
     echo    # (optional) move to a new line
     if [[ ! $REPLY =~ ^[YyDd]$ ]]; then exit; fi
-    cd $work_path
     if [[ $REPLY =~ ^[Dd]$ ]]; then
+        cd "$work_path"
         un_mount
         sudo rm -R $work_path/*
         Eval=$?
@@ -187,7 +184,6 @@ if [ -e "$work_path" ] && [ "$(ls $work_path)" != "" ]; then
             echo "Deleting contents unsuccessful (per return code);this script is written to end in $delay seconds"; sleep $delay; exit 1;
         fi
         echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
-        cd "$work_path"
     fi    
 else
     mkdir --parents $work_path && cd $_
@@ -281,30 +277,15 @@ exit
 
 
 [1]
-
-
-# [1] 
 # testing gerenating CD (not USB) image:
 # sudo genisoimage -lJr -o new_custom.iso -V LinuxMint_CD -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 --boot-info-table fin
 
-
-# man genisoimage:
-# -l     Allow  full  31-character  filenames
-# -J     Generate  Joliet directory records in addition to regular ISO9660 filenames
-#      -R     Generate SUSP and RR records using the Rock Ridge protocol to further describe the  files  on
-#              the ISO9660 filesystem.
-#       -r     This  is like the -R option, but file ownership and modes are set to more useful values.  The
-#              uid and gid are set to zero, because they are usually only useful on the author's system, and
-#              not useful to the client (....goes on)
-#       -no-emul-boot
-#              Specifies that the boot image used to create El Torito bootable CDs is a "no  emulation"  im‐
-#              age. The system will load and execute this image without performing any disk emulation.
-# (.... --boot-info-table -c -b -V -o )
-
-
 [2]
-
 # https://stackoverflow.com/questions/148451/how-to-use-sed-to-replace-only-the-first-occurrence-in-a-file
+
+
+
+
 
 
 
