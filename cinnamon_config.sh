@@ -20,5 +20,5 @@ echo "enabled-applets=$changed_panel" | sudo tee --append "$schema_override_file
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas
 
 # edit applications in menu
-sudo sudo sed --in-place '/Keywords=/Keywords=Tables;/' /usr/share/applications/libreoffice-calc.desktop # add search keyword for LibreOffice Calc
+sudo sudo sed --in-place 's/Keywords=/Keywords=Tables;/' /usr/share/applications/libreoffice-calc.desktop # add search keyword for LibreOffice Calc
 
