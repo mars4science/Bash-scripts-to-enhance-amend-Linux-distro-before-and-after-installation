@@ -10,7 +10,7 @@
 distro_label="LM_20.2_AM_full_v_1.2" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
 software_path_root=/media/$(id --user --name)/usb/LM_20.2 # the script is written to look for software to take from there
-work_path=/media/ramdrive # the script is written to create temporary files and resulting ISO there (free space "expected")
+work_path=/media/zramdrive # the script is written to create temporary files and resulting ISO there (free space "expected")
 
 original_iso="${software_path_root}"/linuxmint-20.2-cinnamon-64bit.iso # the script is written to look there for original ISO
 # ---- parameters end ---- #
@@ -48,6 +48,7 @@ change_squash() {
     sudo cp $script_path/run_at_boot_uid_change.sh $work_path/fin_sq/am
     sudo cp $script_path/systemd_to_run_as_user.sh $work_path/fin_sq/am
     sudo cp $script_path/set_color_profile.sh $work_path/fin_sq/am
+    sudo cp $script_path/add_zram.sh $work_path/fin_sq/am
 
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp "${software_path_root}"/bin/stopfan $work_path/fin_sq/usr/local/bin
@@ -180,7 +181,7 @@ if [ -e "$work_path" ] && [ "$(ls $work_path)" != "" ]; then
         sudo rm -R $work_path/*
         Eval=$?
         delay=0
-        if [ $Eval -ne 0 ]; then 
+        if [ $Eval -ne 0 ]; then
             echo "Deleting contents unsuccessful (per return code);this script is written to end in $delay seconds"; sleep $delay; exit 1;
         fi
         echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
@@ -228,26 +229,47 @@ fi
 # After done with modifications making new `squashfs` file, needs to be free space there  
 # putting in folder of previously created for new iso
 un_mount_in_squashfs # if not unmounted adds e.g. /proc, which I think it not how liveUSB is made to work and it would make it less properly working   
-sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend
+sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 # -comp xz
 # --- end of squashfs ---
 
 # --- generate new iso image ---
-if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - $(stat --printf="%s" fin/casper/filesystem.squashfs)/1048576 )) -le 500 ]; then 
-    echo "Available memory less than 500 MB larger that squashfs file, might need more memory to complete iso file creation"
+if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - $(stat --printf="%s" fin/casper/filesystem.squashfs)/1048576 )) -le 500 ]; then
+    echo "Available memory is less than 500 MB larger that squashfs file, might need more memory to complete iso file creation"
 # TODO if [ "$interactive_mode" = "true" ]; then
-    echo "Press (y/Y) to delete working files in $work_path/fin_sq that made up filesystem.squashfs" 
+    echo "Press (y/Y) to delete working files in $work_path/fin_sq that made up filesystem.squashfs"
     read -p "Any other key to open sub-shell to pause and add more free memory manually"  -n 1 -r
     echo  # (optional) move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        # unmounting tmpfs frees memory, although files in it are to be deleted by code on next line (rm)
-        # but could be faster and not sure how tmpfs works in chrooted
-        if [ -d fin_sq/media/ramdrive ]; then sudo umount fin_sq/media/ramdrive; fi
+        un_mount_in_squashfs
         sudo rm -R fin_sq/*
     else
         echo "Type "\""exit"\"" then press "\""Enter"\"" to continue the script"
         bash -i
     fi
 fi
+
+if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - $(stat --printf="%s" fin/casper/filesystem.squashfs)/1048576 )) -le 500 ]; then
+    echo "After deleting file available memory is still less than 500 MB larger that squashfs file, might need more memory to complete iso file creation"
+# TODO if [ "$interactive_mode" = "true" ]; then
+    echo "Press (a/A) to abort srcipt after deleting all files in $work_path"
+    read -p "Any other key to open sub-shell to pause and try to add more free memory manually"  -n 1 -r
+    echo  # (optional) move to a new line
+    if [[ $REPLY =~ ^[Aa]$ ]]; then
+        un_mount_in_work_path
+        sudo rm -R $work_path/*
+        Eval=$?
+        delay=0
+        if [ $Eval -ne 0 ]; then
+            echo "Deleting contents unsuccessful (per return code);this script is written to end in $delay seconds"; sleep $delay; exit 1;
+        fi
+        echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
+        exit
+    else
+        echo "Type "\""exit"\"" then press "\""Enter"\"" to continue the script"
+        bash -i
+    fi
+fi
+
 
 # added -allow-limited-size for squashfs file size > 2GB 
 # omitting `-eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot` resulted in USB able to boot in legacy mode only
@@ -264,7 +286,7 @@ echo "Next line is coded to invoke new bash instance; on exit all work files are
 bash -i
 
 # now delete intermediary data
-un_mount_in_work_path
+un_mount # was un_mount_in_work_path, I still do not understand why the result after next rm -R is same - all deleted
 sudo rm -R iso to temp fin iso_sq fin_sq temp_sq to_sq initrd
 echo "This line is after code to delete working files"
 
