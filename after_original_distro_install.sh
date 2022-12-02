@@ -103,7 +103,7 @@ sleep 5 # pause n seconds
 # to be run after programs install
 $dir_name/tlp_config_battery.sh
 $dir_name/upower_battery_config.sh # inc. change critial battery level to take action
-$dir_name/make_mpv_default.sh
+$dir_name/change_default_apps_for_multimedia_files.sh
 $dir_name/mpv_config.sh
 $dir_name/after_wine_install.sh # installs gecko and mono
 
