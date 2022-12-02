@@ -24,14 +24,13 @@ fi
 
 # adding bookmarks to Nemo is programmed based on try-and-error and https://forums.linuxmint.com/viewtopic.php?t=170398
 bookmarks_file=/home/$(id -u -n)/.config/gtk-3.0/bookmarks
-if [ -e "$bookmarks_file" ]; then
-    echo 'file:///media/ramdrive ramdrive' >> "$bookmarks_file"
-else
+if [ ! -e "$bookmarks_file" ]; then
     mkdir --parents "$(dirname "$bookmarks_file")"
     echo "file:///home/$(id -u -n)/Documents" > "$bookmarks_file"
     echo "file:///home/$(id -u -n)/Downloads" >> "$bookmarks_file"
     echo "file:///home/$(id -u -n)/Pictures" >> "$bookmarks_file"
-    echo "file:///media/ramdrive Ram drive" >> "$bookmarks_file"
-    echo "file:///media/zramdrive Ram compressed" >> "$bookmarks_file"
 fi
+
+echo "file:///media/ramdisk RAM disk" >> "$bookmarks_file"
+echo "file:///media/zramdisk RAM compressed" >> "$bookmarks_file"
 
