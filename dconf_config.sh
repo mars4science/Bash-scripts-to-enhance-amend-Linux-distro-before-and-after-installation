@@ -39,7 +39,16 @@ gsettings set org.nemo.list-view default-column-order "['name', 'size', 'type', 
 gsettings set org.nemo.search search-visible-columns "['name', 'where', 'date_modified', 'size', 'type', 'owner', 'permissions']"
 
 gsettings set org.nemo.preferences default-folder-viewer 'list-view'
+# standard 100%, large 150%, larger 200%, largest 400%; small 66%, smaller 50%, smallest 33%
+gsettings set org.nemo.list-view default-zoom-level 'large'
 gsettings set org.nemo.icon-view default-zoom-level 'largest'
+
+gsettings set org.nemo.preferences executable-text-activation 'display' # What to do with executable text files when they are activated (single or double clicked). Possible values are "launch" to launch them as programs, "ask" to ask what to do via a dialog, and "display" to display them as text files.
+gsettings set org.nemo.preferences click-double-parent-folder true # If true, double click left on blank area will go to parent folder
+gsettings set org.nemo.preferences quick-renames-with-pause-in-between true # Enables renaming of icons by two times clicking with pause between clicks
+gsettings set org.nemo.preferences show-advanced-permissions true # Show advanced permissions in the file property dialog
+gsettings set org.cinnamon.desktop.media-handling automount false # If set to true, then Nautilus will automatically mount media such as user-visible hard disks and removable media on start-up and media insertion.
+gsettings set org.cinnamon.desktop.media-handling automount-open false # Whether to automatically open a folder for automounted media (happens in Nemo)
 
 # [2] in _readme.md, 
 # does not work, maybe "legacy" was a hint for that, developer wants to find another way to change zoom-in for terminal
