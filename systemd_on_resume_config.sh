@@ -5,6 +5,8 @@
 # TODO test if fixes the issue if run on resume as programmed here (works if run manually after full wake up)
 # result of test: not working. TODO find other ways to fix automatically, for now added custom keys to activate fix code in dconf_config.sh
 
+if [ ! -e "${liveiso_path_scripts_root}" ] ; then liveiso_path_scripts_root=/usr/bin/am-scripts ; fi
+
 file_contents='#!/bin/sh
 
 case $1 in
@@ -55,7 +57,7 @@ if [ $dpm -ge 8 ] && [ $horizontal_relosution -ge 2000 ];then # maybe will be ru
 fi
 
 # temporary to set color profiles until found a way to run on boot
-/am/set_color_profile.sh
+$liveiso_path_scripts_root/set_color_profile.sh
 
     ;;
 esac

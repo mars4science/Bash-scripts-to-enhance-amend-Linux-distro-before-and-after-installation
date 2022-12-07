@@ -3,12 +3,15 @@
 
 # ----- systemd service to run a script to config user environment (AFAIK would be run before login) ----- #
 # could not find info that dbus-daemon is started by systemd, so no dependencies (Requires=, After= : see man systemd.service) 
+
+if [ ! -e "${liveiso_path_scripts_root}" ] ; then liveiso_path_scripts_root=/usr/bin/am-scripts ; fi
+
 service_file_contents="[Unit]
 Description=run a script to config user environment (AFAIK would be run before login)
 
 [Service]
 Type=oneshot
-ExecStart=/am/systemd_to_run_as_user.sh
+ExecStart=$liveiso_path_scripts_root/systemd_to_run_as_user.sh
 
 [Install]
 WantedBy=multi-user.target"
@@ -34,7 +37,7 @@ Description=add zram (compressed ram drive) at boot (AFAIK would be run before l
 
 [Service]
 Type=oneshot
-ExecStart=/am/add_zram.sh
+ExecStart=$liveiso_path_scripts_root/add_zram.sh
 
 [Install]
 WantedBy=multi-user.target"

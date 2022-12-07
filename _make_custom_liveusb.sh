@@ -7,7 +7,7 @@
 
 
 # ---- parameters ---- #
-distro_label="LM_20.2_AM_full_v_1.3" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
+distro_label="LM_20.2_AM_full_v_1.4" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
 software_path_root=/media/$(id --user --name)/usb/LM_20.2 # the script is written to look for software to take from there
 work_path=/media/zramdisk # the script is written to create temporary files and resulting ISO there (free space "expected")
@@ -16,13 +16,14 @@ original_iso="${software_path_root}"/linuxmint-20.2-cinnamon-64bit.iso # the scr
 
 # put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_liveusb.sh - custom init script)
 user_name=mint
-# ---- parameters end ---- #
-
-
-if [ ! -e "$original_iso" ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi
 
 # as after_original_distro_install.sh to be run in chrooted environment there is code to map (via mount) software_path_root to  path_to_software_in_chroot - where above mentioned script is written to look for software
 path_to_software_in_chroot="/software_to_add"
+liveiso_path_scripts_in_chroot=/usr/bin/am-scripts
+liveiso_path_settings_in_chroot=/usr/share/am-settings
+# ---- parameters end ---- #
+
+if [ ! -e "$original_iso" ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi
 
 script_path="$(dirname "$(realpath "$0")")"
 
@@ -32,29 +33,31 @@ change_squash() {
     # remove need to press ENTER at shutdown
     sudo perl -i -pe 's/prompt=1/prompt=/' $work_path/fin_sq/usr/sbin/casper-stop
 
-    if [ -e $work_path/fin_sq/1 ]; then
-        sudo mv $work_path/fin_sq/1 $work_path/fin_sq/am
+    # copy user specific scripts to be run later (later some [maybe all expect dconf_config as maybe it requires systemd running] expected to be moved to initrd change in change_boot() function)
+
+    scripts_to_copy_to=$work_path/fin_sq/$liveiso_path_scripts_in_chroot
+    settings_to_copy_to=$work_path/fin_sq/$liveiso_path_settings_in_chroot
+
+    if [ -e $scripts_to_copy_to ]; then
+        echo path for scripts exists, suspect possible collision. exiting...
+        exit 1
     else
-        sudo mkdir $work_path/fin_sq/am
+        sudo mkdir $scripts_to_copy_to
+    fi
+    if [ -e $settings_to_copy_to ]; then
+        echo path for settings exists, suspect possible collision. exiting...
+        exit 1
+    else
+        sudo mkdir $settings_to_copy_to
     fi
 
-    # copy user specific scripts to be run later (later some [maybe all expect dconf_config as maybe it requires systemd running] expected to be moved to initrd change in change_boot() function)
-    sudo cp $script_path/dconf_config.sh $work_path/fin_sq/am
-    sudo cp $script_path/after_login_config.sh $work_path/fin_sq/am
-    sudo cp $script_path/transmission_setup.sh $work_path/fin_sq/am
-    sudo cp $script_path/xscreensaver_setup.sh $work_path/fin_sq/am
-    sudo cp --recursive "${software_path_root}"/settings $work_path/fin_sq/am
-    sudo cp $script_path/add_ramdisk_and_ramcache.sh $work_path/fin_sq/am
-    sudo cp $script_path/after_wine_run.sh $work_path/fin_sq/am
-    sudo cp $script_path/git_config.sh $work_path/fin_sq/am
-    sudo cp $script_path/user_specific.sh $work_path/fin_sq/am
-    sudo cp $script_path/run_at_boot_liveusb.sh $work_path/fin_sq/am
-    sudo cp $script_path/libvirt_access_rights.sh $work_path/fin_sq/am
+    sudo cp $script_path/to_iso_to_run_once_liveiso_boot/* $scripts_to_copy_to
+    sudo sed --in-place --regexp-extended -- "s|liveiso_path_scripts_root|$liveiso_path_scripts_in_chroot|" $scripts_to_copy_to/systemd_to_run_as_user.sh
+    sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" $scripts_to_copy_to/run_at_boot_liveusb.sh
 
-    sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" $work_path/fin_sq/am/run_at_boot_liveusb.sh
-    sudo cp $script_path/systemd_to_run_as_user.sh $work_path/fin_sq/am
-    sudo cp $script_path/set_color_profile.sh $work_path/fin_sq/am
-    sudo cp $script_path/add_zram.sh $work_path/fin_sq/am
+    sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/transmission_setup.sh
+    sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/xscreensaver_setup.sh
+    sudo cp --recursive "${software_path_root}"/settings $settings_to_copy_to
 
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp "${software_path_root}"/bin/stopfan $work_path/fin_sq/usr/local/bin
@@ -69,7 +72,7 @@ change_squash() {
     sudo mount -o bind,x-mount.mkdir $script_path $work_path/fin_sq/media/root/Scripts
     sudo mount -o bind,remount,ro $script_path $work_path/fin_sq/media/root/Scripts
 
-    sudo chroot $work_path/fin_sq /bin/bash -c "software_path_root=${path_to_software_in_chroot}; export software_path_root; /media/root/Scripts/after_original_distro_install.sh"
+    sudo chroot $work_path/fin_sq /bin/bash -c "software_path_root=${path_to_software_in_chroot}; export software_path_root; liveiso_path_scripts_root=${liveiso_path_scripts_in_chroot}; export liveiso_path_scripts_root; /media/root/Scripts/after_original_distro_install.sh"
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
 }
 
@@ -83,16 +86,16 @@ change_boot() {
     perl -0777e 'while(<>){s/(menuentry[\s\S]*?\n\}\n)/\1\1\1\1/;print "$_"}' $work_path/fin/boot/grub/grub.cfg | 1>/dev/null sudo tee $work_path/fin/boot/grub/grub.cfg_tmp
     sudo mv --force $work_path/fin/boot/grub/grub.cfg_tmp $work_path/fin/boot/grub/grub.cfg
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/boot/grub/grub.cfg
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit to RAM, verbose (UEFI: all menu entries)"/' $work_path/fin/boot/grub/grub.cfg
     # change second manu entry to make text mode boot, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// level 3 init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| level 3 init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/boot/grub/grub.cfg
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, text mode, verbose"/' $work_path/fin/boot/grub/grub.cfg
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/boot/grub/grub.cfg
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, verbose"/' $work_path/fin/boot/grub/grub.cfg
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// quiet splash init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/boot/grub/grub.cfg
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, quiet"/' $work_path/fin/boot/grub/grub.cfg
     # add timeout to start first meny entry automatically (for some reason default script cfg does not have it)
     echo | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
@@ -116,17 +119,17 @@ change_boot() {
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label ram/' $work_path/fin/isolinux/isolinux.cfg
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (to RAM, verbose)/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/isolinux/isolinux.cfg
     # change second manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label text/' $work_path/fin/isolinux/isolinux.cfg
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (text mode, verbose)/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// level 3 init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| level 3 init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/isolinux/isolinux.cfg
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label verbose/' $work_path/fin/isolinux/isolinux.cfg
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (verbose)/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/isolinux/isolinux.cfg
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// quiet splash init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/isolinux/isolinux.cfg
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (quiet)/' $work_path/fin/isolinux/isolinux.cfg
     # edit timeout
     sudo sed --in-place -- 's/\(timeout\).*/\1 50/' $work_path/fin/isolinux/isolinux.cfg
@@ -225,6 +228,7 @@ sudo mount -t overlay -o lowerdir=iso_sq,upperdir=to_sq,workdir=temp_sq overlay 
 # If deleted anyway, fixing maybe by overlayfs `mount -o remount` 
 
 change_squash
+
 if [ "$interactive_mode" = "true" ]; then
     echo "Next in addition to now hardcoded changes one can modify system in $work_path/fin for boot time and"
     echo "in $work_path/fin_sq for resulting live system."

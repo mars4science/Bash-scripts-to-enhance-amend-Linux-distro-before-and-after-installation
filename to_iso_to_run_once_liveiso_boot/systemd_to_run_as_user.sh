@@ -2,7 +2,7 @@
 # trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 sudo  -i -u mint bash <<-EOF
-    exec dbus-run-session -- bash /am/user_specific.sh
+    exec dbus-run-session -- bash liveiso_path_scripts_root/user_specific.sh
 EOF
 
 exit
