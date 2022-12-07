@@ -4,7 +4,7 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 # TODO think about hardcoded copyfrom_path
 
-run_path=/media/ramdrive
+run_path=/media/ramdisk
 link_path="$(get_software_path.sh)"/tor.tar.xz
 
 # for "install" and "update" arguments

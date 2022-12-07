@@ -23,9 +23,10 @@ display_help "$help_message$common_help"
 # ===== #
 
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
+if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; fi
 default_local_debs="$software_path_root/debs"
 default_local_status="$software_path_root/apt_dpkg_state/dpkg_orig_status"
-status_path_tmp="/media/ramdrive/status"
+status_path_tmp="$work_path/status"
 
 # if no arguments, use these:
 if [ $# -eq 0 ]
@@ -212,7 +213,7 @@ while read line; do
             # download-only of deb packages including dependencies
             # TODO see [1] maybe change to apt-get download -o Dir::Cache="./" -o Dir::Cache::archives="./"?
             # though script is coded to copy anyway and only in case of success, if download to e.g. USB directly, in case of failure
-            # would need to delete from USB, though maybe download to ramdrive?
+            # would need to delete from USB, though maybe download to ramdisk?
             sudo apt-get install --download-only --assume-yes $line
 
             # get return status of last command

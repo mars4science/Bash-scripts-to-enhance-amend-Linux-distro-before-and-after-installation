@@ -6,6 +6,8 @@
 
 # ---- parameters ---- #
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
+if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; fi
+
 export software_path_root
 # ---- parameters end ---- #
 
@@ -78,9 +80,9 @@ $dir_name/firefox-replace.sh
 # install phython scripts, i.e. files.py
 $dir_name/Utils_misc_install.sh
 
-# includes making ramdrive now (used in debs install)
+# includes making ramdisk now (used in debs install)
 # also kind of user specific as during liveUSB boot /etc/fstab file in squashfs gets overshadowed,
-# so ramdrive need to be made after boot (one way to try is to run that script) if needed
+# so ramdisk need to be made after boot (one way to try is to run that script) if needed
 $dir_name/add_ramdisk_and_ramcache.sh
 
 $dir_name/disable_swap.sh
@@ -113,9 +115,6 @@ $dir_name/y_tube.sh install
 
 # TODO add config for thinkfan 
 # TODO check what thinkfan do (how interacts with manual control, e.g. via `stopfan`)as it is likely to be installed 
-
-# to open srt (subtitles) in xed, not subtitle editor by default
-echo 'application/x-subrip=xed.desktop' | sudo tee --append /usr/share/applications/defaults.list
 
 # for our old printer (TODO fix printer to enable color output)
 $dir_name/printer_color_as_gray.sh

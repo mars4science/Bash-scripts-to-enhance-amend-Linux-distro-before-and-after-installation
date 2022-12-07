@@ -7,12 +7,15 @@
 
 
 # ---- parameters ---- #
-distro_label="LM_20.2_AM_full_v_1.2" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
+distro_label="LM_20.2_AM_full_v_1.3" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
 software_path_root=/media/$(id --user --name)/usb/LM_20.2 # the script is written to look for software to take from there
-work_path=/media/zramdrive # the script is written to create temporary files and resulting ISO there (free space "expected")
+work_path=/media/zramdisk # the script is written to create temporary files and resulting ISO there (free space "expected")
 
 original_iso="${software_path_root}"/linuxmint-20.2-cinnamon-64bit.iso # the script is written to look there for original ISO
+
+# put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_uid_change.sh - custom init script)
+user_name=mint
 # ---- parameters end ---- #
 
 
@@ -46,6 +49,7 @@ change_squash() {
     sudo cp $script_path/git_config.sh $work_path/fin_sq/am
     sudo cp $script_path/user_specific.sh $work_path/fin_sq/am
     sudo cp $script_path/run_at_boot_uid_change.sh $work_path/fin_sq/am
+    sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" $work_path/fin_sq/am/run_at_boot_uid_change.sh
     sudo cp $script_path/systemd_to_run_as_user.sh $work_path/fin_sq/am
     sudo cp $script_path/set_color_profile.sh $work_path/fin_sq/am
     sudo cp $script_path/add_zram.sh $work_path/fin_sq/am
@@ -149,7 +153,7 @@ un_mount_in_squashfs(){
     u_mount fin_sq/dev/pts
     u_mount fin_sq/dev
     u_mount fin_sq/proc
-    u_mount fin_sq/media/ramdrive
+    u_mount fin_sq/media/ramdisk
     u_mount fin_sq"${path_to_software_in_chroot}"
     u_mount fin_sq/media/root/Scripts
 }

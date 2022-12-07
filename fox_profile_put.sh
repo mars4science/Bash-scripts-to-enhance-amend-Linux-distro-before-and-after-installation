@@ -39,13 +39,13 @@ cd /home/$(id -un)/.mozilla/firefox/$profile_path
 # (verifying option does not work with compression - saw in output of tar when tried)
 time_start=`date +%s`
 archive_name=firefox-browser-profile-$profile_path-`date +'.%Y-%m-%d_%H-%M-%S.tar'`
-tar --create --verbose --verify --file=/media/ramdrive/"$archive_name" \
+tar --create --verbose --verify --file=/media/ramdisk/"$archive_name" \
 $(find . -maxdepth 1 -type f) \
 ./bookmarkbackups \
 ./sessionstore-backups
 # to make in RAM and copy took 00:00:27 vs 00:01:13 directly to USB (two times faster), leave that way
 # however how about data integrity on USB, which way is "safer"?
-mv /media/ramdrive/"$archive_name" /media/$(id -un)/usb
+mv /media/ramdisk/"$archive_name" /media/$(id -un)/usb
 if [ $to_eject = "true" ]; then e_ject usb; fi
 time_end=`date +%s`
 echo

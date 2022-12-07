@@ -19,7 +19,7 @@ _make_custom_liveusb.sh at the start have code to set several variables:
 
 - distro_label="LM_20.2_custom"
 - original_iso=/media/data/Software/distros/linuxmint-20.2-cinnamon-64bit.iso
-- work_path=/media/ramdrive/custom_iso
+- work_path=/media/ramdisk
 
 Another key variable: software_path_root (in _make_custom_liveusb.sh and after_original_distro_install.sh) which sets where scripts get softtware to install
 
@@ -29,7 +29,7 @@ work_path should have sufficient free space, now around several Gb, if fails due
 
 - several additional entries to boot menu of liveISO (text mode, to ram, verbose)
 - uuid of mint user changed to 1000 to make same as first user after installation (for ease of access to files owned by 1000 id user)
-- add ramdrive location (tmpfs system), sets root and mint users cache to tmpfs 
+- add ramdisk location (tmpfs system), sets root and mint users cache to tmpfs
 - added Cinnamon applets (memory utilization and CPU temperature)
 - install packages downloaded in advance and put in $software_path_root/debs
 - add hotkeys (bindings) to rotate "main" screen, volume up 25%, logarithm based screen brightness up/down, start screensaver
@@ -56,7 +56,7 @@ Scripts added to /usr/local/bin:
 - apt_get downloads and/or installs apt packages storing downloaded in $software_path_root/debs location, uses (temporary sets) dpkg_orig_status file from $software_path_root location (or another via command line parameter) as dpkg status
 - f_ree delete cashes on disk, Firefox saved sites data, etc.
 - fox_profile_put, fox_profile_get - save and retrieve current Firefox profile data to /media/$(id -un)/usb/
-- t_or extract and run TOR from ramdrive location
+- t_or extract and run TOR from ramdisk location
 - k_iwix runs kiwix appimage with some variables set as a workaround to libGL error 
 - git_clone clones specific repo
 - git_compact compacts repo
