@@ -42,7 +42,7 @@ change_squash() {
     sudo cp $script_path/dconf_config.sh $work_path/fin_sq/am
     sudo cp $script_path/after_login_config.sh $work_path/fin_sq/am
     sudo cp $script_path/transmission_setup.sh $work_path/fin_sq/am
-    sudo mkdir --parents $work_path/fin_sq/am/transmission-settings
+    sudo cp $script_path/xscreensaver_setup.sh $work_path/fin_sq/am
     sudo cp --recursive "${software_path_root}"/settings $work_path/fin_sq/am
     sudo cp $script_path/add_ramdisk_and_ramcache.sh $work_path/fin_sq/am
     sudo cp $script_path/after_wine_run.sh $work_path/fin_sq/am
