@@ -14,7 +14,7 @@ work_path=/media/zramdisk # the script is written to create temporary files and 
 
 original_iso="${software_path_root}"/linuxmint-20.2-cinnamon-64bit.iso # the script is written to look there for original ISO
 
-# put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_uid_change.sh - custom init script)
+# put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_liveusb.sh - custom init script)
 user_name=mint
 # ---- parameters end ---- #
 
@@ -48,8 +48,10 @@ change_squash() {
     sudo cp $script_path/after_wine_run.sh $work_path/fin_sq/am
     sudo cp $script_path/git_config.sh $work_path/fin_sq/am
     sudo cp $script_path/user_specific.sh $work_path/fin_sq/am
-    sudo cp $script_path/run_at_boot_uid_change.sh $work_path/fin_sq/am
-    sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" $work_path/fin_sq/am/run_at_boot_uid_change.sh
+    sudo cp $script_path/run_at_boot_liveusb.sh $work_path/fin_sq/am
+    sudo cp $script_path/libvirt_access_rights.sh $work_path/fin_sq/am
+
+    sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" $work_path/fin_sq/am/run_at_boot_liveusb.sh
     sudo cp $script_path/systemd_to_run_as_user.sh $work_path/fin_sq/am
     sudo cp $script_path/set_color_profile.sh $work_path/fin_sq/am
     sudo cp $script_path/add_zram.sh $work_path/fin_sq/am
@@ -81,16 +83,16 @@ change_boot() {
     perl -0777e 'while(<>){s/(menuentry[\s\S]*?\n\}\n)/\1\1\1\1/;print "$_"}' $work_path/fin/boot/grub/grub.cfg | 1>/dev/null sudo tee $work_path/fin/boot/grub/grub.cfg_tmp
     sudo mv --force $work_path/fin/boot/grub/grub.cfg_tmp $work_path/fin/boot/grub/grub.cfg
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/boot/grub/grub.cfg
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit to RAM, verbose (UEFI: all menu entries)"/' $work_path/fin/boot/grub/grub.cfg
     # change second manu entry to make text mode boot, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// level 3 init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// level 3 init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/boot/grub/grub.cfg
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, text mode, verbose"/' $work_path/fin/boot/grub/grub.cfg
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/boot/grub/grub.cfg
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, verbose"/' $work_path/fin/boot/grub/grub.cfg
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// quiet splash init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// quiet splash init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/boot/grub/grub.cfg
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, quiet"/' $work_path/fin/boot/grub/grub.cfg
     # add timeout to start first meny entry automatically (for some reason default script cfg does not have it)
     echo | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
@@ -114,17 +116,17 @@ change_boot() {
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label ram/' $work_path/fin/isolinux/isolinux.cfg
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (to RAM, verbose)/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// toram init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/isolinux/isolinux.cfg
     # change second manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label text/' $work_path/fin/isolinux/isolinux.cfg
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (text mode, verbose)/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// level 3 init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// level 3 init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/isolinux/isolinux.cfg
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label verbose/' $work_path/fin/isolinux/isolinux.cfg
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (verbose)/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/isolinux/isolinux.cfg
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// quiet splash init=\/am\/run_at_boot_uid_change.sh --/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/ quiet splash --/s// quiet splash init=\/am\/run_at_boot_liveusb.sh --/' $work_path/fin/isolinux/isolinux.cfg
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (quiet)/' $work_path/fin/isolinux/isolinux.cfg
     # edit timeout
     sudo sed --in-place -- 's/\(timeout\).*/\1 50/' $work_path/fin/isolinux/isolinux.cfg

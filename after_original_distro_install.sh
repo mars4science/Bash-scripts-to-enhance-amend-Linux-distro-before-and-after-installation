@@ -154,6 +154,7 @@ if [ $running_system = "true" ]; then
         $dir_name/run_at_boot_config.sh
     fi
 
+    $dir_name/libvirt_access_rights.sh # for liveUSB running `--append --groups libvirt $user_name` AFAIK has no effect (need reboot or at least relogin), but ACL in /media might be useful
     $dir_name/user_specific.sh
 
     # to leave terminal open with interactive bash if started from GUI
