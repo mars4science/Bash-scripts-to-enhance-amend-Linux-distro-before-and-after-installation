@@ -26,8 +26,8 @@ echo '/ quit' | sudo tee --append $conf_file # set / key to quit player
 conf_file=/etc/mpv/mpv.conf
 echo 'sub-font-size=45' | sudo tee --append $conf_file
 echo 'sub-color=0.0/1.0/1.0/0.2' | sudo tee --append $conf_file
-echo 'sub-border-size=10' | sudo tee --append $conf_file
-echo 'sub-border-color=0.0/0.0/0.0/0.2' | sudo tee --append $conf_file
+echo 'sub-border-size=5' | sudo tee --append $conf_file
+echo 'sub-border-color=0.0/0.0/0.0/0.3' | sudo tee --append $conf_file
 echo 'sub-pos=70' | sudo tee --append $conf_file
 
 echo '' | sudo tee --append $conf_file
