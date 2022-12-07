@@ -1,7 +1,9 @@
 #!/bin/bash
+
+# this script moves + makes new volitile system folders (/var,/tmp) and copies lines starting with line contaning start_TAG to path on next line (script is not supposed to be run [for | on] liveUSB):
 boot_script_path=/boot/custom_init.sh
 
-# actually I have not thought where $0 is Ok and where realpath processing might add value
+# actually I have not thought where $0 is OK+ and where realpath processing might add value
 script_path="$(realpath "$0")"
 if [ ! -d /var_on_disk ]; then 
     sudo mv /var /var_on_disk
@@ -11,7 +13,6 @@ if [ ! -d /tmp_on_disk ]; then
     sudo mv /tmp /tmp_on_disk
     sudo mkdir /tmp
 fi
-if [ ! -d /tmp_on_disk ]; then sudo mv /tmp /tmp_on_disk; fi
 
 sudo sed -i -E -- 's|GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"|GRUB_CMDLINE_LINUX_DEFAULT="init='$boot_script_path'"|' /etc/default/grub
 sudo update-grub
@@ -21,7 +22,10 @@ sudo chmod a+rx $boot_script_path
 start_tag='start''_TAG' # extra '' added to make grep skip this line
 start_line=$(($(cat $script_path | grep -n $start_tag | sed -E 's/([0-9]{1,}).*/\1/')-1))
 exec tail -n +$start_line $script_path | 1>/dev/null sudo tee $boot_script_path
+
 exit
+
+# ------------------------- #
 
 #!/bin/bash
 # start_TAG from line number substruct 1 to get starting line
