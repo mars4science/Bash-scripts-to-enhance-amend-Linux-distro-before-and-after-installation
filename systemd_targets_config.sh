@@ -23,7 +23,7 @@ fi
 
 # /dev/null not to output to terminal
 echo "$service_file_contents" | 1>/dev/null sudo tee "$service_file_fully_qualified_name"
-sudo ln --symbolic "$service_file_fully_qualified_name" /etc/systemd/system/multi-user.target.wants/service_file_name
+sudo ln --symbolic "$service_file_fully_qualified_name" /etc/systemd/system/multi-user.target.wants/"$service_file_name"
 
 systemctl enable $service_file_name
 
@@ -49,7 +49,7 @@ fi
 
 # /dev/null not to output to terminal
 echo "$service_file_contents" | 1>/dev/null sudo tee "$service_file_fully_qualified_name"
-sudo ln --symbolic "$service_file_fully_qualified_name" /etc/systemd/system/multi-user.target.wants/service_file_name
+sudo ln --symbolic "$service_file_fully_qualified_name" /etc/systemd/system/multi-user.target.wants/"$service_file_name"
 
 systemctl enable $service_file_name
 
