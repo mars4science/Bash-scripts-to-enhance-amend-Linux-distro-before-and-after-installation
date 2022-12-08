@@ -35,5 +35,5 @@ sudo sed --in-place --regexp-extended -- 's/errors=remount-ro/errors=remount-ro,
 # also developer found out during liveUSB boot /etc/fstab file in squashfs gets overshadowed,
 # so next line is "user specfic" (to be run after boot)
 sudo mount /media/ramdisk
-sudo mount /media/zramdisk
+# sudo mount /media/zramdisk, not mounted in add_zram.sh
 
