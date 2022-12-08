@@ -2,9 +2,10 @@
 
 #### Disclaimer: some scripts produce modified ISO files which might no longer be considered original distros and might have no legal rights to be called by original names and distributed with original labels and other contents. Only personal use for testing is implied. 
 
-#### Copyright (c) 2009-present, Alex Martianov. All rights reserved. 
+##### Copyright (c) 2009-present, Alex Martianov. All rights reserved. 
 
-#### Licences: GNU GPL 2.0, GNU GPL 3.0.
+##### The rights to the bash scripting code contained in these files and/or this git repository are granted under GNU GPL 3.0 license and GNU GPL 2.0 license.
+##### Text of the licenses see in files LICENSE-* in this repo and/or https://www.gnu.org/licenses/gpl-3.0.en.html, https://www.gnu.org/licenses/gpl-2.0.en.html
 
 Run _make_custom_liveusb.sh to amend liveUSB iso.
 
