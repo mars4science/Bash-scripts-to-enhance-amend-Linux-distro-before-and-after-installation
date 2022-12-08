@@ -83,7 +83,7 @@ $dir_name/Utils_misc_install.sh
 # includes making ramdisk now (used in debs install)
 # also kind of user specific as during liveUSB boot /etc/fstab file in squashfs gets overshadowed,
 # so ramdisk need to be made after boot (one way to try is to run that script) if needed
-$dir_name/add_ramdisk_and_ramcache.sh
+$dir_name/to_iso_to_run_once_liveiso_boot/add_ramdisk_and_ramcache.sh
 
 $dir_name/disable_swap.sh
 $dir_name/memory_notify_config.sh
