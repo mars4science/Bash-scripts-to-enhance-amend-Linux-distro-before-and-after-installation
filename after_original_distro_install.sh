@@ -116,9 +116,6 @@ $dir_name/y_tube.sh install
 # TODO add config for thinkfan 
 # TODO check what thinkfan do (how interacts with manual control, e.g. via `stopfan`)as it is likely to be installed 
 
-# for our old printer (TODO fix printer to enable color output)
-$dir_name/printer_color_as_gray.sh
-
 # add applets/desklets software to Cinnamon
 $dir_name/cinnamon_add_software.sh
 $dir_name/cinnamon_config.sh
