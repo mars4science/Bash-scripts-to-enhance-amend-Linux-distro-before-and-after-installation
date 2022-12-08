@@ -1,6 +1,6 @@
 ﻿### Most of scripts written to amend installation or liveUSB iso file of linux distros. Tested on Linux Mint 21 and some Thinkpad laptops.
 
-#### As of 2022/12/8 it is a small project, no formal QA. [testing] branch contains code that was run and mo unexpected errors were noted, ]main] means code was used more extensively, [devel] is for development in progress.
+#### As of 2022/12/8 it is a small project, no formal QA. [testing] branch contains code that was run and no unexpected errors were noted, ]main] means code was used more extensively, [devel] is for development in progress.
 
 #### Disclaimer: some scripts produce modified ISO files which might no longer be considered original distros and might have no legal rights to be called by original names and distributed with original labels and other contents. Only personal use for testing is implied. 
 
