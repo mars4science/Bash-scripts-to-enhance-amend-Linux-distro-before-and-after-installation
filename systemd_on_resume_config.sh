@@ -54,6 +54,8 @@ horizontal_relosution=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f
 
 if [ $dpm -ge 8 ] && [ $horizontal_relosution -ge 2000 ];then # maybe will be run on small displays, not change default scaling in such case
     gsettings set org.cinnamon.desktop.interface scaling-factor 2
+    # standard 100%, large 150%, larger 200%, largest 400%; small 66%, smaller 50%, smallest 33%
+    gsettings set org.nemo.list-view default-zoom-level 'standard'
 fi
 
 # temporary to set color profiles until found a way to run on boot
