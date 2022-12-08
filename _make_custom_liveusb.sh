@@ -10,9 +10,9 @@
 distro_label="LM_20.2_AM_full_v_1.4" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
 software_path_root=/media/$(id --user --name)/usb/LM_20.2 # the script is written to look for software to take from there
-work_path=/media/zramdisk # the script is written to create temporary files and resulting ISO there (free space "expected")
-
 original_iso="${software_path_root}"/linuxmint-20.2-cinnamon-64bit.iso # the script is written to look there for original ISO
+
+work_path=/media/zramdisk # the script is written to create temporary files and resulting ISO there (free space "expected")
 
 # put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_liveusb.sh - custom init script)
 user_name=mint
@@ -40,12 +40,14 @@ change_squash() {
 
     if [ -e $scripts_to_copy_to ]; then
         echo path for scripts exists, suspect possible collision. exiting...
+        echo run script again and type d to delete contents within working files, then Ctrl-C when asked for interactive
         exit 1
     else
         sudo mkdir $scripts_to_copy_to
     fi
     if [ -e $settings_to_copy_to ]; then
         echo path for settings exists, suspect possible collision. exiting...
+        echo run script again and type d to delete contents within working files, then Ctrl-C when asked for interactive
         exit 1
     else
         sudo mkdir $settings_to_copy_to
@@ -203,9 +205,12 @@ read -p "Choose interactive mode (press i key) to pause at some points, otherwis
 echo  # (optional) move to a new line
 if [[ $REPLY =~ ^[Ii]$ ]]; then interactive_mode="true"; else interactive_mode="false"; fi
 
-mkdir iso to temp fin initrd 
+mkdir iso to temp fin initrd
+
 # man mount: The mount command automatically creates a loop device from a regular file if a  filesystem  type  is
 #            not specified or the filesystem is known for libblkid
+# if original_iso is located on read-write mount, then mount command is expected to output a WARNING about device being write-protected; if read-only - no output expected.
+# makes sense : if ro, then probably user knows about write-protection already.
 sudo mount $original_iso iso #  -o loop
 
 # maybe graft parameter of genisoimage can be used instead of overlayfs to amend mounted original iso contents
