@@ -26,11 +26,13 @@ if [ -e /proc/mounts ]; then running_system="true";
     echo "This line is where code is written to process liveUSB iso file creation"
     sleep 3
     running_system="false";
-    sudo mount -t proc proc /proc
-    sudo mount -t devtmpfs devtmpfs /dev
-    sudo mount -t devpts devpts /dev/pts
+    # expect chrooted environment, somehow sudo worked for linux mint 20.2 but for LM 21 ISO gives "sudo: unable to allocate pty: No such device",
+    # so run w/out sudo, expect user to be root anyway
+    mount -t proc proc /proc
+    mount -t devtmpfs devtmpfs /dev
+    mount -t devpts devpts /dev/pts
 
-    # some locales are added at install time, but it is a code branch for liveUSB
+    # some locales are added at original ISO install time, however it is a code branch for liveUSB
     sudo locale-gen ru_RU
     sudo locale-gen ru_RU.UTF-8
     sudo locale-gen ru_RU.KOI8-R
