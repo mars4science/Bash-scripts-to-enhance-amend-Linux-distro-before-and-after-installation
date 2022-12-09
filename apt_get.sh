@@ -1,10 +1,8 @@
 #!/bin/bash
 
-# apt-config output see man apt-config
-# $() command substitution see man bash 
-# now in /var/cache/apt/archives but made hopefully more future proof
-
-#if [ ! -f $script_path ]; then
+# Tested for Linux Mint 20.2 Cinnamon 64-bit and Linux Mint 21 Cinnamon 64-bit
+# Uses apt and dpkg
+# Help message below might explain usage and what the script does
 
 # for install, update arguments, help message output
 source common_arguments_to_scripts.sh
@@ -14,25 +12,41 @@ help_message="  The Script is written to read from standard input.
   Lines to be read are expected to be names of packages (not fully qualified) from standard input, use 
   1st argument (if not omitted) that is not -d, -i or for help used as location for downloaded files.
 
-  Example: $script_name -i /media/alex/usb/LM_20.2/debs /home/alex/Documents/dpkg_orig_status
-  usage: $script_name [-i | -d ] [location_to_store] [dpkg_status_file_location] < filename
-  or echo -e 'package_unqualified_name[\npackage_unqualified_name] etc' | $script_name [-i | -d] [location_to_store] [dpkg_status_file_location]
+  Example: $script_name -i /media/alex/usb/LM_20.2/debs /home/alex/Documents/apt_dpkg_state
+  usage: $script_name [-i | -d ] [location_to_store] [folder with dpkg status file (dpkg_orig_status e.g. copied from /var/lib/dpkg/status) and apt sources locations, (sources.list file and sources.list.d folder, e.g. copied from /etc/apt)] < filename
+  or echo -e 'package_unqualified_name"'[\\n'"package_unqualified_name] etc' | $script_name [-i | -d] [location_to_store] [folder with dpkg status file and apt sources location]
   -i means install right after downloaded.
-  -d means download only to default path with default_local_status of dpkg.\n"
+  -d means download only to default path with default location of dpkg status file and apt sources.
+  If dpkg status and/or apt sources not found at supplied location, substitution not done.\n"
 display_help "$help_message$common_help"
 # ===== #
 
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
 if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; fi
 default_local_debs="$software_path_root/debs"
-default_local_status="$software_path_root/apt_dpkg_state/dpkg_orig_status"
-status_path_tmp="$work_path/status"
+
+# where to take from dpkg status file and apt sources if not supplied as argument (passed as one argument via shift)
+default_local_apt_dpkg_folder="$software_path_root/apt_dpkg_state/"
+
+# where to put dpkg status file and apt sources temporarity (for script to work, apt might update them?)
+apt_dpkg_folder_tmp="$work_path/apt_dpkg_state"
+status_file_path_tmp="$apt_dpkg_folder_tmp/dpkg_status"
+sources_file_path_tmp="$apt_dpkg_folder_tmp/sources.list"
+sources_dir_path_tmp="$apt_dpkg_folder_tmp/sources.list.d"
+
+if [ -e "$apt_dpkg_folder_tmp" ]
+    then
+        echo >&2 "Exiting as folder set to be used as temporary already exists: $apt_dpkg_folder_tmp"
+        exit 1
+fi
+
+# ----- processing command line arguments ----- #
 
 # if no arguments, use these:
 if [ $# -eq 0 ]
   then
-    set -- '-i' $default_local_debs $default_local_status
-    echo "$0 was called without any parameters, in that case default parameters are used: '-i' $default_local_debs $default_local_status"
+    set -- '-i' $default_local_debs $default_local_apt_dpkg_folder
+    echo "$0 was called without any parameters, in that case default parameters are used: '-i' $default_local_debs $default_local_apt_dpkg_folder"
     no_parameters_supplied=1 # for displaying messages later in case of error          
 fi
 
@@ -43,22 +57,15 @@ if [ $# -eq 1 ]
     if [ $1 = "-i" ] # install after download to default path (if not downloaded already)
       then
         set -- '-i' $default_local_debs       
-    elif [ $1 = "-d" ] # download only to default path with default_local_status of dpkg
+    elif [ $1 = "-d" ] # download only to default path with default location for dpkg status and apt sources
       then
-        set -- $default_local_debs $default_local_status
+        set -- $default_local_debs $default_local_apt_dpkg_folder
     elif [ $1 = "printpath" ]
       then
         printf "%s" $default_local_debs
         exit
     fi
 fi
-
-eval $(apt-config shell CACHE Dir::Cache)
-eval $(apt-config shell ARCHIVES Dir::Cache::archives)
-
-# from man bash:
-# brace { after $ "serve to protect the variable to be expanded from characters immediately following it which could be interpreted as part of the name."
-debs_cache_folder=/${CACHE}/${ARCHIVES}
 
 # argument $0 is name of the script
 # = should be used with the test command for POSIX conformance.
@@ -69,54 +76,13 @@ if [ $1 = "-i" ]
     shift
 fi
 
-# make named pipe to collect errors for packets and output all errors at the end
-# mkfifo errors_apt_get
-# named pipes are useful when one need input to hang and wait to output, also it mixes sequence (when sereval outputs echo > pipe and then one read from pipe cat < pipe)
-errors_apt_get=/errors_apt_get
-
-status_path=$2
-
-# -z true if length is 0, -n for !=0
-# POSIX way [] not [[ ]]
-# both ; and new line can serve as separators
-substitute_status(){
-    if [ -n "$status_path" ]
-      then
-        cp $status_path $status_path_tmp
-        copy_exit_status=$?
-        if [ $copy_exit_status -ne 0 ];then # error
-            echo >&2 "Exiting on error $copy_exit_status after trying to create temporary dpkg status file"
-            if [ -v no_parameters_supplied ]; then 
-                echo >&2 "$0 was called without any parameters, calling with '-i' parameter means same except for no status file substitution"
-            fi   
-            exit $err
-        fi
-
-        # now /var/lib/dpkg/status but made hopefully more future proof   
-        eval $(apt-config shell STATUS Dir::State::status)
-
-        # if [ ! -f $STATUS.orig ] then ; sudo cp $status_path $STATUS.orig ; fi
-        sudo mv $STATUS $STATUS.bak;
-        sudo ln -s $status_path_tmp $STATUS;
-    fi
-}
-
-substitute_status
-
-restore_status(){
-    if [ -n "$status_path" ]
-      then
-        sudo mv --force $STATUS.bak $STATUS;
-        rm $status_path_tmp
-    fi
-}
 
 # call above in case of ctrl-c pressed
 exit_on_ctrl_c(){
-# man bash: 
+# man bash:
 # -v varname
 #     True if the shell variable varname is set (has been assigned a value).
-    if [ -v connect_restore ]; then 
+    if [ -v connect_restore ]; then
       if [ $connect_restore -eq 1 ]; then nmcli networking on; fi
     fi
     restore_status
@@ -125,16 +91,122 @@ exit_on_ctrl_c(){
 }
 trap 'exit_on_ctrl_c' SIGINT
 
-# man bash
-# Command substitution allows the output of a command to replace the command name.  There are two forms:
-# $(command) or `command`
-# Bash performs the expansion by executing command in a subshell environment and replacing the command substitution with the standard output of the command, 
+
+eval $(apt-config shell CACHE Dir::Cache)
+eval $(apt-config shell ARCHIVES Dir::Cache::archives)
+
+# from man bash:
+# brace { after $ "serve to protect the variable to be expanded from characters immediately following it which could be interpreted as part of the name."
+debs_cache_folder=/${CACHE}/${ARCHIVES}
+
+
+# make named pipe to collect errors for packets and output all errors at the end
+# mkfifo errors_apt_get
+# named pipes are useful when one need input to hang and wait to output, also it mixes sequence (when sereval outputs echo > pipe and then one read from pipe cat < pipe)
+errors_apt_get=/errors_apt_get
+
+
+# below derives paths from command line argument
+apt_dpkg_folder=$2
+status_file_path=$apt_dpkg_folder/dpkg_orig_status
+sources_file_path=$apt_dpkg_folder/sources.list
+sources_dir_path=$apt_dpkg_folder/sources.list.d
+
+# ----- functions definitions ----- #
+
+# -z true if length is 0, -n for !=0 (for strings)
+# POSIX way [] not [[ ]]
+# both ; and new line can serve as separators
+
+substitute_status(){
+    if [ -d "$apt_dpkg_folder" ]
+      then
+        mkdir --parent $apt_dpkg_folder_tmp
+        cp $status_file_path $status_file_path_tmp
+        copy_status_file_exit_status=$?
+        cp $sources_file_path $sources_file_path_tmp
+        copy_sources_file_exit_status=$?
+        cp --recursive $sources_dir_path $sources_dir_path_tmp
+        copy_sources_dir_exit_status=$?
+
+        # `man bash` outputs that expressions can be combined with e.g. && for [[ ]], but does not say for [ ]
+        if [[ ($copy_status_file_exit_status -ne 0) &&  ($copy_sources_file_exit_status -ne 0) && ($copy_sources_dir_exit_status -ne 0) ]];then # error
+            echo >&2 "Exiting on error, neither dpkg status file not both apt sources file and folder were copied with success"
+            if [ -v no_parameters_supplied ]; then 
+                echo >&2 "$0 was called without any parameters, calling with '-i' parameter means same except for no dpkg status file / apt sources substitution"
+            fi   
+            exit $err
+        fi
+
+        # noted there are /var/lib/dpkg/status, /etc/apt/sources.list, single file /etc/apt/sources.list.d/official-package-repositories.list, but made hopefully more future proof
+        eval $(apt-config shell STATUS_FILE Dir::State::status) # full path
+        eval $(apt-config shell ETC_DIR Dir::Etc) # gave etc/apt
+        eval $(apt-config shell SOURCES_FILE Dir::Etc::sourcelist) # only last part of path
+        eval $(apt-config shell SOURCES_DIR Dir::Etc::sourceparts) # only last part of path
+
+        SOURCES_FILE=/$ETC_DIR/$SOURCES_FILE
+        SOURCES_DIR=/$ETC_DIR/$SOURCES_DIR
+
+        if [ $copy_status_file_exit_status -eq 0 ] ; then
+            sudo mv $STATUS_FILE $STATUS_FILE.bak;
+            sudo ln -s $status_file_path_tmp $STATUS_FILE;
+        fi
+
+        if [ $copy_sources_file_exit_status -eq 0 ] ; then
+            sudo mv $SOURCES_FILE $SOURCES_FILE.bak;
+            sudo ln -s $sources_file_path_tmp $SOURCES_FILE;
+        fi
+
+        if [ $copy_sources_dir_exit_status -eq 0 ] ; then
+            sudo mv $SOURCES_DIR $SOURCES_DIR.bak;
+            sudo ln -s $sources_dir_path_tmp $SOURCES_DIR;
+        fi
+
+        # even if sources not substituted, refresh is often useful
+        echo === mext line: sudo apt-get update ===
+        sudo apt-get update
+        echo === line after line with update ===
+
+    fi
+}
+
+
+restore_status(){
+    if [ -d "$apt_dpkg_folder_tmp" ]
+      then
+        rm --recursive "$apt_dpkg_folder_tmp"
+
+        if [ $copy_status_file_exit_status -eq 0 ] ; then
+            sudo mv --force $STATUS_FILE.bak $STATUS_FILE
+            # rm $status_file_path_tmp
+        fi
+
+        if [ $copy_sources_file_exit_status -eq 0 ] ; then
+            sudo mv --force $SOURCES_FILE.bak $SOURCES_FILE
+            # rm $sources_file_path_tmp
+        fi
+
+        if [ $copy_sources_dir_exit_status -eq 0 ] ; then
+            sudo rm $SOURCES_DIR # line added as `mv` wrote for line below cannot overwrite non-directory .. with directory (script made a link)
+            sudo mv $SOURCES_DIR.bak $SOURCES_DIR
+        fi
+
+        if [[ ($copy_sources_file_exit_status -eq 0) || ($copy_sources_dir_exit_status -eq 0) ]] ; then
+            echo === after sources substitution reversed mext line: sudo apt-get update  ===
+            sudo apt-get update # sources were substituted, update back with original sources
+            echo === line after line with update ===
+        fi
+    fi
+}
+
+# Bash performs the expansion of command substituion by executing command in a subshell environment and replacing the command substitution with the standard output of the command,
 # !!!!!! ----- with any trailing newlines deleted -------- !!!!!!!!!!!
+
 install_local(){
     if [ -n "$install_now" ]
       then
         # added x and 2>/dev/null for case of making of liveUSB iso, when with chroot nmcli outputs error
-        # x is needed because no output does not mean empty string as I've understood by try-and-error last time
+        # x is needed because no output does not mean empty string as I''ve understood by try-and-error last time
         if [ "x$(2>/dev/null nmcli networking connectivity)" = "xfull" ]; then
             nmcli networking off
             connect_restore=1
@@ -190,6 +262,10 @@ install_local(){
     fi
 }
 
+# ----- start of main part of code where functions are called ----- #
+
+substitute_status
+
 # from man apt-get:
 # clears out the local repository of retrieved package files. It removes everything but the lock file from
 # /var/cache/apt/archives/ and /var/cache/apt/archives/partial/
@@ -238,8 +314,6 @@ while read line; do
     fi # empty line
 done # reading lines of names of packages
 
-# call with parameter $2, why parameter???
-# restore_status $2
 
 restore_status
 
