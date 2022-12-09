@@ -253,7 +253,7 @@ install_local(){
         if [ $Eval -eq 0 ];then
             echo "    Package(s)  $line  installed (at least seems like it)"
         else
-            echo "Package  $line  NOT installed (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
+            echo "    Package  $line  NOT installed (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
         fi
         
         sudo setfacl -x u:_apt /media/$(id -un)
