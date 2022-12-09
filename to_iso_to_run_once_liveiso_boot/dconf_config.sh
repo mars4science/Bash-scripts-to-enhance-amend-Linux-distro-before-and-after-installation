@@ -54,6 +54,18 @@ gsettings set org.cinnamon.desktop.media-handling automount false # If set to tr
 gsettings set org.cinnamon.desktop.media-handling automount-open false # Whether to automatically open a folder for automounted media (happens in Nemo)
 gsettings set org.cinnamon.desktop.media-handling autorun-never true # If set to true, then Nautilus will never prompt nor autorun/autostart programs when a medium is inserted.
 
+# gnome-system-monitor
+gsettings set org.gnome.gnome-system-monitor show-whose-processes 'all' # Determines which processes to show
+gsettings set org.gnome.gnome-system-monitor cpu-smooth-graph 'false' # Show CPU chart as smooth graph using Bezier curves
+gsettings set org.gnome.gnome-system-monitor update-interval 1000 # Time in milliseconds between updates of the process view
+gsettings set org.gnome.gnome-system-monitor graph-update-interval 1000
+gsettings set org.gnome.gnome-system-monitor.proctree col-14-visible 'true' # Show process “Command Line” column on startup
+gsettings set org.gnome.gnome-system-monitor.proctree col-14-width 120 # Width of process “Command Line” column
+gsettings set org.gnome.gnome-system-monitor.proctree col-4-visible 'true' # Show process “Resident Memory” column on startup
+gsettings set org.gnome.gnome-system-monitor.proctree col-4-width 90 # Width of process “Resident Memory” column
+gsettings set org.gnome.gnome-system-monitor.proctree sort-col 8 # CPU %
+gsettings set org.gnome.gnome-system-monitor.proctree sort-order 0 # highest at top
+
 # [2] in _readme.md, 
 # does not work, maybe "legacy" was a hint for that, developer wants to find another way to change zoom-in for terminal
 gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/zoom-in/ zoom-in "<Ctrl>equal"
