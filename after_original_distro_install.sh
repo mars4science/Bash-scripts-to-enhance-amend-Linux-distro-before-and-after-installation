@@ -18,10 +18,11 @@ dir_name=$(dirname $full_path)
 #  TODO make next line redundant 
 cd `dirname $0`
 
-if [ $(ischroot;echo $?) -eq 1 ] ; then
+if [ $(ischroot;echo $?) -ne 1 ] ; then
     running_system="false";
     echo "Seems now in chrooted environment for liveUSB ISO file creation"; sleep 2
 else running_system="true"; fi
+
 
 # some locales are added at original ISO install time, but still just in case and for liveISO
 sudo locale-gen ru_RU
