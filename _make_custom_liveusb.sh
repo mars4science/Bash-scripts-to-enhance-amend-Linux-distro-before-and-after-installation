@@ -168,6 +168,7 @@ un_mount_in_squashfs(){
     u_mount fin_sq/dev/pts
     u_mount fin_sq/dev
     u_mount fin_sq/proc
+    u_mount fin_sq/sys
     u_mount fin_sq/media/ramdisk
     u_mount fin_sq"${path_to_software_in_chroot}"
     u_mount fin_sq/media/root/Scripts
