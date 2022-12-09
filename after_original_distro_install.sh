@@ -18,31 +18,18 @@ dir_name=$(dirname $full_path)
 #  TODO make next line redundant 
 cd `dirname $0`
 
-# test if run in chrooted environment, then I now 2021-12-22 do not think some actions are of value for such situation
-# one can run `mount -t proc proc /proc` then `ps` and `mount` worked IIRC [1]
-# "true" is just a string, bash test uses binary or unary operators, they return true, but true value cannot be written explicitly as I've understood many times again and again
-if [ -e /proc/mounts ]; then running_system="true"; 
-  else 
-    echo "This line is where code is written to process liveUSB iso file creation"
-    sleep 3
+if [ $(ischroot;echo $?) -eq 1 ] ; then
     running_system="false";
-    # expect chrooted environment, somehow sudo worked for linux mint 20.2 but for LM 21 ISO gives "sudo: unable to allocate pty: No such device",
-    # so run w/out sudo, expect user to be root anyway
-    mount -t proc proc /proc
-    mount -t devtmpfs devtmpfs /dev
-    mount -t devpts devpts /dev/pts
+    echo "Seems now in chrooted environment for liveUSB ISO file creation"; sleep 2
+else running_system="true"; fi
 
-    # some locales are added at original ISO install time, however it is a code branch for liveUSB
-    sudo locale-gen ru_RU
-    sudo locale-gen ru_RU.UTF-8
-    sudo locale-gen ru_RU.KOI8-R
-    sudo locale-gen ru_RU.CP1251
-    sudo locale-gen uk_UA
-    sudo locale-gen uk_UA.UTF-8
-
-sleep 10
-
-fi
+# some locales are added at original ISO install time, but still just in case and for liveISO
+sudo locale-gen ru_RU
+sudo locale-gen ru_RU.UTF-8
+sudo locale-gen ru_RU.KOI8-R
+sudo locale-gen ru_RU.CP1251
+sudo locale-gen uk_UA
+sudo locale-gen uk_UA.UTF-8
 
 if [ $running_system = "true" ]; then
     # turn off wireless comms
@@ -171,10 +158,3 @@ exit
 # above line make changes only in bash running the script which exits after script completion
 # maybe some combination with exec "$BASH" or exec scriptname - what I've tried did not work as hoped for as of now ...
 
-
-[1]
-
-root@alex:/# ps
-Error, do this: mount -t proc proc /proc
-root@alex:/# mount
-mount: failed to read mtab: No such file or directory

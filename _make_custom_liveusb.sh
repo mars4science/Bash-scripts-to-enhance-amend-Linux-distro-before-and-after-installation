@@ -5,6 +5,7 @@
 # ---- auto script  ----- #
 # ---- manual way is after auto script (note: manual outdated, auto up-to-date)  ----- #
 
+# script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
 
 # ---- parameters ---- #
 distro_label="LM_20.2_AM_full_v_1.4" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
@@ -73,6 +74,13 @@ change_squash() {
     # to run script(s) via chroot need path to them inside chrooted environment
     sudo mount -o bind,x-mount.mkdir $script_path $work_path/fin_sq/media/root/Scripts
     sudo mount -o bind,remount,ro $script_path $work_path/fin_sq/media/root/Scripts
+
+    # moved here from after_original_distro_install.sh as I understood is customary to set chroot environment before calling chroot
+    sudo mount -t proc proc $work_path/fin_sq/proc
+    sudo mount -t sysfs sys $work_path/fin_sq/sys
+    sudo mount -t devtmpfs devtmpfs $work_path/fin_sq/dev
+    sudo mount -t devpts devpts $work_path/fin_sq/dev/pts
+    # note which looks as made before `mount /proc` was added: # mount  ----- output: mount: failed to read mtab: No such file or directory
 
     sudo chroot $work_path/fin_sq /bin/bash -c "software_path_root=${path_to_software_in_chroot}; export software_path_root; liveiso_path_scripts_root=${liveiso_path_scripts_in_chroot}; export liveiso_path_scripts_root; /media/root/Scripts/after_original_distro_install.sh"
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
