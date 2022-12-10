@@ -9,7 +9,7 @@
 ##### The rights to the bash scripting code contained in these files and/or this git repository are granted under GNU GPL 3.0 license and GNU GPL 2.0 license.
 ##### Text of the licenses see in files LICENSE-* in this repo and/or https://www.gnu.org/licenses/gpl-3.0.en.html, https://www.gnu.org/licenses/gpl-2.0.en.html
 
-#### _make_custom_liveusb.sh to amend liveUSB iso 
+#### _make_custom_liveusb.sh to amend liveUSB iso (some parts are specific to Linux Mint Cinnamon distribution, tested with versions 20.2 and 21)
 It calls many other scripts from the repo. 
 (Some other scripts are not called, some that are are IMO also useful as standalone)
 
