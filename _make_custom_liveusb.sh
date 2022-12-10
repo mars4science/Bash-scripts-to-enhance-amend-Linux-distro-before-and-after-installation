@@ -13,7 +13,7 @@ distro_label="GNU-Linux_1_b21" # arbitrary string, not sure script written to pr
 software_path_root=/media/ramdisk/LM_21 # the script is written to look for software to take from there
 original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
 
-work_path=/media/ramdrive/work # the script is written to create temporary files and resulting ISO there (free space "expected")
+work_path=/media/ramdisk/work # the script is written to create temporary files and resulting ISO there (free space "expected")
 
 # put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_liveusb.sh - custom init script)
 user_name=mint
@@ -211,11 +211,10 @@ if [ -e "$work_path" ] && [ "$(ls $work_path)" != "" ]; then
         un_mount
         sudo rm -R $work_path/*
         Eval=$?
-        delay=0
         if [ $Eval -ne 0 ]; then
-            echo "Deleting contents unsuccessful (per return code);this script is written to end in $delay seconds"; sleep $delay; exit 1;
+            delay=10; echo "Deleting contents unsuccessful (per return code);this script is written to end in $delay seconds"; sleep $delay; exit 1;
         fi
-        echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
+            delay=2; echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
     fi    
 else
     mkdir --parents $work_path && cd $_
