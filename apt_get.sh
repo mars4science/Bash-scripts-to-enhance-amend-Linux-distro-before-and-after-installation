@@ -247,7 +247,7 @@ install_local(){
         # apt lacks --assume-yes option, so changing to apt-get
         
         # DEBIAN_FRONTEND=noninteractive added for wireshark-qt - see above
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes $debs_storage_folder/*.deb 
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends $debs_storage_folder/*.deb
         Eval=$?
 
         if [ $Eval -eq 0 ];then
