@@ -2,8 +2,6 @@
 
 trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
-# TODO think about hardcoded copyfrom_path
-
 run_path=/media/ramdisk
 link_path="$(get_software_path.sh)"/tor.tar.xz
 
@@ -23,10 +21,10 @@ display_help "$help_message$common_help"
 if [ ! -e "$link_path" ]; then
     if [ ! -d $(dirname "$link_path") ]; then sudo mkdir $(dirname "$link_path"); fi
     if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
-    copyfrom_path="$software_path_root/tor-browser-linux64-10.5.10_en-US.tar.xz"
-    if [ ! -e "$copyfrom_path" ]; then echo >&2 "tor path $copyfrom_path not found, exiting with error"; exit 1; fi
-    sudo cp "$copyfrom_path" $(dirname "$link_path")
-    sudo ln -s $(dirname "$link_path")/$(basename "$copyfrom_path") $link_path
+    tor_archive_path=$software_path_root/$(ls --sort=time $software_path_root | grep tor-browser- | head --lines=1)
+    if [ ! -e "$tor_archive_path" ]; then echo >&2 "  ERROR/Error: tor path $tor_archive_path not found, exiting with error code 1"; exit 1; fi
+    sudo cp "$tor_archive_path" $(dirname "$link_path")
+    sudo ln -s $(dirname "$link_path")/$(basename "$tor_archive_path") $link_path
     echo copied and linked tor to "$link_path", run script again to copy to RAM and start from there
     exit 0
 fi
@@ -43,11 +41,11 @@ tar x -f "$run_path"/tor.tar --atime-preserve --one-top-level="$run_path"
 rm "$run_path"/tor.tar
 
 "$run_path"/tor-browser_en-US/Browser/start-tor-browser --register-app
-gtk-launch start-tor-browser.desktop
+gtk-launch start-tor-browser.desktop # [1]
 
 exit
 
-Notes:
+[1]:
 
 Where <file> is the name of the .desktop file with or without the .desktop part. The name must not include the full path.
 
