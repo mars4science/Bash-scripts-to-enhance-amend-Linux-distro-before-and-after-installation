@@ -1,10 +1,8 @@
 #!/bin/bash
 # trap 'err=$?; echo >&2 "Exiting on error $err"; sleep 10; exit $err' ERR
 
-# per knowledge of depeloper current code when run during liveUSB iso alteration produces errors, hence check before run
-# interestingly "get"/"read" works, however "set"/"write" produces errors
-# &>/dev/null gsettings set org.cinnamon.desktop.interface scaling-factor 1
-# changed check to `dconf write` as gsettings exits with 0 (outputs warning) [1]
+# dbus-run-session needs to be used to run the script (to write to dconf database) before user login, for liveUSB the script is run from systemd_to_run_as_user.sh [1]
+
 &>/dev/null dconf write /org/cinnamon/desktop/interface/scaling-factor 1
 if [ $? -ne 0 ]; then
     1>&2 echo "-!- Per code and knowledge of the deleloper at time of this script was written,"
@@ -81,7 +79,7 @@ gsettings set org.gnome.gnome-system-monitor.proctree col-4-width 90 # Width of 
 gsettings set org.gnome.gnome-system-monitor.proctree sort-col 8 # CPU %
 gsettings set org.gnome.gnome-system-monitor.proctree sort-order 0 # highest at top
 
-# [2] in _readme.md, 
+# [2] in _readme.md ([2] no longer there, what was it?)
 # does not work, maybe "legacy" was a hint for that, developer wants to find another way to change zoom-in for terminal
 gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/zoom-in/ zoom-in "<Ctrl>equal"
 
@@ -92,7 +90,7 @@ gsettings set org.cinnamon.settings-daemon.plugins.power sleep-inactive-battery-
 gsettings set org.cinnamon.settings-daemon.plugins.power idle-dim-time 300 # in seconds, dim screen after becoming idle; timeout
 gsettings set org.cinnamon.settings-daemon.plugins.power idle-brightness 10 # in %
 
-# See [1] of _readme.md, also for some reason command (for binding) that have $(xrandr do not work, only specific with e.g. eDP-1,
+# See [1] of _readme.md ([1] no longer there, what was it?), also for some reason command (for binding) that have $(xrandr do not work, only specific with e.g. eDP-1,
 # therefore changed script code to make shell files and bind to them - it resulted in being able to use keys to rotate system's display
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9','custom10', '__dummy__']"
 # or dconf write /org/cinnamon/desktop/keybindings/custom-list "['custom0', 'custom1', 'custom2', '__dummy__']"
@@ -180,18 +178,6 @@ gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_bac
 
 exit
 
-# add cinnamon applets to right lower panel (to the left of all the rest - clock, wifi etc.)
-# does not result in panal change for some reason
-# DONE: find out the reasons to the above, see below:
-# result depend on speed of boot process, based on response to created github issue moved panel edit to
-# editing /usr/share/glib-2.0/schemas org.cinnamon.gschema.xml or 10_cinnamon.gschema.override
-# in cinnamon_config.sh
-applets_orig=`dconf read /org/cinnamon/enabled-applets`
-applets_changed=`echo $applets_orig | perl -pe 's/(right:)([0-9]+)/$1.($2+2)/eg' | perl -pe "s/]/, 'panel1:right:0:mem-monitor-text\@datanom.net:100', 'panel1:right:1:temperature\@fevimu:101']/"`
-dconf write /org/cinnamon/enabled-applets "['']"
-gsettings set org.cinnamon enabled-applets "['']"
-dconf write /org/cinnamon/enabled-applets "$applets_changed"
-
 [1]
 # dconf write /org/cinnamon/desktop/interface/scaling-factor 1
 error: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
@@ -202,5 +188,19 @@ root@alex:/# gsettings set org.cinnamon.desktop.interface scaling-factor 1
 (process:242481): dconf-WARNING **: 08:34:30.432: failed to commit changes to dconf: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
 root@alex:/# echo $?
 0
+
+[2] link for footnote is not here, task moved to cinnamon_config.sh
+# Adding cinnamon applets to right lower panel (to the left of all the rest - clock, wifi etc.)
+# did not result in panel change for some reason
+# DONE: find out the reasons to the above, see below:
+# looks like result depends on speed of boot process, based on response to created github issue moved panel editing to
+# editing /usr/share/glib-2.0/schemas org.cinnamon.gschema.xml or 10_cinnamon.gschema.override
+# in cinnamon_config.sh
+applets_orig=`dconf read /org/cinnamon/enabled-applets`
+applets_changed=`echo $applets_orig | perl -pe 's/(right:)([0-9]+)/$1.($2+2)/eg' | perl -pe "s/]/, 'panel1:right:0:mem-monitor-text\@datanom.net:100', 'panel1:right:1:temperature\@fevimu:101']/"`
+dconf write /org/cinnamon/enabled-applets "['']"
+gsettings set org.cinnamon enabled-applets "['']"
+dconf write /org/cinnamon/enabled-applets "$applets_changed"
+
 
 
