@@ -53,7 +53,7 @@ if [ $? -ne 0 ] ; then # noted above schema depricated for Linux Mint 21
     gsettings set org.cinnamon.desktop.peripherals.mouse double-click 550
 fi
 gsettings set org.cinnamon.settings-daemon.peripherals.touchpad horizontal-scrolling true
-if [ $? -ne 0 ] ; then # noted above schema depricated for Linux Mint 21 and no such key ! still left the code in case it will be available for some systems
+if [ $? -ne 0 ] ; then # noted above schema depricated for Linux Mint 21 and no such key, experiment showed that horizontal-scrolling works, setting key left just in case setting will be re-introduced
     echo " next line try org.cinnamon.desktop.peripherals.touchpad instead"
     gsettings set org.cinnamon.desktop.peripherals.touchpad horizontal-scrolling true
 fi
@@ -86,6 +86,7 @@ gsettings set org.gnome.gnome-system-monitor.proctree sort-order 0 # highest at 
 gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/zoom-in/ zoom-in "<Ctrl>equal"
 
 gsettings set org.cinnamon.desktop.screensaver lock-delay 600 # seconds, ??? start delay not found via dconf Editor
+gsettings set org.cinnamon.settings-daemon.plugins.power lock-on-suspend false # in GUI it is in screensaver settings window, diaable as reported workaround for reported bug of scale reset after suspend on Linux Mint 21 (bundled screensaver does not lock screen when booted as liveUSB, xscreensaver does and has many programs/themes)
 gsettings set org.cinnamon.settings-daemon.plugins.power sleep-display-battery 900 # in seconds
 gsettings set org.cinnamon.settings-daemon.plugins.power sleep-inactive-battery-timeout 1800 # in seconds
 gsettings set org.cinnamon.settings-daemon.plugins.power idle-dim-time 300 # in seconds, dim screen after becoming idle; timeout
@@ -93,7 +94,7 @@ gsettings set org.cinnamon.settings-daemon.plugins.power idle-brightness 10 # in
 
 # See [1] of _readme.md, also for some reason command (for binding) that have $(xrandr do not work, only specific with e.g. eDP-1,
 # therefore changed script code to make shell files and bind to them - it resulted in being able to use keys to rotate system's display
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', '__dummy__']"
+gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9','custom10', '__dummy__']"
 # or dconf write /org/cinnamon/desktop/keybindings/custom-list "['custom0', 'custom1', 'custom2', '__dummy__']"
 echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate normal' | sudo tee $(get_install_path.sh)/display_rotate_normal.sh
 echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate left' | sudo tee $(get_install_path.sh)/display_rotate_left.sh
@@ -122,32 +123,37 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/name "'
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/binding "['<Primary>u']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/command "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'"
 
+# <Primary> was Ctrl on some thinkpad, set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/name "'Volume Down'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/binding "['<Primary>j']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/command "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'"
+
 # fix TrackPoint issue om carbon X1 gen 6
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/name "'TrackPoint X1G6 fix'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/binding "['<Super><Alt>t']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/command "'/lib/systemd/system-sleep/trackpoint_reset key'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/name "'TrackPoint X1G6 fix'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/binding "['<Super><Alt>t']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/command "'/lib/systemd/system-sleep/trackpoint_reset key'"
 
 # set custom screen scale
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/name "'Screen scale'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/binding "['<Super><Alt>s']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/command "'/lib/systemd/system-sleep/scaling_factor key'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/name "'Screen scale'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/binding "['<Super><Alt>s']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/command "'/lib/systemd/system-sleep/scaling_factor key'"
 
 # screen lock binding, TODO check if xscreensaver deamon is started when ISO is booted with its debs installed
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/name "'Screen lock'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/binding "['<Super><Alt>l']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/command "'sh -c \'xscreensaver-command -lock || xscreensaver-command -pref\''"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/name "'Screen lock'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/binding "['<Super><Alt>l']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/command "'sh -c \'xscreensaver-command -lock || xscreensaver-command -pref\''"
 
 # set custom monitor brightness adjustments
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/name "'Brightness up'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/binding "['MonBrightnessUp']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/command "'night +1'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/name "'Brightness up'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/binding "['MonBrightnessUp']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/command "'night +1'"
 
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/name "'Brightness down'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/binding "['MonBrightnessDown']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/command "'night -1'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/name "'Brightness down'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/binding "['MonBrightnessDown']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/command "'night -1'"
 
 # to activate bindings (for some reason do not work just from populating dconf database from above commands), different order of items in the list
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9']"
+gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9','custom10']"
 # or dconf write /org/cinnamon/desktop/keybindings/custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4']"
 
 gsettings set org.nemo.preferences show-hidden-files true
@@ -166,7 +172,7 @@ dconf write /org/cinnamon/sounds/plug-enabled false
 dconf write /org/cinnamon/sounds/unplug-enabled true
 
 gsettings set ca.desrt.dconf-editor.Settings show-warning false # If “true”, Dconf Editor opens a popup when launched reminding the user to be careful.
-gsettings get org.gnome.nm-applet disable-disconnected-notifications true # Set this to true to disable notifications when disconnecting from a network.
+gsettings set org.gnome.nm-applet disable-disconnected-notifications true # Set this to true to disable notifications when disconnecting from a network.
 
 exit
 
