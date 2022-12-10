@@ -8,12 +8,12 @@
 # script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
 
 # ---- parameters ---- #
-distro_label="LM_20.2_AM_full_v_1.4" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
+distro_label="GNU-Linux_1_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
-software_path_root=/media/$(id --user --name)/usb/LM_20.2 # the script is written to look for software to take from there
-original_iso="${software_path_root}"/linuxmint-20.2-cinnamon-64bit.iso # the script is written to look there for original ISO
+software_path_root=/media/ramdisk/LM_21 # the script is written to look for software to take from there
+original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
 
-work_path=/media/zramdisk # the script is written to create temporary files and resulting ISO there (free space "expected")
+work_path=/media/ramdrive/work # the script is written to create temporary files and resulting ISO there (free space "expected")
 
 # put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_liveusb.sh - custom init script)
 user_name=mint
@@ -95,6 +95,7 @@ change_boot() {
     # duplicate first menu entry three times, \s\S needed as in perl . (dot) does not include end of line
     perl -0777e 'while(<>){s/(menuentry[\s\S]*?\n\}\n)/\1\1\1\1/;print "$_"}' $work_path/fin/boot/grub/grub.cfg | 1>/dev/null sudo tee $work_path/fin/boot/grub/grub.cfg_tmp
     sudo mv --force $work_path/fin/boot/grub/grub.cfg_tmp $work_path/fin/boot/grub/grub.cfg
+
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/boot/grub/grub.cfg
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit to RAM, verbose (UEFI: all menu entries)"/' $work_path/fin/boot/grub/grub.cfg
@@ -114,10 +115,14 @@ change_boot() {
     echo "set timeout=5" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
 #    echo "fi" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
 
+    # remove trademark info from boot menu
+    sudo sed --in-place --regexp-extended -- 's/Linux Mint.*Cinnamon/OS/' $work_path/fin/boot/grub/grub.cfg
+
+
     # ======= for legacy boot =======
     #   append  file=/cdrom/preseed/linuxmint.seed boot=casper initrd=/casper/initrd.lz toram --
     # edit menu title
-    sudo sed --in-place -- 's/\(menu title\).*/\1 Linux Mint 20.2 64-bit based (legacy boot)/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place -- 's|\(menu title\).*|\1 GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)|' $work_path/fin/isolinux/isolinux.cfg
     # duplicate first menu entry two times, \s\S needed as in perl . does not include end of line   
     perl -0777e 'while(<>){s/(label[\s\S]*?--\n)(menu default\n)/\1\2\1\1\1/;print "$_"}' $work_path/fin/isolinux/isolinux.cfg | 1>/dev/null sudo tee $work_path/fin/isolinux/isolinux.cfg_tmp    
     sudo mv --force $work_path/fin/isolinux/isolinux.cfg_tmp $work_path/fin/isolinux/isolinux.cfg
@@ -143,6 +148,9 @@ change_boot() {
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (quiet)/' $work_path/fin/isolinux/isolinux.cfg
     # edit timeout
     sudo sed --in-place -- 's/\(timeout\).*/\1 50/' $work_path/fin/isolinux/isolinux.cfg
+
+    # remove trademark info from boot menu
+    sudo sed --in-place --regexp-extended -- 's/Linux Mint/OS/' $work_path/fin/isolinux/isolinux.cfg
 
     # code to repalce memtest to start with stock iso
     sudo cp "${software_path_root}/memtest86+/memtest86+-5.31b.bin" $work_path/fin/casper/memtest
