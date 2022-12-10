@@ -9,24 +9,36 @@
 ##### The rights to the bash scripting code contained in these files and/or this git repository are granted under GNU GPL 3.0 license and GNU GPL 2.0 license.
 ##### Text of the licenses see in files LICENSE-* in this repo and/or https://www.gnu.org/licenses/gpl-3.0.en.html, https://www.gnu.org/licenses/gpl-2.0.en.html
 
-Run _make_custom_liveusb.sh to amend liveUSB iso.
-
-Run after_original_distro_install.sh to amend system after installation.
-
-_make_usb_persistent.sh - standalone script to edit ISO file to change default boot parameters
-r_sync.sh – not finalized try on using rsync to synchronize two folders both ways (see code and comments in the script how it works)
-
-Scripts to amend ISO are written to be run as ordinary user, they use sudo in themselves
+#### _make_custom_liveusb.sh to amend liveUSB iso 
+It calls many other scripts from the repo. 
+(Some other scripts are not called, some that are are IMO also useful as standalone)
 
 _make_custom_liveusb.sh at the start have code to set several variables:
 
-- distro_label="LM_20.2_custom"
-- original_iso=/media/data/Software/distros/linuxmint-20.2-cinnamon-64bit.iso
+- distro_label="name_for_ISO_file and label of disk when mounted"
+- original_iso=/media/data/Software/distros/linuxmint-21-cinnamon-64bit.iso
 - work_path=/media/ramdrive/custom_iso
+- software_path_root=/media/usb/data
 
-Another key variable: software_path_root (in _make_custom_liveusb.sh and after_original_distro_install.sh) which sets where scripts get softtware to install
+$work_path should have sufficient free space, now around several Gb, if fails due to space, someone can increase space and restart, it asks to delete previous temporary files when started (if finds any)
 
-work_path should have sufficient free space, now around several Gb, if fails due to space, just increase space and restart, it asks to delete previous temporary files when started (if finds any)
+#### This script (+ scripts it is written to call) expects to find in path set by $software_path_root for parts of it functionality:
+
+- debs - folders with debs, one folder for one application to install
+- settings - transmission folder as in user home, .xscreensaver as in user home, background.jpg to set as background
+- bin - executables to add to folder in PATH, including night - logarithmic control of brightness (linked to be called via custom keyboard binding) , stopfan - stop fan of thinkpads (both see my other repo) , youtube-dlp, yt-dlp
+- bin/appimages - appimages to be added 
+- bin/desktops (desktop files used to display items in Cinnamon menu to be added)
+- bin/icons (icons for desktop files to be added)
+- bin/the_rest (contains executables to add to folder in $PATH) folders 
+- color-profiles - contains specific profile to fix IMO incorrect color of a specific ThinkPad model (used by set_color_profile.sh)
+- cinnamon-applets - applets to be added, also for mem-monitor-text@datanom.net and temperature@fevimu there is code to amend their settings (code in  cinnamon_config.sh)
+- wine-gecko,
+- wine-mono - folders with downloaded archives that are put on ISO by install_wine-gecko.sh, install_wine-mono.sh, om websites of those were found relatioships between vesions of wine and their in tables, in mentined scripts several matches for recent versions are coded.
+- tor-browser-linux64-*.tar.xz files - most recent selected and added
+- firefox-*.tar.bz2 files - most recent selected and added
+- files.py, files_functions.py - scripts to add from my other repo (used for removing duplicates, sync, and some other tasks with files)
+- apt_dpkg_state with dpkg_orig_status (dpkg status file) and sources.list and sources.list.d (apt sources) - used by apt_get.sh to install files in debs folder mentioned above (expected debs were downloaded with those files via apt_get.sh earlier) - TODO: think about getting them from original ISO
 
 #### List of changes programmed to be made by _make_custom_liveusb.sh:
 
@@ -75,6 +87,16 @@ Other minor tweaks, e.g.:
 - notifyes on low memory (memory_notify_config.sh, might not work)
 - add mnt_ro mnt_rw functions to make mount read-only and rw respectively, e_ject - eject usb storage (bash_functions.sh)
 
+##### Scripts to amend ISO are written to be run as ordinary user, they use sudo in themselves
+
+#### after_original_distro_install.sh to amend system after installation.
+
+#### Some others:
+
+_make_usb_persistent.sh - standalone script to edit ISO file to change default boot parameters
+r_sync.sh – not finalized try on using rsync to synchronize two folders both ways (see code and comments in the script how it works)
+
+
 #### TODO 
 
 - power (maybe Cinnamon): delay(s) (on battery and on AC) before screen blacking
@@ -86,5 +108,4 @@ Other minor tweaks, e.g.:
 - increase font used for boot
 - script to print packages dscriptions from deb files for all stored.
 - tlp_config_battery.sh make to work when two batteries are present
-- gsettings for networkmanager
 
