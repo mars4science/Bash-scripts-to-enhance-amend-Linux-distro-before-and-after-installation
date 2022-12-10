@@ -62,7 +62,8 @@ change_squash() {
     sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/xscreensaver_setup.sh
     sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/dconf_config.sh
 
-    sudo cp --recursive "${software_path_root}"/settings $settings_to_copy_to
+    # sudo cp --recursive "${software_path_root}"/settings/* $settings_to_copy_to
+    sudo rsync -a "${software_path_root}"/settings/ $settings_to_copy_to # replaced cp because IIRecalledC * expansion does not include dot prefixed files
 
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp "${software_path_root}"/bin/stopfan $work_path/fin_sq/usr/local/bin

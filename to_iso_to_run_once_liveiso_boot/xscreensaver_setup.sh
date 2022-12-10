@@ -8,6 +8,6 @@ if [ ! -e "${software_path_root}" ] ; then software_path_root=liveiso_path_setti
 
 if [ -e /home/$(id -u -n) ]; then
     home_folder="/home/$(id -un)"
-    cp --no-preserve=all "$software_path_root"/settings/xscreensaver/.xscreensaver "$home_folder"
+    cp --no-preserve=all "$software_path_root"/.xscreensaver "$home_folder"
     chmod o=r,ug=rw "$home_folder"/.xscreensaver
 fi
