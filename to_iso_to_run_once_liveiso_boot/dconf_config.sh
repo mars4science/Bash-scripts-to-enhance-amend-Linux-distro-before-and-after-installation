@@ -30,8 +30,6 @@ gsettings set org.gnome.libgnomekbd.keyboard layouts "['us', 'ru']"
 # gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp', 'grp\tgrp:lalt_lshift_toggle']"
 gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp']"
 
-gsettings set org.cinnamon.settings-daemon.peripherals.touchpad horizontal-scrolling true
-
 gsettings set org.nemo.desktop trash-icon-visible true
 
 gsettings set org.nemo.list-view default-visible-columns "['name', 'size', 'type', 'date_modified', 'owner', 'permissions']"
@@ -40,14 +38,31 @@ gsettings set org.nemo.search search-visible-columns "['name', 'where', 'date_mo
 
 gsettings set org.nemo.preferences default-folder-viewer 'list-view'
 # standard 100%, large 150%, larger 200%, largest 400%; small 66%, smaller 50%, smallest 33%
-gsettings set org.nemo.list-view default-zoom-level 'large'
+gsettings set org.nemo.list-view default-zoom-level 'standard'
 gsettings set org.nemo.icon-view default-zoom-level 'largest'
 
 gsettings set org.nemo.preferences executable-text-activation 'display' # What to do with executable text files when they are activated (single or double clicked). Possible values are "launch" to launch them as programs, "ask" to ask what to do via a dialog, and "display" to display them as text files.
 # seems to not have effect if "open with" and/or default desktop application is set for x-shellscript files (see change_default_apps_for_multimedia_files.sh)
 gsettings set org.nemo.preferences click-double-parent-folder true # If true, double click left on blank area will go to parent folder
 gsettings set org.nemo.preferences quick-renames-with-pause-in-between true # Enables renaming of icons by two times clicking with pause between clicks
+
+# peripherals, changed schema from LM 20.2 to LM 21
 gsettings set org.cinnamon.settings-daemon.peripherals.mouse double-click 550 # to ensure double click don't activate rename - increase default (400)
+if [ $? -ne 0 ] ; then # noted above schema depricated for Linux Mint 21
+    echo " next line try org.cinnamon.desktop.peripherals.mouse instead"
+    gsettings set org.cinnamon.desktop.peripherals.mouse double-click 550
+fi
+gsettings set org.cinnamon.settings-daemon.peripherals.touchpad horizontal-scrolling true
+if [ $? -ne 0 ] ; then # noted above schema depricated for Linux Mint 21 and no such key ! still left the code in case it will be available for some systems
+    echo " next line try org.cinnamon.desktop.peripherals.touchpad instead"
+    gsettings set org.cinnamon.desktop.peripherals.touchpad horizontal-scrolling true
+fi
+gsettings set org.cinnamon.settings-daemon.peripherals.touchpad tap-to-click true # noted: false by default for Linux Mint 21
+if [ $? -ne 0 ] ; then # noted above schema depricated for Linux Mint 21
+    echo " next line try org.cinnamon.desktop.peripherals.touchpad instead"
+    gsettings set org.cinnamon.desktop.peripherals.touchpad tap-to-click true
+fi
+
 
 gsettings set org.nemo.preferences show-advanced-permissions true # Show advanced permissions in the file property dialog
 gsettings set org.cinnamon.desktop.media-handling automount false # If set to true, then Nautilus will automatically mount media such as user-visible hard disks and removable media on start-up and media insertion.
@@ -150,7 +165,9 @@ dconf write /org/cinnamon/sounds/tile-enabled false
 dconf write /org/cinnamon/sounds/plug-enabled false
 dconf write /org/cinnamon/sounds/unplug-enabled true
 
-sleep 10
+gsettings set ca.desrt.dconf-editor.Settings show-warning false # If “true”, Dconf Editor opens a popup when launched reminding the user to be careful.
+gsettings get org.gnome.nm-applet disable-disconnected-notifications true # Set this to true to disable notifications when disconnecting from a network.
+
 exit
 
 # add cinnamon applets to right lower panel (to the left of all the rest - clock, wifi etc.)
@@ -165,8 +182,6 @@ dconf write /org/cinnamon/enabled-applets "['']"
 gsettings set org.cinnamon enabled-applets "['']"
 dconf write /org/cinnamon/enabled-applets "$applets_changed"
 
-
-
 [1]
 # dconf write /org/cinnamon/desktop/interface/scaling-factor 1
 error: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
@@ -175,7 +190,7 @@ root@alex:/# echo $?
 root@alex:/# gsettings set org.cinnamon.desktop.interface scaling-factor 1
 
 (process:242481): dconf-WARNING **: 08:34:30.432: failed to commit changes to dconf: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
-root@alex-ThinkPad-slim:/# echo $?
+root@alex:/# echo $?
 0
 
 
