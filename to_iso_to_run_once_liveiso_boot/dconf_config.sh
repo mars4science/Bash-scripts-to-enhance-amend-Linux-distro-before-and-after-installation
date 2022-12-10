@@ -174,6 +174,10 @@ dconf write /org/cinnamon/sounds/unplug-enabled true
 gsettings set ca.desrt.dconf-editor.Settings show-warning false # If “true”, Dconf Editor opens a popup when launched reminding the user to be careful.
 gsettings set org.gnome.nm-applet disable-disconnected-notifications true # Set this to true to disable notifications when disconnecting from a network.
 
+desktop_background=/usr/share/backgrounds/linuxmint-ulyssa/echerkasski_countryside.jpg
+if [ ! -e "$desktop_background" ] ; then desktop_background=liveiso_path_settings_root/echerkasski_countryside.jpg ; fi
+gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_background"
+
 exit
 
 # add cinnamon applets to right lower panel (to the left of all the rest - clock, wifi etc.)

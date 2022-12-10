@@ -60,6 +60,8 @@ change_squash() {
 
     sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/transmission_setup.sh
     sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/xscreensaver_setup.sh
+    sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/dconf_config.sh
+
     sudo cp --recursive "${software_path_root}"/settings $settings_to_copy_to
 
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
