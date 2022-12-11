@@ -118,6 +118,31 @@ sources_dir_path=$apt_dpkg_folder/sources.list.d
 # POSIX way [] not [[ ]]
 # both ; and new line can serve as separators
 
+substitute_dpkg_status(){
+    if [ $copy_status_file_exit_status -eq 0 ] ; then
+        sudo mv $STATUS_FILE $STATUS_FILE.bak;
+        sudo ln -s $status_file_path_tmp $STATUS_FILE;
+    fi
+}
+
+substitute_apt_status(){
+    if [ $copy_sources_file_exit_status -eq 0 ] ; then
+        sudo mv $SOURCES_FILE $SOURCES_FILE.bak;
+        sudo ln -s $sources_file_path_tmp $SOURCES_FILE;
+    fi
+
+    if [ $copy_sources_dir_exit_status -eq 0 ] ; then
+        sudo mv $SOURCES_DIR $SOURCES_DIR.bak;
+        sudo ln -s $sources_dir_path_tmp $SOURCES_DIR;
+    fi
+
+    # even if sources not substituted, refresh is often useful
+    echo === mext line: sudo apt-get update ===
+    sudo apt-get update
+    echo === line after line with update ===
+}
+
+
 substitute_status(){
     if [ -d "$apt_dpkg_folder" ]
       then
@@ -147,55 +172,43 @@ substitute_status(){
         SOURCES_FILE=/$ETC_DIR/$SOURCES_FILE
         SOURCES_DIR=/$ETC_DIR/$SOURCES_DIR
 
-        if [ $copy_status_file_exit_status -eq 0 ] ; then
-            sudo mv $STATUS_FILE $STATUS_FILE.bak;
-            sudo ln -s $status_file_path_tmp $STATUS_FILE;
-        fi
-
-        if [ $copy_sources_file_exit_status -eq 0 ] ; then
-            sudo mv $SOURCES_FILE $SOURCES_FILE.bak;
-            sudo ln -s $sources_file_path_tmp $SOURCES_FILE;
-        fi
-
-        if [ $copy_sources_dir_exit_status -eq 0 ] ; then
-            sudo mv $SOURCES_DIR $SOURCES_DIR.bak;
-            sudo ln -s $sources_dir_path_tmp $SOURCES_DIR;
-        fi
-
-        # even if sources not substituted, refresh is often useful
-        echo === mext line: sudo apt-get update ===
-        sudo apt-get update
-        echo === line after line with update ===
-
+        substitute_dpkg_status
+        substitute_apt_status
     fi
 }
 
 
+restore_dpkg_status(){
+    if [ $copy_status_file_exit_status -eq 0 ] ; then
+        sudo mv --force $STATUS_FILE.bak $STATUS_FILE
+        # rm $status_file_path_tmp
+    fi
+}
+
+restore_apt_status(){
+    if [ $copy_sources_file_exit_status -eq 0 ] ; then
+        sudo mv --force $SOURCES_FILE.bak $SOURCES_FILE
+        # rm $sources_file_path_tmp
+    fi
+
+    if [ $copy_sources_dir_exit_status -eq 0 ] ; then
+        sudo rm $SOURCES_DIR # line added as `mv` wrote for line below cannot overwrite non-directory .. with directory (script made a link)
+        sudo mv $SOURCES_DIR.bak $SOURCES_DIR
+    fi
+
+    if [[ ($copy_sources_file_exit_status -eq 0) || ($copy_sources_dir_exit_status -eq 0) ]] ; then
+        echo === after sources substitution reversed mext line: sudo apt-get update  ===
+        sudo apt-get update # sources were substituted, update back with original sources
+        echo === line after line with update ===
+    fi
+}
+
 restore_status(){
     if [ -d "$apt_dpkg_folder_tmp" ]
       then
+        restore_dpkg_status
+        restore_apt_status
         rm --recursive "$apt_dpkg_folder_tmp"
-
-        if [ $copy_status_file_exit_status -eq 0 ] ; then
-            sudo mv --force $STATUS_FILE.bak $STATUS_FILE
-            # rm $status_file_path_tmp
-        fi
-
-        if [ $copy_sources_file_exit_status -eq 0 ] ; then
-            sudo mv --force $SOURCES_FILE.bak $SOURCES_FILE
-            # rm $sources_file_path_tmp
-        fi
-
-        if [ $copy_sources_dir_exit_status -eq 0 ] ; then
-            sudo rm $SOURCES_DIR # line added as `mv` wrote for line below cannot overwrite non-directory .. with directory (script made a link)
-            sudo mv $SOURCES_DIR.bak $SOURCES_DIR
-        fi
-
-        if [[ ($copy_sources_file_exit_status -eq 0) || ($copy_sources_dir_exit_status -eq 0) ]] ; then
-            echo === after sources substitution reversed mext line: sudo apt-get update  ===
-            sudo apt-get update # sources were substituted, update back with original sources
-            echo === line after line with update ===
-        fi
     fi
 }
 
@@ -214,10 +227,9 @@ install_local(){
             connect_restore=0
         fi
         #nmcli radio wifi off
-        restore_status
+        restore_dpkg_status
         # apt uses _apt user, so that user should have access to the folder with debs. udisks makes username folder in media giving access to the user via ACL, so:
         sudo setfacl -m u:_apt:x /media/$(id -un)
-
 
         # process needed confugurations settings 
         # added to make selection during wireshark install
@@ -257,7 +269,7 @@ install_local(){
         fi
         
         sudo setfacl -x u:_apt /media/$(id -un)
-        substitute_status
+        substitute_dpkg_status
         if [ $connect_restore -eq 1 ]; then nmcli networking on; fi
     fi
 }
@@ -334,47 +346,6 @@ exit
     # (( i=i+1 ))
     # i=$(($i+1))    
 
-
-# from man bash:
-# Bash is Copyright (C) 1989-2018 by the Free Software Foundation, Inc.
-# ?      Expands to the exit status of the most recently executed foreground pipeline.
-# The  `$'  character  introduces  parameter  expansion,  command substitution, or arithmetic expansion.  
-# The parameter name or symbol to be expanded may be enclosed in braces, which are optional but serve 
-# to protect the variable to be expanded from characters immediately following it which could be interpreted as part of the name.
-
-
-
-# from man bash:
-# Bash is Copyright (C) 1989-2018 by the Free Software Foundation, Inc.
-#       if list; then list; [ elif list; then list; ] ... [ else list; ] fi
-#              The if list is executed.  If its exit status is zero, the then list is executed.  Otherwise, each elif list is executed in turn, and  if  its  exit  status  is
-#              zero, the corresponding then list is executed and the command completes.  Otherwise, the else list is executed, if present.  The exit status is the exit status
-#              of the last command executed, or zero if no condition tested true.
-#
-#       Conditional expressions are used by the [[ compound command and the test and [ builtin commands to test file attributes and perform string and arithmetic comparisons.
-#       The test abd [ commands determine their behavior based on the number of arguments; see the descriptions of those commands for any other command-specific actions.
-
-#       test expr
-#       [ expr ]
-#              Return  a  status  of 0 (true) or 1 (false) depending on the evaluation of the conditional expression expr.  Each operator and operand must be a separate argu‐
-#              ment.  Expressions are composed of the primaries described above under CONDITIONAL EXPRESSIONS.  test does not accept any options, nor does it accept  and  ig‐
-#              nore an argument of -- as signifying the end of options.
-#              test and [ evaluate conditional expressions using a set of rules based on the number of arguments.
-#
-#              0 arguments
-#                     The expression is false.
-#              1 argument
-#                     The expression is true if and only if the argument is not null.
-
-#       [[ expression ]]
-#              Return a status of 0 or 1 depending on the evaluation of the conditional expression expression.  Expressions are composed of the primaries described below  un‐
-#              der  CONDITIONAL EXPRESSIONS.  Word splitting and pathname expansion are not performed on the words between the [[ and ]]; tilde expansion, parameter and vari‐
-#              able expansion, arithmetic expansion, command substitution, process substitution, and quote removal are performed.  Conditional operators such as  -f  must  be
-#              unquoted to be recognized as primaries.
-#
-#              When used with [[, the < and > operators sort lexicographically using the current locale.
-#
-#       See the description of the test builtin command (section SHELL BUILTIN COMMANDS below) for the handling of parameters (i.e.  missing parameters).
 
 [1]
 https://unix.stackexchange.com/questions/683777/why-apt-get-does-not-download-all-dependencies-in-download-only-mode
