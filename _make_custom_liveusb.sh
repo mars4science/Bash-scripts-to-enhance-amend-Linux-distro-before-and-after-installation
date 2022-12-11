@@ -19,7 +19,7 @@ work_path=/media/ramdisk/work # the script is written to create temporary files 
 user_name=mint
 
 # as after_original_distro_install.sh to be run in chrooted environment there is code to map (via mount) software_path_root to  path_to_software_in_chroot - where above mentioned script is written to look for software
-path_to_software_in_chroot="/software_to_add"
+path_to_software_in_chroot="/tmp/path_for_mount_to_add_software_to_liveiso"
 liveiso_path_scripts_in_chroot=/usr/bin/am-scripts
 liveiso_path_settings_in_chroot=/usr/share/am-settings
 # ---- parameters end ---- #
