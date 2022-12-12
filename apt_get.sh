@@ -227,7 +227,7 @@ install_local(){
             connect_restore=0
         fi
         #nmcli radio wifi off
-        restore_dpkg_status
+        if [ -d "$apt_dpkg_folder" ] ; then restore_dpkg_status ; fi # restore status for installating period if expect to have been substituted
         # apt uses _apt user, so that user should have access to the folder with debs. udisks makes username folder in media giving access to the user via ACL, so:
         sudo setfacl -m u:_apt:x /media/$(id -un)
 
@@ -269,7 +269,7 @@ install_local(){
         fi
         
         sudo setfacl -x u:_apt /media/$(id -un)
-        substitute_dpkg_status
+        if [ -d "$apt_dpkg_folder" ] ; then substitute_dpkg_status ; fi # substitute status back if expected to have been restored for installating period
         if [ $connect_restore -eq 1 ]; then nmcli networking on; fi
     fi
 }
