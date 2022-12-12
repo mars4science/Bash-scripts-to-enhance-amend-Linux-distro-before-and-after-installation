@@ -34,7 +34,7 @@ $work_path should have sufficient free space, now around several Gb, if fails du
 
 - debs - folders with debs, one folder for one application to install (via `apt_get.sh`)
 - settings - transmission folder as in user home, .xscreensaver as in user home, background.jpg to set as background
-- bin - executables to add to path hardcoded in `get_install_path.sh` (now it is /usr/local/bin), including night - logarithmic control of brightness (linked to be called via custom keyboard binding), stopfan - stop fan of thinkpads (both see my other repo), youtube-dlp, yt-dlp
+- bin - executables to add to path hardcoded in `get_install_path.sh` (now it is /usr/local/bin), including `night` - logarithmic control of brightness (linked to be called via custom keyboard binding), `stopfan` - stop fan of thinkpads (both see my other repo), youtube-dlp, yt-dlp
 - bin/appimages - appimages to be added to path hardcoded in `get_install_path.sh`
 - bin/desktops - desktop files used to display items in Cinnamon menu to be added
 - bin/icons - icons for desktop files to be added
