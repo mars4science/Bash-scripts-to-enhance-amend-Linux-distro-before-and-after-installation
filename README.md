@@ -60,16 +60,19 @@ $work_path should have sufficient free space, now around several Gb, if fails du
 - add hotkeys (bindings) to rotate "main" screen, volume up/down 25% (6dB), logarithm based screen brightness up/down via `night` application, start screensaver
 - change thresholds of remaining battery % for shutdown (via upower)
 - switching layouts by ctrl-space (no such option in GUI btw)
-- add more columns to system monitor
+- add columns to system monitor: resident memory, command line
 - Cinnamon tweaks:
     - zooming enabled with "cursor pushes contents around", keys to zoom are super(win)+alt+(+/-)
     - horizontal scrolling enabled
     - display Hi-DPI scale enable
     - show trash on desktop
-    - Nemo: add columns: permissions, owner
-    - Nemo: setting to do not utomatically open a folder for automounted media
-    - Nemo: setting to neither prompt nor autorun/autostart programs when a medium is inserted
+    - setting to do not utomatically open a folder for automounted media (opened in file manager by default in Linux Mint 20.2)
+    - setting to neither prompt nor autorun/autostart programs when a medium is inserted
     - setting desktop background
+- Nemo tweaks:
+    - add columns: permissions, owner
+    - add bookmarks for ramdisk (Ramdisk), zramdisk (Compressed RAM) - via `after_login_config.sh`
+
 
 Scripts added to /usr/local/bin:
 
