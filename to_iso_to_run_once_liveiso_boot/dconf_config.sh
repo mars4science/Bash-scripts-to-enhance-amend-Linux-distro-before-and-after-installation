@@ -176,7 +176,10 @@ desktop_background=liveiso_path_settings_root/background.jpg
 if [ ! -e "$desktop_background" ] ; then desktop_background=/usr/share/backgrounds/linuxmint-ulyssa/echerkasski_countryside.jpg ; fi
 gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_background"
 
+gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run)
+
 exit
+
 
 [1]
 # dconf write /org/cinnamon/desktop/interface/scaling-factor 1
