@@ -92,7 +92,7 @@ gsettings set org.cinnamon.settings-daemon.plugins.power idle-brightness 10 # in
 
 # See [1] of _readme.md ([1] no longer there, what was it?), also for some reason command (for binding) that have $(xrandr do not work, only specific with e.g. eDP-1,
 # therefore changed script code to make shell files and bind to them - it resulted in being able to use keys to rotate system's display
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9','custom10', '__dummy__']"
+gsettings set org.cinnamon.desktop.keybindings custom-list "[ '__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10']"
 # or dconf write /org/cinnamon/desktop/keybindings/custom-list "['custom0', 'custom1', 'custom2', '__dummy__']"
 echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate normal' | sudo tee $(get_install_path.sh)/display_rotate_normal.sh
 echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate left' | sudo tee $(get_install_path.sh)/display_rotate_left.sh
@@ -150,9 +150,9 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/name "
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/binding "['MonBrightnessDown']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/command "'night -1'"
 
-# to activate bindings (for some reason do not work just from populating dconf database from above commands), different order of items in the list
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9','custom10']"
-# or dconf write /org/cinnamon/desktop/keybindings/custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4']"
+# to activate bindings (for some reason do not work just from populating dconf database from above commands), different order of items in the list (per output of `gsettings get` output is reversed after editining a binding)
+gsettings set org.cinnamon.desktop.keybindings custom-list "['custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__' ]"
+# or dconf write /org/cinnamon/desktop/keybindings/custom-list "['custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__' ]"
 
 gsettings set org.nemo.preferences show-hidden-files true
 gsettings set org.nemo.preferences show-open-in-terminal-toolbar true
