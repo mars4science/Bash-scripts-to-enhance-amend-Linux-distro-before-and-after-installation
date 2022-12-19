@@ -5,10 +5,9 @@
 # TODO separate into system wide and user specific scripts (user specific be run for each user)
 
 # ---- parameters ---- #
-if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
-if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; fi
+if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; export software_path_root ; fi
+if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; export work_path ; fi
 
-export software_path_root
 # ---- parameters end ---- #
 
 current_dir=`pwd`
@@ -25,6 +24,7 @@ else running_system="true"; fi
 
 
 # some locales are added at original ISO install time, but still just in case and for liveISO
+
 sudo locale-gen ru_RU
 sudo locale-gen ru_RU.UTF-8
 sudo locale-gen ru_RU.KOI8-R
@@ -57,13 +57,16 @@ $dir_name/fox_tabs_get.sh install
 $dir_name/git_clone.sh install
 $dir_name/git_compact.sh install
 $dir_name/get_software_path.sh install
-$dir_name/t_or.sh install
-# on the first run t_or is expected to copy tor bundle from USB (now partly hardcoded location) to location given by get_software_path.sh
-t_or
 
-$dir_name/k_iwix.sh install
+$dir_name/w_browser.sh install # add script to the system
+# next on the first run is expected to copy archive with secondary browser from $software_path_root/... to location given by get_software_path.sh
+w_browser
+
+# after creating and writing code to copy from /bin/appimages kiwix appimage  move there, no need for special script (just put in desktop file workaround for libGL error
+# Exec=bash -c "LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6 kiwix-desktop_x86_64_2.1.0.appimage"
+# $dir_name/k_iwix.sh install
 # on the first run k_iwix is expected to copy kiwix appimage from USB (now partly hardcoded location) to location given by get_software_path.sh
-k_iwix
+# k_iwix
 
 $dir_name/firefox-replace.sh
 
