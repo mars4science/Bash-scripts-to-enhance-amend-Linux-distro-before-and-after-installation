@@ -93,6 +93,7 @@ change_squash() {
 change_boot() {
     # modify boot config
     # [2]
+
     # ======= for UEFI boot =======
     # 	linux	/casper/vmlinuz  file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=${iso_path} toram --
     # duplicate first menu entry three times, \s\S needed as in perl . (dot) does not include end of line
@@ -117,6 +118,10 @@ change_boot() {
 #    echo 'if [ "${timeout}" = 0 ]; then' | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
     echo "set timeout=5" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
 #    echo "fi" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
+
+    # to made text large on hiDPI displays and to improve cursor/manual boot optopns editing speed at boot time
+    echo "GRUB_GFXMODE=640x480x32,auto" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
+
 
     # remove trademark info from boot menu
     sudo sed --in-place --regexp-extended -- 's/Linux Mint.*Cinnamon/OS/' $work_path/fin/boot/grub/grub.cfg
