@@ -43,7 +43,7 @@ $work_path should have sufficient free space, now around several Gb, if fails du
 - cinnamon-applets - applets to be added (via `cinnamon_add_software.sh`), also for mem-monitor-text@datanom.net and temperature@fevimu there is code to amend their settings (code in  `cinnamon_config.sh`)
 - wine-gecko,
 - wine-mono - folders with downloaded archives that are put on ISO by `install_wine-gecko.sh`, `install_wine-mono.sh`, on websites of those were found relatioships between vesions of wine and their in tables, in mentined scripts several matches for recent versions are coded.
-- tor-browser-linux64-*.tar.xz files - most recent selected and added
+- *-browser-* files - most recent selected and added (tar or zip archives of web browsers expected, used by `w_browser.sh`)
 - firefox-*.tar.bz2 files - most recent selected and added
 - files.py, files_functions.py - scripts to add from my other repo (used for removing duplicates, sync, and some other tasks with files) to path hardcoded in `get_install_path.sh`
 - apt_dpkg_state with dpkg_orig_status (dpkg status file) and sources.list and sources.list.d (apt sources) - used by `apt_get.sh` to install files in debs folder mentioned above (expected debs were downloaded with those files via `apt_get.sh` earlier) - TODO: think about getting them from original ISO
@@ -79,7 +79,7 @@ Scripts added to /usr/local/bin:
 - `apt_get` downloads and/or installs apt packages storing downloaded in $software_path_root/debs location, uses (temporary sets) dpkg_orig_status file from $software_path_root location (or another via command line parameter) as dpkg status
 - `f_ree` delete cashes on disk, Firefox saved sites data, etc.
 - `fox_profile_put`, `fox_profile_get` - save and retrieve current Firefox profile data to /media/$(id -un)/usb/
-- `t_or` extract and run TOR from ramdisk location
+- `w_browser` extract and run additional web browser from ramdisk location
 - `k_iwix` runs kiwix appimage with some variables set as a workaround to libGL error 
 - `git_clone` clones specific git repo via `git clone mirror-- $1 ../.git` (all branches, see man page of git-clone for details on refs)
 - `git_compact` compacts repo with `git switch --orphan empty_long_name`

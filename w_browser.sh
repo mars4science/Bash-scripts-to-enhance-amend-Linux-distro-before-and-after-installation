@@ -33,11 +33,25 @@ fi
 # delete previous run
 if [ -d "$run_path" ]; then rm --recursive "$run_path"/*; fi
 
-# extract
-tar x -f "$link_path" --atime-preserve --one-top-level="$run_path"
+link_path=$(realpath "$link_path") # needed for grep below
 
-# usually folder in archive include browser word
-browser_folder=$(ls "$run_path" | grep browser | head --lines=1)
+# extract
+if [ $(echo "$link_path" | grep ".tar") ] ; then
+    tar x -f "$link_path" --atime-preserve --one-top-level="$run_path"
+elif [ $(echo "$link_path" | grep ".zip") ] ; then
+    unzip "$link_path" -d "$run_path"
+else
+    echo "Neither tar nor zip archive format for browser, exiting"; exit 1
+fi
+
+# previous variants, less general
+# in case archive have single top folder where all is, assume that folder in archive include "browser" word
+# browser_folder=$(ls "$run_path" | grep browser | head --lines=1)
+# browser_folder=$(find "$run_path" -maxdepth 1 -type d -name *browser*)
+
+# in case archive have single top folder where all is
+if [ $(ls "$run_path" | wc | awk '{print $1}') -eq 1 ] ; then browser_folder=$(ls "$run_path"); else browser_folder=""; fi
+
 # usually browser exec file include browser word
 browser_exec_file=$(ls "$run_path/$browser_folder" | grep browser | head --lines=1)
 
