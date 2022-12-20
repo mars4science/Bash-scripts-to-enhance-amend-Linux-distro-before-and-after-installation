@@ -8,7 +8,7 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 # for "install" and "update" arguments
 source common_arguments_to_scripts.sh
 # help
-help_message="  Clones remote/original repository to local as bare one (as tested clones all branches that way). Then changes config to core.bare false to prepare for futher usage as many git commands do not work on/in repository with core.bare true.
+help_message="  Clones remote/original repository to local as mirrow one (as tested clones all branches that way). Then changes config file to one that looks as one for regular repo as many git commands do not work on/in repository with core.bare true, some work differently with fetch set for mirroring.
   Usage: $script_name path_to_original_git [path_to_dest_folder, . (current folder) if omitted]\n"
 display_help "$help_message$common_help"
 # ====== #
@@ -27,10 +27,12 @@ fi
 if [ $# -eq 2 ]; then cd "$2"; fi
 
 git clone --mirror "$1" "./.git"
-git config core.bare false
+git config --bool core.bare false
+sed --in-place -- "s|fetch = +refs/\*:refs/\*|fetch = +refs/heads/*:refs/remotes/origin/*|" .git/config
+sed --in-place -- "/mirror = true/d" .git/config
 
-# cd "$2"
+cd - # change directory back from "$2"
 
-# decided not to do that after answer to my question on SO that it is not supported, may use git-archive, git-branch w/out it to extract parts of the tree
+# ??? decided not to do that after answer to my question on SO that it is not supported, may use git-archive, git-branch w/out it to extract parts of the tree
 # git config --bool core.bare false
 
