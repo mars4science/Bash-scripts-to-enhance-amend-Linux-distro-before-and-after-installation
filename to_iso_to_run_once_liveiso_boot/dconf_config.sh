@@ -24,7 +24,7 @@ fi
 gsettings set org.cinnamon.desktop.a11y.applications screen-magnifier-enabled true
 gsettings set org.cinnamon.desktop.a11y.magnifier mouse-tracking push
 
-gsettings set org.gnome.libgnomekbd.keyboard layouts "['us', 'ru', 'ua']"
+# gsettings set org.gnome.libgnomekbd.keyboard layouts "['us', 'fr', 'de']" # now set in after_original_distro_install.sh and those script edits this line for liveISO
 # gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp', 'grp\tgrp:lalt_lshift_toggle']"
 gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp']"
 

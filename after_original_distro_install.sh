@@ -5,8 +5,16 @@
 # TODO separate into system wide and user specific scripts (user specific be run for each user)
 
 # ---- parameters ---- #
+
+# set variables in case run this script directly (not via _make_custom_liveusb.sh)
+
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; export software_path_root ; fi
 if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; export work_path ; fi
+if [ "x${liveiso_path_scripts_root}" = "x" ] ; then liveiso_path_scripts_root=/usr/bin/am-scripts ; export liveiso_path_scripts_root ; fi
+
+eval "$locales" # "convert" passed argument back to array
+
+if [ ${#locales[@]} -eq 0 ] ; then echo after_locales; locales=("fr_FR" "en_US") ; fi # array, list separated by space; correct syntax of each entry in /etc/locale.gen
 
 # ---- parameters end ---- #
 
@@ -22,20 +30,38 @@ if [ $(ischroot;echo $?) -ne 1 ] ; then
     echo "Seems now in chrooted environment for liveUSB ISO file creation"; sleep 2
 else running_system="true"; fi
 
-
-# some locales are added at original ISO install time, but still just in case and for liveISO
-
-sudo locale-gen ru_RU
-sudo locale-gen ru_RU.UTF-8
-sudo locale-gen ru_RU.KOI8-R
-sudo locale-gen ru_RU.CP1251
-sudo locale-gen uk_UA
-sudo locale-gen uk_UA.UTF-8
-
 if [ $running_system = "true" ]; then
     # turn off wireless comms
     # TODO add for bluetooth, could not find how w/out tlp 2021/12/5
     nmcli radio all off
+fi
+
+if [ ${#locales[@]} -ne 0 ] ; then
+
+    # some locales are added at original ISO install time, but still just in case and for liveISO - for languages (selected locales) support
+    for key in "${locales[@]}"; do sudo locale-gen "$key".*; done
+
+    # change interface language
+    # echo "LANG=${locales[0]}.UTF-8" | sudo tee /etc/default/locale # works, also can be done as below:
+    sudo update-locale "LANG=${locales[0]}.UTF-8" LANGUAGE= LC_MESSAGES= LC_COLLATE= LC_CTYPE= # works if locates are available (generated already) 
+
+    # set keyboard layouts
+    # was -gt 1 (if more than 1 locale) but realized in case default language changed need to change layout just in case
+    # make list with small letters of last parts separated by comma, quoted with single quotes and replace in dconf_config.sh line
+    # gsettings set org.gnome.libgnomekbd.keyboard layouts "['us', 'fr', 'de']"
+    layouts="gsettings set org.gnome.libgnomekbd.keyboard layouts "\""['"
+    for key in "${locales[@]}"; do layouts=$layouts$(echo "$key" | awk 'BEGIN {FS = "_"}{print tolower($2)}')"', '"; done
+    layouts=${layouts::-3}']"' # remove extra , '
+    if [ $running_system = "false" ]; then
+        sudo sed --in-place --regexp-extended -- "s/# gsettings set org.gnome.libgnomekbd.keyboard layouts.*/$layouts/" $liveiso_path_scripts_root/dconf_config.sh
+    else
+        # as running "${layouts}" results in "command not found", making temp file:
+        layouts_command_file=/tmp/layouts.sh
+        echo "${layouts}" | sudo tee $layouts_command_file
+        sudo chmod a+x $layouts_command_file
+        $layouts_command_file
+        sudo rm $layouts_command_file
+    fi
 fi
 
 # used by the rest of scripts when run with install / update arguments 
@@ -144,8 +170,8 @@ if [ $running_system = "true" ]; then
         $dir_name/run_at_boot_config.sh
     fi
 
-    $dir_name/libvirt_access_rights.sh # for liveUSB running `--append --groups libvirt $user_name` AFAIK has no effect (need reboot or at least relogin), but ACL in /media might be useful
-    $dir_name/user_specific.sh
+    $dir_name/to_iso_to_run_once_liveiso_boot/libvirt_access_rights.sh # for liveUSB running `--append --groups libvirt $user_name` AFAIK has no effect (need reboot or at least relogin), but ACL in /media might be useful
+    $dir_name/to_iso_to_run_once_liveiso_boot/user_specific.sh
 
     # to leave terminal open with interactive bash if started from GUI
     # ps output list processes' paths as called (relative), so use "$0" 

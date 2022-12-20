@@ -22,11 +22,13 @@ _make_custom_liveusb.sh at the start have code to set several variables:
 - distro_label="name_for_ISO_file and label of disk when mounted"
 - original_iso - full path to ISO file to amend
 - work_path - full path with sufficient free space, end result (modified ISO file) is programmed to be left there after temporary files are deleted
+- work_path_in_chroot - path to create temp files by scripts run in chroot
 - software_path_root - full path where data to add are located 
 - user_name - to replace user name in `run_at_boot_liveusb.sh`
 - path_to_software_in_chroot - full path were data to be added is mounted during install (TODO - remove folder after install)
 - liveiso_path_scripts_in_chroot - full path for scripts be copied to that are to run during boot via `systemd_to_run_as_user.sh`)
 - liveiso_path_settings_in_chroot - full path for files to be copied to for copying to user folder during boot
+- locales - array of locales (languages/keyboard layouts) to add, first one is for interface language 
 
 $work_path should have sufficient free space, now around several Gb, if fails due to space, someone can increase space and restart, it asks to delete previous temporary files when started (if finds any)
 
@@ -52,6 +54,7 @@ $work_path should have sufficient free space, now around several Gb, if fails du
 
 - several additional entries to boot menu of liveISO (text mode, toram, verbose)
 - uuid of mint user changed to 1000 to make same as first user after installation (for ease of access to files owned by 1000 id user)
+- add locales (languages/keyboard layouts), set interface language 
 - add ramdisk location (tmpfs system), sets root and mint users cache to tmpfs
 - add zramdisk location
 - add zram device for swap (swap not activated on boot, to activate swap command: `swap on --all`)
@@ -81,7 +84,7 @@ Scripts added to /usr/local/bin:
 - `fox_profile_put`, `fox_profile_get` - save and retrieve current Firefox profile data to /media/$(id -un)/usb/
 - `w_browser` extract and run additional web browser from ramdisk location
 - `k_iwix` runs kiwix appimage with some variables set as a workaround to libGL error 
-- `git_clone` clones specific git repo via `git clone mirror-- $1 ../.git` (all branches, see man page of git-clone for details on refs)
+- `git_clone` clones specific git repo with mirror option then amends config to make cloned repo look as regular
 - `git_compact` compacts repo with `git switch --orphan empty_long_name`
 
 Other minor tweaks, e.g.:
@@ -111,7 +114,7 @@ Other minor tweaks, e.g.:
 #### TODO 
 
 - at the end of install remove folder $path_to_software_in_chroot set in `_make_custom_liveusb.sh`  (path were data to be added is mounted during install)
-- move copying of data from `_make_custom_liveusb.sh` to `after_original_distro_install.sh`
+- DONE: move copying of data from `_make_custom_liveusb.sh` to `after_original_distro_install.sh` - as of now decided not needed as this copying needed for liveISO modification only, for running system `after_original_distro_install.sh` have code to call the scripts and copy settings
 - power (maybe Cinnamon): delay(s) (on battery and on AC) before screen blacking
 - investigate why for liveUSB tlp config of wifi off during boot is not honored
 - use org.cinnamon.* something to store info, e.g. paths
@@ -121,5 +124,5 @@ Other minor tweaks, e.g.:
 - increase font used for boot
 - script to print packages dscriptions from deb files for all stored.
 - `tlp_config_battery.sh` make to work when two batteries are present
-- fix code to remove limitation of running from path that does not contain spaces and special characters (complete quoting variables)
-- change git_clone to set refs to be able to push/pull from a repo supplied as argument to the script
+- fix code to remove limitation of running from path that does not contain spaces and special characters (complete quoting of variables)
+- DONE: change git_clone to set refs to be able to push/pull from a repo supplied as argument to the script

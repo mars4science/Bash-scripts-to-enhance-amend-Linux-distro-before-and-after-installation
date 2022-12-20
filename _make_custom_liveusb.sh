@@ -10,10 +10,11 @@
 # ---- parameters ---- #
 distro_label="GNU-Linux_1_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
-software_path_root=/media/ramdisk/LM_21 # the script is written to look for software to take from there
+software_path_root=/media/mint/usb/LM # the script is written to look for software to take from there
 original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
 
 work_path=/media/ramdisk/work # the script is written to create temporary files and resulting ISO there (free space "expected")
+work_path_in_chroot=/media/ramdisk # used by apt_get.sh
 
 # put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_liveusb.sh - custom init script)
 user_name=mint
@@ -22,6 +23,11 @@ user_name=mint
 path_to_software_in_chroot="/tmp/path_for_mount_to_add_software_to_liveiso"
 liveiso_path_scripts_in_chroot=/usr/bin/am-scripts
 liveiso_path_settings_in_chroot=/usr/share/am-settings
+
+# array, list separated by space; correct syntax of each entry in /etc/locale.gen; used to generate locales, set keyboard layouts available for switching
+# first in array also used to set system interface language
+locales=("fr_FR" "en_US" "de_DE")
+
 # ---- parameters end ---- #
 
 if [ ! -e "$original_iso" ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi
@@ -85,7 +91,8 @@ change_squash() {
     sudo mount -t devpts devpts $work_path/fin_sq/dev/pts
     # note which looks as made before `mount /proc` was added: # mount  ----- output: mount: failed to read mtab: No such file or directory
 
-    sudo chroot $work_path/fin_sq /bin/bash -c "software_path_root=${path_to_software_in_chroot}; export software_path_root; liveiso_path_scripts_root=${liveiso_path_scripts_in_chroot}; export liveiso_path_scripts_root; /media/root/Scripts/after_original_distro_install.sh"
+    locales=$(echo "${locales[@]@A}" | sed "s/"\""/'/g") # A operator of bash generate declare line with double quotes, need to replace for bash -c below
+    sudo chroot $work_path/fin_sq /bin/bash -c "software_path_root=${path_to_software_in_chroot}; export software_path_root; liveiso_path_scripts_root=${liveiso_path_scripts_in_chroot}; export liveiso_path_scripts_root; locales="\""${locales}"\""; export locales; liveiso_path_scripts_root=$liveiso_path_scripts_in_chroot; export liveiso_path_scripts_root; work_path=${work_path_in_chroot}; export work_path; /media/root/Scripts/after_original_distro_install.sh"
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
 }
 

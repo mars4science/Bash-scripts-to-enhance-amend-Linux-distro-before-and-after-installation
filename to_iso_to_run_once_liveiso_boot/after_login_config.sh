@@ -23,6 +23,7 @@ if [ -e /home/$(id -u -n)/.profile ]; then
 fi
 
 # adding bookmarks to Nemo is programmed based on try-and-error and https://forums.linuxmint.com/viewtopic.php?t=170398
+# not correct in case of interface language changed - TODO update bookmarks file after it was created
 bookmarks_file=/home/$(id -u -n)/.config/gtk-3.0/bookmarks
 if [ ! -e "$bookmarks_file" ]; then
     mkdir --parents "$(dirname "$bookmarks_file")"
