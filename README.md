@@ -113,6 +113,7 @@ Other minor tweaks, e.g.:
 
 #### TODO 
 
+- fix `after_login_config.sh` where Nemo bookmarks set do not correspond to actual folders in $HOME in case of interface language change
 - at the end of install remove folder $path_to_software_in_chroot set in `_make_custom_liveusb.sh`  (path were data to be added is mounted during install)
 - DONE: move copying of data from `_make_custom_liveusb.sh` to `after_original_distro_install.sh` - as of now decided not needed as this copying needed for liveISO modification only, for running system `after_original_distro_install.sh` have code to call the scripts and copy settings
 - power (maybe Cinnamon): delay(s) (on battery and on AC) before screen blacking
