@@ -41,9 +41,14 @@ if [ ${#locales[@]} -ne 0 ] ; then
     # some locales are added at original ISO install time, but still just in case and for liveISO - for languages (selected locales) support
     for key in "${locales[@]}"; do sudo locale-gen "$key".*; done
 
+    export LC_ALL=${locales[0]}.UTF-8 # added to get read of "locale: Cannot set LC_CTYPE to default locale: No such file or directory" during debs install
+    echo "- Note - : 'bash: warning: setlocale: LC_ALL: cannot change locale' does not seem to prevent locales variables from being changed by previous command in the script; exact meaning of the warning: not clear"
+
     # change interface language
-    # echo "LANG=${locales[0]}.UTF-8" | sudo tee /etc/default/locale # works, also can be done as below:
-    sudo update-locale "LANG=${locales[0]}.UTF-8" LANGUAGE= LC_MESSAGES= LC_COLLATE= LC_CTYPE= # works if locates are available (generated already) 
+    echo "LANG=${locales[0]}.UTF-8" | sudo tee /etc/default/locale # works, also can be done via update-locale, see below. The diffence is that tee clears whole file, update-locale need VARIABLE1= to crear each variable from the file
+    echo LC_COLLATE=C.UTF-8 | sudo tee --append /etc/default/locale # added LC_COLLATE=C.UTF-8 for correct sorting of files in Nemo ( _ - before lowercase letters)
+
+    # sudo update-locale "LANG=${locales[0]}.UTF-8" LC_ALL= LC_MESSAGES= LC_COLLATE=C.UTF-8 # works if locale for LANG is available (generated already)
 
     # set keyboard layouts
     # was -gt 1 (if more than 1 locale) but realized in case default language changed need to change layout just in case
@@ -55,12 +60,9 @@ if [ ${#locales[@]} -ne 0 ] ; then
     if [ $running_system = "false" ]; then
         sudo sed --in-place --regexp-extended -- "s/# gsettings set org.gnome.libgnomekbd.keyboard layouts.*/$layouts/" $liveiso_path_scripts_root/dconf_config.sh
     else
-        # as running "${layouts}" results in "command not found", making temp file:
-        layouts_command_file=/tmp/layouts.sh
-        echo "${layouts}" | sudo tee $layouts_command_file
-        sudo chmod a+x $layouts_command_file
-        $layouts_command_file
-        sudo rm $layouts_command_file
+        # as running "${layouts}" results in "command not found", using alias
+        alias gsettings_layouts="${layouts}"
+        gsettings_layouts
     fi
 fi
 
