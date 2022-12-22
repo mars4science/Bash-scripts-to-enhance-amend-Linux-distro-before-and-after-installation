@@ -10,11 +10,15 @@
 # ---- parameters ---- #
 distro_label="GNU-Linux_1_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
-software_path_root=/media/mint/usb/LM # the script is written to look for software to take from there
+software_path_root=/media/ramdrive/LM # the script is written to look for software to take from there
 original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
 
 work_path=/media/ramdisk/work # the script is written to create temporary files and resulting ISO there (free space "expected")
-work_path_in_chroot=/media/ramdisk # used by apt_get.sh
+change_boot_menu="true" # set to "true" to edit boot menu (which adds options e.g. boot to ram, change id of live user, add rights for virt manager usage)
+
+# array, list separated by space; correct syntax of each entry can be found in /etc/locale.gen (languagecode_COUNTRYCODE); used to generate locales, set keyboard layouts available for switching
+# first in array also used to set system interface language, set to empty () for not doing locales changes
+locales=("fr_FR" "en_US" "de_DE")
 
 # put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_liveusb.sh - custom init script)
 user_name=mint
@@ -23,10 +27,7 @@ user_name=mint
 path_to_software_in_chroot="/tmp/path_for_mount_to_add_software_to_liveiso"
 liveiso_path_scripts_in_chroot=/usr/bin/am-scripts
 liveiso_path_settings_in_chroot=/usr/share/am-settings
-
-# array, list separated by space; correct syntax of each entry in /etc/locale.gen; used to generate locales, set keyboard layouts available for switching
-# first in array also used to set system interface language
-locales=("fr_FR" "en_US" "de_DE")
+work_path_in_chroot=/tmp # used by apt_get.sh
 
 # ---- parameters end ---- #
 
@@ -92,7 +93,7 @@ change_squash() {
     # note which looks as made before `mount /proc` was added: # mount  ----- output: mount: failed to read mtab: No such file or directory
 
     locales=$(echo "${locales[@]@A}" | sed "s/"\""/'/g") # A operator of bash generate declare line with double quotes, need to replace for bash -c below
-    sudo chroot $work_path/fin_sq /bin/bash -c "software_path_root=${path_to_software_in_chroot}; export software_path_root; liveiso_path_scripts_root=${liveiso_path_scripts_in_chroot}; export liveiso_path_scripts_root; locales="\""${locales}"\""; export locales; liveiso_path_scripts_root=$liveiso_path_scripts_in_chroot; export liveiso_path_scripts_root; work_path=${work_path_in_chroot}; export work_path; /media/root/Scripts/after_original_distro_install.sh"
+    sudo chroot $work_path/fin_sq /bin/bash -c "export software_path_root=${path_to_software_in_chroot}; export liveiso_path_scripts_root=${liveiso_path_scripts_in_chroot}; export locales="\""${locales}"\""; export liveiso_path_scripts_root=$liveiso_path_scripts_in_chroot; export work_path=${work_path_in_chroot}; /media/root/Scripts/after_original_distro_install.sh"
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
 }
 
@@ -226,7 +227,7 @@ if [ -e "$work_path" ] && [ "$(ls $work_path)" != "" ]; then
         if [ $Eval -ne 0 ]; then
             delay=10; echo "Deleting contents unsuccessful (per return code);this script is written to end in $delay seconds"; sleep $delay; exit 1;
         fi
-            delay=2; echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
+            delay=1; echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
     fi    
 else
     mkdir --parents $work_path && cd $_
@@ -247,7 +248,7 @@ sudo mount $original_iso iso #  -o loop
 # maybe graft parameter of genisoimage can be used instead of overlayfs to amend mounted original iso contents
 sudo mount -t overlay -o lowerdir=iso,upperdir=to,workdir=temp overlay fin
 
-change_boot
+if [ "${change_boot_menu}" = "true" ] ; then change_boot; fi
 
 # mount squashfs for modification
 

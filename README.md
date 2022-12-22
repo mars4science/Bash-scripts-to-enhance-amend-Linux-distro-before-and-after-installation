@@ -1,8 +1,8 @@
 ﻿### Most of scripts written to amend installation or liveUSB iso file of linux distros. Tested on Linux Mint 21 and some Thinkpad laptops.
 
-#### As of 2022/12/8 it is a small project, no formal QA. [testing] branch contains code that was run and no unexpected errors were noted, [main] means code was used more extensively, [devel] is for development in progress.
+As of 2022/12/8 it is a small project, no formal QA. [testing] branch contains code that was run and no unexpected errors were noted, [main] means code was used more extensively, [devel] is for development in progress.
 
-#### Disclaimer: some scripts produce modified ISO files which might no longer be considered original distros and might have no legal rights to be called by original names and distributed with original labels and other content. Only personal use for testing is implied. 
+##### Disclaimer: some scripts produce modified ISO files which might no longer be considered original distros and might have no legal rights to be called by original names and distributed with original labels and other content. Only personal use for testing is implied.
 
 Scripts are expected to be run from path that does not contain spaces and special characters (not all variables are quoted).
 
@@ -19,16 +19,19 @@ Some parts are specific to Linux Mint Cinnamon distribution (LM) and to ThinkPad
 
 _make_custom_liveusb.sh at the start have code to set several variables:
 
-- distro_label="name_for_ISO_file and label of disk when mounted"
+- distro_label - name_for_ISO_file and label of disk when mounted
+- software_path_root - full path where data to add are located
 - original_iso - full path to ISO file to amend
 - work_path - full path with sufficient free space, end result (modified ISO file) is programmed to be left there after temporary files are deleted
-- work_path_in_chroot - path to create temp files by scripts run in chroot
-- software_path_root - full path where data to add are located 
+- change_boot_menu - set to set to "true" to edit boot menu (which adds options e.g. boot to ram, change id of live user, add rights for virt manager usage)
+    - Note: above are variables to set to run example 1 of script usage (to only add some software with `apt-install` of debs), see examples at the end of README
+- locales - array of locales (languages/keyboard layouts) to add, first one is for interface language
 - user_name - to replace user name in `run_at_boot_liveusb.sh`
 - path_to_software_in_chroot - full path were data to be added is mounted during install (TODO - remove folder after install)
 - liveiso_path_scripts_in_chroot - full path for scripts be copied to that are to run during boot via `systemd_to_run_as_user.sh`)
 - liveiso_path_settings_in_chroot - full path for files to be copied to for copying to user folder during boot
-- locales - array of locales (languages/keyboard layouts) to add, first one is for interface language 
+- work_path_in_chroot - path to create temp files by scripts run in chroot
+
 
 $work_path should have sufficient free space, now around several Gb, if fails due to space, someone can increase space and restart, it asks to delete previous temporary files when started (if finds any)
 
@@ -110,6 +113,23 @@ Other minor tweaks, e.g.:
 - `_make_usb_persistent.sh` - standalone script to edit ISO file to change default boot parameters
 - `_rename_based_on_meta.sh` - standalone script using ffmpeg
 - `_r_sync.sh` – not finalized try on using rsync to synchronize two folders both ways (see code and comments in the script how it works)
+
+### Examples
+
+#### Example 1 (to only add some software done with `apt-install` of deb files)
+- copy the following scripts to empty folder:
+    - `after_original_distro_install.sh`
+    - `apt_get.sh`
+    - `install_debs.sh`
+    - `_make_custom_liveusb.sh`
+- set variables listed at the beginning of _make_custom_liveusb.sh, see more detailed descriptions in the beginning of README.
+    - distro_label - "arbirary string with no special symbols, no spaces"
+    - software_path_root - full path where folder "debs" with software packages to add is located. Separate subfolder for each package, set of deb files for each package (main package and its dependencies) can be downloaded via apt_get.sh script (which uses `apt-get install --download-only`)
+    - original_iso - full path to ISO file to amend
+    - work_path - full path with sufficient free space, end result (modified ISO file) is programmed to be left there after temporary files are deleted
+    - change_boot_menu - set to "false"
+- run `_make_custom_liveusb.sh`, ignore notifications that files cannot be read/found, for installation of deb files see section starting from "===== next in a few seconds going to install downloaded debian packages =====" and ending with "===== This line is after install code, next in a few seconds going to continue ====="
+- upon completion of the script collect ISO file named in accordance with distro_label from work_path
 
 #### TODO 
 

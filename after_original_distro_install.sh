@@ -12,11 +12,15 @@ if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)
 if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; export work_path ; fi
 if [ "x${liveiso_path_scripts_root}" = "x" ] ; then liveiso_path_scripts_root=/usr/bin/am-scripts ; export liveiso_path_scripts_root ; fi
 
-eval "$locales" # "convert" passed argument back to array
-
-if [ ${#locales[@]} -eq 0 ] ; then echo after_locales; locales=("fr_FR" "en_US") ; fi # array, list separated by space; correct syntax of each entry in /etc/locale.gen
+if [ ! -v locales ] ; then locales=("fr_FR" "en_US") ; # (1) variable not set, fill in: the array, list separated by space; set to empty () for not doing locales changes; correct syntax of each entry can be found in /etc/locale.gen (languagecode_COUNTRYCODE)
 
 # ---- parameters end ---- #
+
+# (1)
+# locales if passed from `_make_custom_liveusb.sh` are in a form of "declare -a locales=([0]="A")", if locales array was set to empty, then expected to be "declare -a locales=()", if not declared at all (the script run directly), then locales variable is empty.
+
+    export locales="${locales[@]@A}" # A operator of bash generate "declare" statement line with double quotes
+fi
 
 current_dir=`pwd`
 full_path=`realpath $0` # man realpath : Print the resolved absolute file name;
@@ -26,45 +30,19 @@ dir_name=$(dirname $full_path)
 cd `dirname $0`
 
 if [ $(ischroot;echo $?) -ne 1 ] ; then
-    running_system="false";
+    export running_system="false";
     echo "Seems now in chrooted environment for liveUSB ISO file creation"; sleep 2
-else running_system="true"; fi
-
-if [ $running_system = "true" ]; then
-    # turn off wireless comms
+    export LC_ALL=C.UTF-8 # added to get rid of "locale: Cannot set LC_CTYPE to default locale: No such file or directory" during debs install in case locale of chrooted is different from locale of system on which scripts are run
+else
+    export running_system="true"
+    # turn off wireless comms to try to ensure installation does not require internet connection
     # TODO add for bluetooth, could not find how w/out tlp 2021/12/5
     nmcli radio all off
 fi
 
-if [ ${#locales[@]} -ne 0 ] ; then
-
-    # some locales are added at original ISO install time, but still just in case and for liveISO - for languages (selected locales) support
-    for key in "${locales[@]}"; do sudo locale-gen "$key".*; done
-
-    export LC_ALL=${locales[0]}.UTF-8 # added to get read of "locale: Cannot set LC_CTYPE to default locale: No such file or directory" during debs install
-    echo "- Note - : 'bash: warning: setlocale: LC_ALL: cannot change locale' does not seem to prevent locales variables from being changed by previous command in the script; exact meaning of the warning: not clear"
-
-    # change interface language
-    echo "LANG=${locales[0]}.UTF-8" | sudo tee /etc/default/locale # works, also can be done via update-locale, see below. The diffence is that tee clears whole file, update-locale need VARIABLE1= to crear each variable from the file
-    echo LC_COLLATE=C.UTF-8 | sudo tee --append /etc/default/locale # added LC_COLLATE=C.UTF-8 for correct sorting of files in Nemo ( _ - before lowercase letters)
-
-    # sudo update-locale "LANG=${locales[0]}.UTF-8" LC_ALL= LC_MESSAGES= LC_COLLATE=C.UTF-8 # works if locale for LANG is available (generated already)
-
-    # set keyboard layouts
-    # was -gt 1 (if more than 1 locale) but realized in case default language changed need to change layout just in case
-    # make list with small letters of last parts separated by comma, quoted with single quotes and replace in dconf_config.sh line
-    # gsettings set org.gnome.libgnomekbd.keyboard layouts "['us', 'fr', 'de']"
-    layouts="gsettings set org.gnome.libgnomekbd.keyboard layouts "\""['"
-    for key in "${locales[@]}"; do layouts=$layouts$(echo "$key" | awk 'BEGIN {FS = "_"}{print tolower($2)}')"', '"; done
-    layouts=${layouts::-3}']"' # remove extra , '
-    if [ $running_system = "false" ]; then
-        sudo sed --in-place --regexp-extended -- "s/# gsettings set org.gnome.libgnomekbd.keyboard layouts.*/$layouts/" $liveiso_path_scripts_root/dconf_config.sh
-    else
-        # as running "${layouts}" results in "command not found", using alias
-        alias gsettings_layouts="${layouts}"
-        gsettings_layouts
-    fi
-fi
+# set locales
+$dir_name/locales_change.sh
+# locale # when run showed locale not affected by running export LC_ALL (now commented out) in the script on line directly above
 
 # used by the rest of scripts when run with install / update arguments 
 # paths are harcoded in these two scripts

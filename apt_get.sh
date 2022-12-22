@@ -5,20 +5,24 @@
 # Help message below might explain usage and what the script does
 
 # for install, update arguments, help message output
-source common_arguments_to_scripts.sh
-# help
-help_message="  The Script is written to read from standard input.
-  Script is written to download deb packages with dependancies and stores them locally.
-  Lines to be read are expected to be names of packages (not fully qualified) from standard input, use 
-  1st argument (if not omitted) that is not -d, -i or for help used as location for downloaded files.
+if [ -e common_arguments_to_scripts.sh ] ; then
+    source common_arguments_to_scripts.sh
+    # help
+    help_message="  The Script is written to read from standard input.
+      Script is written to download deb packages with dependancies and stores them locally.
+      Lines to be read are expected to be names of packages (not fully qualified) from standard input, use
+      1st argument (if not omitted) that is not -d, -i or for help used as location for downloaded files.
 
-  Example: $script_name -i /media/alex/usb/LM_20.2/debs /home/alex/Documents/apt_dpkg_state
-  usage: $script_name [-i | -d ] [location_to_store] [folder with dpkg status file (dpkg_orig_status e.g. copied from /var/lib/dpkg/status) and apt sources locations, (sources.list file and sources.list.d folder, e.g. copied from /etc/apt)] < filename
-  or echo -e 'package_unqualified_name"'[\\n'"package_unqualified_name] etc' | $script_name [-i | -d] [location_to_store] [folder with dpkg status file and apt sources location]
-  -i means install right after downloaded.
-  -d means download only to default path with default location of dpkg status file and apt sources.
-  If dpkg status and/or apt sources not found at supplied location, substitution not done.\n"
-display_help "$help_message$common_help"
+      Example: $script_name -i /media/alex/usb/LM_20.2/debs /home/alex/Documents/apt_dpkg_state
+      usage: $script_name [-i | -d ] [location_to_store] [folder with dpkg status file (dpkg_orig_status e.g. copied from /var/lib/dpkg/status) and apt sources locations, (sources.list file and sources.list.d folder, e.g. copied from /etc/apt)] < filename
+      or echo -e 'package_unqualified_name"'[\\n'"package_unqualified_name] etc' | $script_name [-i | -d] [location_to_store] [folder with dpkg status file and apt sources location]
+      -i means install right after downloaded.
+      -d means download only to default path with default location of dpkg status file and apt sources.
+      If dpkg status and/or apt sources not found at supplied location, substitution not done.\n"
+    display_help "$help_message$common_help"
+else
+    if [ $1 = "install" ] ; then echo "apt_get not going to be installed"; exit 1; fi
+fi
 # ===== #
 
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
