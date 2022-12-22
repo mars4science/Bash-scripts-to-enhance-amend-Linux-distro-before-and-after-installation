@@ -74,3 +74,17 @@ echo '    geth --nodiscover --maxpeers 0 console' | sudo tee --append /etc/bash.
 echo '}; export -f gethh' | sudo tee --append /etc/bash.bashrc
 echo '' | sudo tee --append /etc/bash.bashrc
 
+# git: pull all tracked local branches
+echo '' | sudo tee --append /etc/bash.bashrc
+echo 'git_pull() {' | sudo tee --append /etc/bash.bashrc
+echo '    echo - pulling all tracked local branches from all remotes' | sudo tee --append /etc/bash.bashrc
+echo '    orig_branch=$(git branch | grep "*" | sed "s/[ *]*//") # getting name of current branch via asterisk' | sudo tee --append /etc/bash.bashrc
+echo '    git fetch --all || exit 1' | sudo tee --append /etc/bash.bashrc
+echo '    for branch in $(git branch | sed "s/[ *]*//") ; do # remove spaces and asterisk' | sudo tee --append /etc/bash.bashrc
+echo '        git checkout $branch && git merge --ff-only FETCH_HEAD' | sudo tee --append /etc/bash.bashrc
+echo '    done' | sudo tee --append /etc/bash.bashrc
+echo '    echo - checking out to branch where function was called from ' | sudo tee --append /etc/bash.bashrc
+echo '    git checkout $orig_branch' | sudo tee --append /etc/bash.bashrc
+echo '}; export -f git_pull' | sudo tee --append /etc/bash.bashrc
+echo '' | sudo tee --append /etc/bash.bashrc
+
