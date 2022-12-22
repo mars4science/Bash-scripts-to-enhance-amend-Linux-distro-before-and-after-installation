@@ -100,6 +100,7 @@ Other minor tweaks, e.g.:
 - disables swap (`disable_swap.sh`)
 - notifyes on low memory (`memory_notify_config.sh`, might not work)
 - add mntro mntrw functions to make mount read-only and read-write respectively, e_ject - eject usb storage (added via `bash_functions.sh`)
+- add git_pull function to pull all tracked branches from "origin"
 
 ##### Scripts to amend ISO are written to be run as ordinary user, they use sudo in themselves
 
