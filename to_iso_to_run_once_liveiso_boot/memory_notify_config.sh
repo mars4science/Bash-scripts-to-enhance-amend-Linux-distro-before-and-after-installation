@@ -12,5 +12,5 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 (crontab -l 2>/dev/null; echo '* * * * * if [ $(free -wm | awk '\''/^Mem:/ { print $8 }'\'') -le 500 ]; then XDG_RUNTIME_DIR=/run/user/$(id -u) notify-send -u normal '\''Available memory: 500 Mb only!'\''; fi') | crontab -
 # firefox is now main app taking more and more memory as it runs
 # after gecko install process name of firefox is GeckoMain 
-(crontab -l 2>/dev/null; echo '* * * * * if [ $(free -wm | awk '\''/^Mem:/ { print $8 }'\'') -le 250 ]; then XDG_RUNTIME_DIR=/run/user/$(id -u) pkill firefox$ || firefox-bin$ || pkill GeckoMain; fi') | crontab -
+(crontab -l 2>/dev/null; echo '* * * * * if [ $(free -wm | awk '\''/^Mem:/ { print $8 }'\'') -le 250 ]; then XDG_RUNTIME_DIR=/run/user/$(id -u) pkill firefox$ || pkill firefox-bin$ || pkill GeckoMain; fi') | crontab -
 

@@ -13,6 +13,7 @@ $dir_name/transmission_setup.sh
 $dir_name/xscreensaver_setup.sh
 $dir_name/dconf_config.sh
 $dir_name/after_wine_run.sh
+$dir_name/memory_notify_config.sh
 
 # change git config, e.g. colors of output for better visibility  
 $dir_name/git_config.sh

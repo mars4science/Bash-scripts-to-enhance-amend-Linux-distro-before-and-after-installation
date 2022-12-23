@@ -90,7 +90,7 @@ Scripts added to /usr/local/bin:
 - `git_clone` clones specific git repo with mirror option then amends config to make cloned repo look as regular
 - `git_compact` compacts repo with `git switch --orphan empty_long_name`
 
-Other minor tweaks, e.g.:
+Other minor tweaks, including:
 
 - sets systemd task at boot target for transmission settings
 - replaces Firefox with downloaded (and w/out google search engine selection disabled in Mint) version
@@ -98,7 +98,7 @@ Other minor tweaks, e.g.:
 - workaround of problem of specific old color printer (`printer_color_as_gray.sh`)
 - installs python scripts, i.e. `files.py` (program from my other repo), placed in software_path_root by `Utils_misc_install.sh`
 - disables swap (`disable_swap.sh`)
-- notifies on low memory (`memory_notify_config.sh`, might not work)
+- notifies on low memory (`memory_notify_config.sh`)
 - add functions to bash (added to `/etc/bash.bashrc` via `bash_functions.sh` )
     - `mntro`, `mntrw` to make mount read-only and read-write respectively, 
     - `e_ject` - eject usb storage

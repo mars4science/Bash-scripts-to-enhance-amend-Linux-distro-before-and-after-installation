@@ -85,7 +85,6 @@ $dir_name/Utils_misc_install.sh
 $dir_name/to_iso_to_run_once_liveiso_boot/add_ramdisk_and_ramcache.sh
 
 $dir_name/disable_swap.sh
-$dir_name/memory_notify_config.sh
 $dir_name/display_backlight_control_setup.sh
 $dir_name/bash_functions.sh
 
