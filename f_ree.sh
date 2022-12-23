@@ -18,6 +18,7 @@ remove_if_exists ~/.cache
 remove_if_exists ~/.wine
 remove_if_exists ~/.local/share/wineprefixes
 remove_if_exists ~/.local/share/Trash
+remove_if_exists ~/.local/share/baloo # not sure that index service is useful taking into account it takes CPU resources
 
 ff_profiles="/home/$(id -un)/.mozilla/firefox/profiles.ini"
 if [ -e "$ff_profiles" ]; then
