@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # replaces in Linux Mint modified (at least for google search) Mozilla Firefox with downloaded from Mozilla site version
+# the script's code is written to process tar or zip archives with `firefox` executable to start Firefox located in root of archive or in single top folder of the archive (usually named "firefox")
 
 ff_installed_link=$(which firefox)
 # man bash:
@@ -32,7 +33,18 @@ else
     sudo mkdir $ff_toinstall_folder # previous firefox folder not found, make somewhere safe from collision
     cd $_
 fi
-sudo tar --extract --file=$ff_archive
+
+# extract
+if [ $(echo "$ff_archive" | grep ".tar") ] ; then
+    sudo tar --extract --file="$ff_archive" --atime-preserve --one-top-level="$ff_toinstall_folder"
+elif [ $(echo "$ff_archive" | grep ".zip") ] ; then
+    unzip "$ff_archive" -d "$ff_toinstall_folder"
+else
+    echo "Neither tar nor zip archive format for browser, exiting"; exit 1
+fi
+
+# in case archive have single top folder where all is
+if [ $(ls "$ff_toinstall_folder" | wc | awk '{print $1}') -eq 1 ] ; then ff_toinstall_folder="$ff_toinstall_folder/"$(ls "$ff_toinstall_folder"); fi
 
 # restore link that the srcipt code as written is supposed to break
 if [ "$ff_link_symbolic" = "true" ]; then
@@ -42,7 +54,7 @@ else
     if [[ ! ("$ff_toinstall_folder" = "$ff_installed_folder") ]]; then sudo ln --symbolic --force $ff_toinstall_folder/firefox $(get_install_path.sh) ; fi
 fi
 
-# disable updates (inc. reminders), checkDefaultBrowser
+# disable updates (inc. reminders) - maybe works, checkDefaultBrowser - not works, now default browser is to be set via dconf
 ff_distribution_folder=$ff_toinstall_folder/distribution
 sudo mkdir --parents $ff_distribution_folder # --parents : no error if existing, make parent directories as needed
 echo '{"policies": {"DisableAppUpdate": true}}' | 1>/dev/null sudo tee $ff_distribution_folder/policies.json

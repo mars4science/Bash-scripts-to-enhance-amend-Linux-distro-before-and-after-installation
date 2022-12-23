@@ -93,7 +93,7 @@ Scripts added to /usr/local/bin:
 Other minor tweaks, including:
 
 - sets systemd task at boot target for transmission settings
-- replaces Firefox with downloaded (and w/out google search engine selection disabled in Mint) version
+- replaces Firefox (`firefox-replace.sh`) with downloaded (and w/out google search engine selection disabled in Mint) version; the script's code is written to process tar or zip archives with `firefox` executable to start Firefox located in root of archive or in single top folder of the archive (usually named "firefox")
 - makes mpv default for video/audio file types, configures some mpv keys (`mpv_config.sh`)
 - workaround of problem of specific old color printer (`printer_color_as_gray.sh`)
 - installs python scripts, i.e. `files.py` (program from my other repo), placed in software_path_root by `Utils_misc_install.sh`
@@ -138,6 +138,7 @@ Other minor tweaks, including:
 #### TODO 
 
 - fix `after_login_config.sh` where Nemo bookmarks set do not correspond to actual folders in $HOME in case of interface language change
+- find out if notifications can be displayed on top of `mpv` in full-screen (now see ones made by `notify-send` don't) 
 - at the end of install remove folder $path_to_software_in_chroot set in `_make_custom_liveusb.sh`  (path were data to be added is mounted during install)
 - DONE: move copying of data from `_make_custom_liveusb.sh` to `after_original_distro_install.sh` - as of now decided not needed as this copying needed for liveISO modification only, for running system `after_original_distro_install.sh` have code to call the scripts and copy settings
 - power (maybe Cinnamon): delay(s) (on battery and on AC) before screen blacking
