@@ -23,7 +23,7 @@ _make_custom_liveusb.sh at the start have code to set several variables:
 - software_path_root - full path where data to add are located
 - original_iso - full path to ISO file to amend
 - work_path - full path with sufficient free space, end result (modified ISO file) is programmed to be left there after temporary files are deleted
-- change_boot_menu - set to set to "true" to edit boot menu (which adds options e.g. boot to ram, change id of live user, add rights for virt manager usage)
+- change_boot_menu - set to set to "true" to edit boot menu (which adds options e.g. boot to ram, change id of live user, add rights for virt manager usage, replace splash/menu background image)
     - Note: above are variables to set to run example 1 of script usage (to only add some software with `apt-install` of debs), see examples at the end of README
 - locales - array of locales (languages/keyboard layouts) to add, first one is for interface language
 - user_name - to replace user name in `run_at_boot_liveusb.sh`

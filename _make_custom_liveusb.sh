@@ -25,8 +25,8 @@ user_name=mint
 
 # as after_original_distro_install.sh to be run in chrooted environment there is code to map (via mount) software_path_root to  path_to_software_in_chroot - where above mentioned script is written to look for software
 path_to_software_in_chroot="/tmp/path_for_mount_to_add_software_to_liveiso"
-liveiso_path_scripts_in_chroot=/usr/bin/am-scripts
-liveiso_path_settings_in_chroot=/usr/share/am-settings
+liveiso_path_scripts_in_chroot=/usr/bin/amendedliveiso-scripts
+liveiso_path_settings_in_chroot=/usr/share/amendedliveiso-settings
 work_path_in_chroot=/tmp # used by apt_get.sh
 
 # ---- parameters end ---- #
@@ -35,7 +35,7 @@ if [ ! -e "$original_iso" ]; then delay=5; echo original iso file not found at $
 
 script_path="$(dirname "$(realpath "$0")")"
 
-# write commands what do amend in resulting live system
+# commands that make amendments that result in changed booted live system
 change_squash() {
 
     # remove need to press ENTER at shutdown
@@ -43,8 +43,8 @@ change_squash() {
 
     # copy user specific scripts to be run later (later some [maybe all expect dconf_config as maybe it requires systemd running] expected to be moved to initrd change in change_boot() function)
 
-    scripts_to_copy_to=$work_path/fin_sq/$liveiso_path_scripts_in_chroot
-    settings_to_copy_to=$work_path/fin_sq/$liveiso_path_settings_in_chroot
+    scripts_to_copy_to="$work_path/fin_sq"$liveiso_path_scripts_in_chroot
+    settings_to_copy_to="$work_path/fin_sq"$liveiso_path_settings_in_chroot
 
     if [ -e $scripts_to_copy_to ]; then
         echo path for scripts exists, suspect possible collision. exiting...
@@ -97,76 +97,90 @@ change_squash() {
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
 }
 
-# write commands what do amend in boot environment
+# commands what amend early boot environment
 change_boot() {
     # modify boot config
-    # [2]
+    # sed usage see [2]
+
+    # substitute init to change id of live user, etc. (check if it was copied to ISO)
+    if [ -e "$scripts_to_copy_to/run_at_boot_liveusb.sh" ] ; then
+        custom_init_boot_option="init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh "
+    else custom_init_boot_option=""; fi
 
     # ======= for UEFI boot =======
+
+    grub_config=$work_path/fin/boot/grub/grub.cfg
+
     # 	linux	/casper/vmlinuz  file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=${iso_path} toram --
     # duplicate first menu entry three times, \s\S needed as in perl . (dot) does not include end of line
-    perl -0777e 'while(<>){s/(menuentry[\s\S]*?\n\}\n)/\1\1\1\1/;print "$_"}' $work_path/fin/boot/grub/grub.cfg | 1>/dev/null sudo tee $work_path/fin/boot/grub/grub.cfg_tmp
-    sudo mv --force $work_path/fin/boot/grub/grub.cfg_tmp $work_path/fin/boot/grub/grub.cfg
+    perl -0777e 'while(<>){s/(menuentry[\s\S]*?\n\}\n)/\1\1\1\1/;print "$_"}' ${grub_config} | 1>/dev/null sudo tee ${grub_config}_tmp
+    sudo mv --force ${grub_config}_tmp ${grub_config}
 
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/boot/grub/grub.cfg
-    sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit to RAM, verbose (UEFI: all menu entries)"/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram ${custom_init_boot_option}--|" ${grub_config}
+    sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit to RAM, verbose (UEFI: all menu entries)"/' ${grub_config}
     # change second manu entry to make text mode boot, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| level 3 init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/boot/grub/grub.cfg
-    sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, text mode, verbose"/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| level 3 ${custom_init_boot_option}--|" ${grub_config}
+    sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, text mode, verbose"/' ${grub_config}
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/boot/grub/grub.cfg
-    sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, verbose"/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| ${custom_init_boot_option}--|" ${grub_config}
+    sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, verbose"/' ${grub_config}
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/boot/grub/grub.cfg
-    sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, quiet"/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash ${custom_init_boot_option}--|" ${grub_config}
+    sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, quiet"/' ${grub_config}
     # add timeout to start first meny entry automatically (for some reason default script cfg does not have it)
-    echo | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
-    echo "set timeout_style=menu" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
-#    echo 'if [ "${timeout}" = 0 ]; then' | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
-    echo "set timeout=5" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
-#    echo "fi" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
+    echo | sudo tee --append ${grub_config} > /dev/null
+    echo "set timeout_style=menu" | sudo tee --append ${grub_config} > /dev/null
+#    echo 'if [ "${timeout}" = 0 ]; then' | sudo tee --append ${grub_config} > /dev/null
+    echo "set timeout=5" | sudo tee --append ${grub_config} > /dev/null
+#    echo "fi" | sudo tee --append ${grub_config} > /dev/null
 
     # to made text large on hiDPI displays and to improve cursor/manual boot optopns editing speed at boot time
-    echo "GRUB_GFXMODE=640x480x32,auto" | sudo tee --append $work_path/fin/boot/grub/grub.cfg > /dev/null
-
+    echo "GRUB_GFXMODE=640x480x32,auto" | sudo tee --append ${grub_config} > /dev/null
 
     # remove trademark info from boot menu
-    sudo sed --in-place --regexp-extended -- 's/Linux Mint.*Cinnamon/OS/' $work_path/fin/boot/grub/grub.cfg
+    sudo sed --in-place --regexp-extended -- 's/Linux Mint.*Cinnamon/OS/' ${grub_config}
 
 
     # ======= for legacy boot =======
+
+    legacy_config=$work_path/fin/isolinux/isolinux.cfg
+
     #   append  file=/cdrom/preseed/linuxmint.seed boot=casper initrd=/casper/initrd.lz toram --
     # edit menu title
-    sudo sed --in-place -- 's|\(menu title\).*|\1 GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)|' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place -- 's|\(menu title\).*|\1 GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)|'  ${legacy_config}
     # duplicate first menu entry two times, \s\S needed as in perl . does not include end of line   
-    perl -0777e 'while(<>){s/(label[\s\S]*?--\n)(menu default\n)/\1\2\1\1\1/;print "$_"}' $work_path/fin/isolinux/isolinux.cfg | 1>/dev/null sudo tee $work_path/fin/isolinux/isolinux.cfg_tmp    
-    sudo mv --force $work_path/fin/isolinux/isolinux.cfg_tmp $work_path/fin/isolinux/isolinux.cfg
+    perl -0777e 'while(<>){s/(label[\s\S]*?--\n)(menu default\n)/\1\2\1\1\1/;print "$_"}'  ${legacy_config} | 1>/dev/null sudo tee  ${legacy_config}_tmp
+    sudo mv --force  ${legacy_config}_tmp  ${legacy_config}
     # edit in-place, add three more rows number of rows in the menu
-    sudo perl -i -pe 's/(MENU ROWS )([0-9]+)/$1.($2+3)/e' $work_path/fin/isolinux/isolinux.cfg
-    sudo perl -i -pe 's/(TABMSGROW )([0-9]+)/$1.($2+3)/e' $work_path/fin/isolinux/isolinux.cfg
-    sudo perl -i -pe 's/(CMDLINEROW )([0-9]+)/$1.($2+3)/e' $work_path/fin/isolinux/isolinux.cfg
+    sudo perl -i -pe 's/(MENU ROWS )([0-9]+)/$1.($2+3)/e'  ${legacy_config}
+    sudo perl -i -pe 's/(TABMSGROW )([0-9]+)/$1.($2+3)/e'  ${legacy_config}
+    sudo perl -i -pe 's/(CMDLINEROW )([0-9]+)/$1.($2+3)/e'  ${legacy_config}
 
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label ram/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (to RAM, verbose)/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label ram/'  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (to RAM, verbose)/'  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram ${custom_init_boot_option}--|"  ${legacy_config}
     # change second manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label text/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (text mode, verbose)/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| level 3 init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label text/'  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (text mode, verbose)/'  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| level 3 ${custom_init_boot_option}--|"  ${legacy_config}
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label verbose/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (verbose)/' $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label verbose/'  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (verbose)/'  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| ${custom_init_boot_option}--|"  ${legacy_config}
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh --|" $work_path/fin/isolinux/isolinux.cfg
-    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (quiet)/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash ${custom_init_boot_option}--|"  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (quiet)/'  ${legacy_config}
     # edit timeout
-    sudo sed --in-place -- 's/\(timeout\).*/\1 50/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place -- 's/\(timeout\).*/\1 50/'  ${legacy_config}
 
     # remove trademark info from boot menu
-    sudo sed --in-place --regexp-extended -- 's/Linux Mint/OS/' $work_path/fin/isolinux/isolinux.cfg
+    sudo sed --in-place --regexp-extended -- 's/Linux Mint/OS/'  ${legacy_config}
+
+    # replace menu background
+    if [ -e "${software_path_root}/splash.png" ] ; then
+        sudo cp --force "${software_path_root}/splash.png" "$work_path/fin/isolinux/splash.png" ; fi
 
     # code to repalce memtest to start with stock iso
     sudo cp "${software_path_root}/memtest86+/memtest86+-5.31b.bin" $work_path/fin/casper/memtest
@@ -248,10 +262,7 @@ sudo mount $original_iso iso #  -o loop
 # maybe graft parameter of genisoimage can be used instead of overlayfs to amend mounted original iso contents
 sudo mount -t overlay -o lowerdir=iso,upperdir=to,workdir=temp overlay fin
 
-if [ "${change_boot_menu}" = "true" ] ; then change_boot; fi
-
 # mount squashfs for modification
-
 mkdir iso_sq to_sq temp_sq fin_sq
 sudo mount iso/casper/filesystem.squashfs iso_sq -t squashfs -o loop
 sudo mount -t overlay -o lowerdir=iso_sq,upperdir=to_sq,workdir=temp_sq overlay fin_sq
@@ -264,7 +275,9 @@ sudo mount -t overlay -o lowerdir=iso_sq,upperdir=to_sq,workdir=temp_sq overlay 
 # https://unix.stackexchange.com/questions/679391/unionfs-deleting-folder-from-upperdir-results-in-diappearance-of-files-in-the-o
 # If deleted anyway, fixing maybe by overlayfs `mount -o remount` 
 
+# call two main functions
 change_squash
+if [ "${change_boot_menu}" = "true" ] ; then change_boot; fi
 
 if [ "$interactive_mode" = "true" ]; then
     echo "Next in addition to now hardcoded changes one can modify system in $work_path/fin for boot time and"
