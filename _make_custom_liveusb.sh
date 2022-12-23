@@ -178,7 +178,7 @@ change_boot() {
     # remove trademark info from boot menu
     sudo sed --in-place --regexp-extended -- 's/Linux Mint/OS/'  ${legacy_config}
 
-    # replace menu background
+    # replace menu background; 640x480 png was displayed, 715x480 was NOT displayed at boot time
     if [ -e "${software_path_root}/splash.png" ] ; then
         sudo cp --force "${software_path_root}/splash.png" "$work_path/fin/isolinux/splash.png" ; fi
 
