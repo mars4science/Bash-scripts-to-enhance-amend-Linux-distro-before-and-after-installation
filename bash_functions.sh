@@ -80,14 +80,27 @@ echo '' | sudo tee --append $bashrc
 # git: pull all tracked local branches
 echo '' | sudo tee --append $bashrc
 echo 'git_pull() {' | sudo tee --append $bashrc
-echo '    echo - pulling (fast-forward only) all tracked local branches from origin remote' | sudo tee --append $bashrc
+echo '    echo "- pulling (fast-forward only) all tracked local branches from origin remote"' | sudo tee --append $bashrc
 echo '    git fetch || return 1' | sudo tee --append $bashrc
 echo '    orig_branch=$(git branch | grep "*" | sed "s/[ *]*//") # getting name of current branch via asterisk' | sudo tee --append $bashrc
 echo '    for branch in $(git branch | sed "s/[ *]*//") ; do # remove spaces and asterisk' | sudo tee --append $bashrc
 echo '        git checkout $branch && git merge --ff-only FETCH_HEAD' | sudo tee --append $bashrc
 echo '    done' | sudo tee --append $bashrc
-echo '    echo - checking out to branch where function was called from ' | sudo tee --append $bashrc
+echo '    echo "- checking out to branch where function was called from"' | sudo tee --append $bashrc
 echo '    git checkout $orig_branch' | sudo tee --append $bashrc
 echo '}; export -f git_pull' | sudo tee --append $bashrc
 echo '' | sudo tee --append $bashrc
 
+# git: merge current branch into all other local branches
+echo '' | sudo tee --append $bashrc
+echo 'git_merge() {' | sudo tee --append $bashrc
+echo '    echo "- merging (fast-forward only) current branch into all other local branches"' | sudo tee --append $bashrc
+echo '    1>/dev/null git branch || return 1 # return in case was run not in valid git repo' | sudo tee --append $bashrc
+echo '    current_branch=$(git branch | grep "*" | sed "s/[ *]*//") # getting name of current branch via asterisk' | sudo tee --append $bashrc
+echo '    for branch in $(git branch | sed "s/[ *]*//") ; do # remove spaces and asterisk' | sudo tee --append $bashrc
+echo '        if [ $branch != $current_branch ] ; then git checkout $branch && git merge --ff-only $current_branch; fi' | sudo tee --append $bashrc
+echo '    done' | sudo tee --append $bashrc
+echo '    echo "- checking out to branch where function was called from"' | sudo tee --append $bashrc
+echo '    git checkout $current_branch' | sudo tee --append $bashrc
+echo '}; export -f git_merge' | sudo tee --append $bashrc
+echo '' | sudo tee --append $bashrc

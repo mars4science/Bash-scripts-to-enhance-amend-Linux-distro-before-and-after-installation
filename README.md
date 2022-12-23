@@ -98,9 +98,12 @@ Other minor tweaks, e.g.:
 - workaround of problem of specific old color printer (`printer_color_as_gray.sh`)
 - installs python scripts, i.e. `files.py` (program from my other repo), placed in software_path_root by `Utils_misc_install.sh`
 - disables swap (`disable_swap.sh`)
-- notifyes on low memory (`memory_notify_config.sh`, might not work)
-- add mntro mntrw functions to make mount read-only and read-write respectively, e_ject - eject usb storage (added via `bash_functions.sh`)
-- add git_pull function to pull all tracked branches from "origin"
+- notifies on low memory (`memory_notify_config.sh`, might not work)
+- add functions to bash (added to `/etc/bash.bashrc` via `bash_functions.sh` )
+    - `mntro`, `mntrw` to make mount read-only and read-write respectively, 
+    - `e_ject` - eject usb storage
+    - `git_pull` to pull (with fast-forward merge only) all tracked branches from "origin"
+    - `git_mrge` to merge (fast-forward only) current branch into all other local branches
 
 ##### Scripts to amend ISO are written to be run as ordinary user, they use sudo in themselves
 
