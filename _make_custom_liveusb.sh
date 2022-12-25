@@ -8,13 +8,14 @@
 # script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
 
 # ---- parameters ---- #
-distro_label="GNU-Linux_1_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
+distro_label="GNU-Linux_1_b21-light" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
 software_path_root=/media/ramdrive/LM # the script is written to look for software to take from there
 original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
 
 work_path=/media/ramdisk/work # the script is written to create temporary files and resulting ISO there (free space "expected")
 change_boot_menu="true" # set to "true" to edit boot menu (which adds options e.g. boot to ram, change id of live user, add rights for virt manager usage)
+new_legacy_menu_title="GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)"
 
 # array, list separated by space; correct syntax of each entry can be found in /etc/locale.gen (languagecode_COUNTRYCODE); used to generate locales, set keyboard layouts available for switching
 # first in array also used to set system interface language, set to empty () for not doing locales changes
@@ -148,35 +149,35 @@ change_boot() {
 
     #   append  file=/cdrom/preseed/linuxmint.seed boot=casper initrd=/casper/initrd.lz toram --
     # edit menu title
-    sudo sed --in-place -- 's|\(menu title\).*|\1 GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)|'  ${legacy_config}
+    sudo sed --in-place -- "s|\(menu title\).*|\1${new_legacy_menu_title}|" ${legacy_config}
     # duplicate first menu entry two times, \s\S needed as in perl . does not include end of line   
-    perl -0777e 'while(<>){s/(label[\s\S]*?--\n)(menu default\n)/\1\2\1\1\1/;print "$_"}'  ${legacy_config} | 1>/dev/null sudo tee  ${legacy_config}_tmp
-    sudo mv --force  ${legacy_config}_tmp  ${legacy_config}
+    perl -0777e 'while(<>){s/(label[\s\S]*?--\n)(menu default\n)/\1\2\1\1\1/;print "$_"}' ${legacy_config} | 1>/dev/null sudo tee ${legacy_config}_tmp
+    sudo mv --force ${legacy_config}_tmp ${legacy_config}
     # edit in-place, add three more rows number of rows in the menu
-    sudo perl -i -pe 's/(MENU ROWS )([0-9]+)/$1.($2+3)/e'  ${legacy_config}
-    sudo perl -i -pe 's/(TABMSGROW )([0-9]+)/$1.($2+3)/e'  ${legacy_config}
-    sudo perl -i -pe 's/(CMDLINEROW )([0-9]+)/$1.($2+3)/e'  ${legacy_config}
+    sudo perl -i -pe 's/(MENU ROWS )([0-9]+)/$1.($2+3)/e' ${legacy_config}
+    sudo perl -i -pe 's/(TABMSGROW )([0-9]+)/$1.($2+3)/e' ${legacy_config}
+    sudo perl -i -pe 's/(CMDLINEROW )([0-9]+)/$1.($2+3)/e' ${legacy_config}
 
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label ram/'  ${legacy_config}
-    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (to RAM, verbose)/'  ${legacy_config}
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram ${custom_init_boot_option}--|"  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label ram/' ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (to RAM, verbose)/' ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram ${custom_init_boot_option}--|" ${legacy_config}
     # change second manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label text/'  ${legacy_config}
-    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (text mode, verbose)/'  ${legacy_config}
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| level 3 ${custom_init_boot_option}--|"  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label text/' ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (text mode, verbose)/' ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| level 3 ${custom_init_boot_option}--|" ${legacy_config}
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label verbose/'  ${legacy_config}
-    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (verbose)/'  ${legacy_config}
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| ${custom_init_boot_option}--|"  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/label.*/s//label verbose/' ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (verbose)/' ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| ${custom_init_boot_option}--|" ${legacy_config}
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash ${custom_init_boot_option}--|"  ${legacy_config}
-    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (quiet)/'  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash ${custom_init_boot_option}--|" ${legacy_config}
+    sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (quiet)/' ${legacy_config}
     # edit timeout
-    sudo sed --in-place -- 's/\(timeout\).*/\1 50/'  ${legacy_config}
+    sudo sed --in-place -- 's/\(timeout\).*/\1 50/' ${legacy_config}
 
     # remove trademark info from boot menu
-    sudo sed --in-place --regexp-extended -- 's/Linux Mint/OS/'  ${legacy_config}
+    sudo sed --in-place --regexp-extended -- 's/Linux Mint/OS/' ${legacy_config}
 
     # replace menu background; 640x480 png was displayed, 715x480 was NOT displayed at boot time
     if [ -e "${software_path_root}/splash.png" ] ; then
