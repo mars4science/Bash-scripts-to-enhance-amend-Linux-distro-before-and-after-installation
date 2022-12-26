@@ -149,7 +149,7 @@ change_boot() {
 
     #   append  file=/cdrom/preseed/linuxmint.seed boot=casper initrd=/casper/initrd.lz toram --
     # edit menu title
-    sudo sed --in-place -- "s|\(menu title\).*|\1${new_legacy_menu_title}|" ${legacy_config}
+    sudo sed --in-place -- "s|\(menu title \).*|\1${new_legacy_menu_title}|" ${legacy_config}
     # duplicate first menu entry two times, \s\S needed as in perl . does not include end of line   
     perl -0777e 'while(<>){s/(label[\s\S]*?--\n)(menu default\n)/\1\2\1\1\1/;print "$_"}' ${legacy_config} | 1>/dev/null sudo tee ${legacy_config}_tmp
     sudo mv --force ${legacy_config}_tmp ${legacy_config}
