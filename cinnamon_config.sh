@@ -41,3 +41,13 @@ if [[ -e "$path_to_edit" ]]; then
         echo -e '\nKeywords=Emulators;Virtualization;KVM;QEMU;' | sudo tee --append "$path_to_edit"
     fi
 fi
+
+# add search keywords for Kazam (screen capture)
+path_to_edit=/usr/share/applications/kazam.desktop
+if [[ -e "$path_to_edit" ]]; then
+    if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
+        sudo sudo sed --in-place 's/Keywords=/Keywords=capture;/' "$path_to_edit"
+    else
+        echo -e '\nKeywords=capture;record;video;screen;' | sudo tee --append "$path_to_edit"
+    fi
+fi
