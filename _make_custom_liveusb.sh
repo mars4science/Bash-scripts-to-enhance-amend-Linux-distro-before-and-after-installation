@@ -8,9 +8,9 @@
 # script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
 
 # ---- parameters ---- #
-distro_label="GNU-Linux_1_b21-light" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
+distro_label="GNU-Linux_1_b21-initrd-test" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
-software_path_root=/media/ramdrive/LM # the script is written to look for software to take from there
+software_path_root=/media/ramdisk/LM # the script is written to look for software to take from there
 original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
 
 work_path=/media/ramdisk/work # the script is written to create temporary files and resulting ISO there (free space "expected")
@@ -19,7 +19,7 @@ new_legacy_menu_title="GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)
 
 # array, list separated by space; correct syntax of each entry can be found in /etc/locale.gen (languagecode_COUNTRYCODE); used to generate locales, set keyboard layouts available for switching
 # first in array also used to set system interface language, set to empty () for not doing locales changes
-locales=("fr_FR" "en_US" "de_DE")
+locales=("en_US" "fr_FR" "de_DE")
 
 # put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_liveusb.sh - custom init script)
 user_name=mint
@@ -64,7 +64,9 @@ change_squash() {
 
     sudo cp $script_path/to_iso_to_run_once_liveiso_boot/* $scripts_to_copy_to
     sudo sed --in-place --regexp-extended -- "s|liveiso_path_scripts_root|$liveiso_path_scripts_in_chroot|" $scripts_to_copy_to/systemd_to_run_as_user.sh
+    sudo sed --in-place --regexp-extended -- "s|user=mint|user=$user_name|" $scripts_to_copy_to/systemd_to_run_as_user.sh
     sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" $scripts_to_copy_to/run_at_boot_liveusb.sh
+
 
     sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/transmission_setup.sh
     sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/xscreensaver_setup.sh
