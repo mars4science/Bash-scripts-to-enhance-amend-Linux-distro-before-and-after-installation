@@ -31,7 +31,7 @@ git config --bool core.bare false
 sed --in-place -- "s|fetch = +refs/\*:refs/\*|fetch = +refs/heads/*:refs/remotes/origin/*|" .git/config
 sed --in-place -- "/mirror = true/d" .git/config
 
-cd - # change directory back from "$2"
+if [ $# -eq 2 ]; then cd -; fi  # change directory back from "$2"
 
 # ??? decided not to do that after answer to my question on SO that it is not supported, may use git-archive, git-branch w/out it to extract parts of the tree
 # git config --bool core.bare false
