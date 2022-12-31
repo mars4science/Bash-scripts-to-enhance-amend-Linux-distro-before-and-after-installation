@@ -8,7 +8,7 @@
 # script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
 
 # ---- parameters ---- #
-distro_label="GNU-Linux_1_b21-initrd-test" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
+distro_label="GNU-Linux_1_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
 software_path_root=/media/ramdisk/LM # the script is written to look for software to take from there
 original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
@@ -17,12 +17,12 @@ work_path=/media/ramdisk/work # the script is written to create temporary files 
 change_boot_menu="true" # set to "true" to edit boot menu (which adds options e.g. boot to ram, change id of live user, add rights for virt manager usage)
 new_legacy_menu_title="GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)"
 
+change_initramfs="true" # change early boot envinonment, now changing of user name is programmed
+user_name=somebody # in case of change_initramfs=true put arbitrary name to set for user, in case of "false" put user name as set in the distro (used in run_at_boot_liveusb.sh - custom init script and systemd_to_run_as_user.sh - run as user during boot)
+
 # array, list separated by space; correct syntax of each entry can be found in /etc/locale.gen (languagecode_COUNTRYCODE); used to generate locales, set keyboard layouts available for switching
 # first in array also used to set system interface language, set to empty () for not doing locales changes
-locales=("en_US" "fr_FR" "de_DE")
-
-# put standard liveUSB system user name, "mint" for Linux Mint (used in run_at_boot_liveusb.sh - custom init script)
-user_name=mint
+locales=("fr_FR" "en_US" "de_DE")
 
 # as after_original_distro_install.sh to be run in chrooted environment there is code to map (via mount) software_path_root to  path_to_software_in_chroot - where above mentioned script is written to look for software
 path_to_software_in_chroot="/tmp/path_for_mount_to_add_software_to_liveiso"
@@ -100,7 +100,7 @@ change_squash() {
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
 }
 
-# commands what amend early boot environment
+# commands that amend boot menus and options
 change_boot() {
     # modify boot config
     # sed usage see [2]
@@ -187,17 +187,22 @@ change_boot() {
 
     # code to repalce memtest to start with stock iso
     sudo cp "${software_path_root}/memtest86+/memtest86+-5.31b.bin" $work_path/fin/casper/memtest
-
-
-# TODO add changing initramfs / initrd 
-
-    # change initrd (e.g. change live session user id - DONE)
-#    sudo unmkinitramfs $work_path/fin/casper/initrd.lz $work_path/initrd
-
-
-# Clear out debconf database again to avoid confusing ubiquity later.
-
 }
+
+
+change_initrd(){
+
+    initrd_path=$work_path/fin/casper/initrd.lz
+
+    # unpack
+    sudo unmkinitramfs $initrd_path $work_path/initrd
+
+    # amend
+    sudo sed --in-place --regexp-extended -- "s|USERNAME=.*|USERNAME="\""$user_name"\""|" $work_path/initrd/main/etc/casper.conf
+    sudo sed --in-place --regexp-extended -- "s|USERFULLNAME=.*|USERFULLNAME="\""User $user_name"\""|" $work_path/initrd/main/etc/casper.conf
+}
+
+# ??? where and what for this comment near initrd??? Clear out debconf database again to avoid confusing ubiquity later.
 
 u_mount(){
     # proc path exists before script, mount_path is relative, so grep, not just `findmnt "$mount_path"` and current folder is "expected" to be $work_path
@@ -281,12 +286,27 @@ sudo mount -t overlay -o lowerdir=iso_sq,upperdir=to_sq,workdir=temp_sq overlay 
 # call two main functions
 change_squash
 if [ "${change_boot_menu}" = "true" ] ; then change_boot; fi
+if [ "${change_initramfs}" = "true" ] ; then change_initrd; fi
 
 if [ "$interactive_mode" = "true" ]; then
-    echo "Next in addition to now hardcoded changes one can modify system in $work_path/fin for boot time and"
-    echo "in $work_path/fin_sq for resulting live system."
-    echo "now code to invoke bash in chrooted environment; type "\""exit"\"" to continue the srcipt and build new iso"
+    echo "  Next in addition to now hardcoded changes one can modify system in $work_path/fin for boot menus, $work_path/initrd for early boot environment and in $work_path/fin_sq for resulting live system."
+    echo "  now code to invoke bash in chrooted environment; type "\""exit"\"" to continue the srcipt and build new iso"
     sudo chroot $work_path/fin_sq
+fi
+
+if [ "${change_initramfs}" = "true" ] ; then
+    cd $work_path/initrd/main
+    echo "  repacking initrd ..."
+
+    if [ "x${SOURCE_DATE_EPOCH}"="x" ]; then SOURCE_DATE_EPOCH=$(date "+%F")" 00:00:00" ; fi # SOURCE_DATE_EPOCH="Dec 31 00:00:00 UTC 2022" ;fi
+    # ensure that no timestamps are newer than $SOURCE_DATE_EPOCH
+    find "$work_path/initrd" -newermt "${SOURCE_DATE_EPOCH}" -print0 | \
+	    sudo xargs -0r touch --no-dereference --date="${SOURCE_DATE_EPOCH}"
+
+    # --reproducible requires cpio >= 2.12
+    echo "    (ignoring firmware update files, etc., packing only files for rootfs)"
+    find . -print0 | cpio --null --create --reproducible --format=newc | xz --format=lzma | 1>/dev/null sudo tee $initrd_path
+    cd $work_path
 fi
 
 # After done with modifications making new `squashfs` file, needs to be free space there  
