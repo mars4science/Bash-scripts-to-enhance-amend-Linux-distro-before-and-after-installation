@@ -25,6 +25,7 @@ _make_custom_liveusb.sh at the start have code to set several variables:
 - work_path - full path with sufficient free space, end result (modified ISO file) is programmed to be left there after temporary files are deleted
 - change_boot_menu - set to set to "true" to edit boot menu (which adds options e.g. boot to ram, change id of live user, add rights for virt manager usage, replace splash/menu background image)
     - Note: above are variables to set to run example 1 of script usage (to only add some software with `apt-install` of debs), see examples at the end of README
+- change_initramfs - set to true to allow changes to initramfs (early boot environment), now code does changing of user name (inc. full name) and mounting /cow in /casper to be able to see changes changes made to filesystem while running and allow ealier amending of those changes
 - locales - array of locales (languages/keyboard layouts) to add, first one is for interface language
 - user_name - to replace user name in `run_at_boot_liveusb.sh`
 - path_to_software_in_chroot - full path were data to be added is mounted during install (TODO - remove folder after install)

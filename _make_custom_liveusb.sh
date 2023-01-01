@@ -102,6 +102,7 @@ change_squash() {
 
 # commands that amend boot menus and options
 change_boot() {
+
     # modify boot config
     # sed usage see [2]
 
@@ -109,6 +110,10 @@ change_boot() {
     if [ -e "$scripts_to_copy_to/run_at_boot_liveusb.sh" ] ; then
         custom_init_boot_option="init=$liveiso_path_scripts_in_chroot/run_at_boot_liveusb.sh "
     else custom_init_boot_option=""; fi
+
+    # added after studying casper script in initramfs (initrd file):
+    # "showmounts" added for adding /casper with nounts to /cow that is mounted over by init/casper of initramfs (if change_initramfs set to "true")
+    # "nopersistence" is for not creating writable partition on USB stick to store logs
 
     # ======= for UEFI boot =======
 
@@ -120,13 +125,13 @@ change_boot() {
     sudo mv --force ${grub_config}_tmp ${grub_config}
 
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram ${custom_init_boot_option}--|" ${grub_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts toram ${custom_init_boot_option}--|" ${grub_config}
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit to RAM, verbose (UEFI: all menu entries)"/' ${grub_config}
     # change second manu entry to make text mode boot, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| level 3 ${custom_init_boot_option}--|" ${grub_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts nopersistent level 3 ${custom_init_boot_option}--|" ${grub_config}
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, text mode, verbose"/' ${grub_config}
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| ${custom_init_boot_option}--|" ${grub_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts nopersistent ${custom_init_boot_option}--|" ${grub_config}
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, verbose"/' ${grub_config}
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash ${custom_init_boot_option}--|" ${grub_config}
@@ -163,15 +168,15 @@ change_boot() {
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label ram/' ${legacy_config}
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (to RAM, verbose)/' ${legacy_config}
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| toram ${custom_init_boot_option}--|" ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts toram ${custom_init_boot_option}--|" ${legacy_config}
     # change second manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label text/' ${legacy_config}
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (text mode, verbose)/' ${legacy_config}
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| level 3 ${custom_init_boot_option}--|" ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts nopersistent level 3 ${custom_init_boot_option}--|" ${legacy_config}
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label verbose/' ${legacy_config}
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (verbose)/' ${legacy_config}
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| ${custom_init_boot_option}--|" ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts nopersistent ${custom_init_boot_option}--|" ${legacy_config}
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash ${custom_init_boot_option}--|" ${legacy_config}
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (quiet)/' ${legacy_config}
@@ -200,6 +205,10 @@ change_initrd(){
     # amend
     sudo sed --in-place --regexp-extended -- "s|USERNAME=.*|USERNAME="\""$user_name"\""|" $work_path/initrd/main/etc/casper.conf
     sudo sed --in-place --regexp-extended -- "s|USERFULLNAME=.*|USERFULLNAME="\""User $user_name"\""|" $work_path/initrd/main/etc/casper.conf
+
+    # add mount of /cow of initramfs to /casper of resultant fs
+    sudo sed --in-place --regexp-extended -- 's|(if [[] -n "[$][{]SHOWMOUNTS[}]" []]; then)|\1\n\n        mkdir -p "${rootmnt}/${LIVE_MEDIA_PATH}/cow"\n        mount --bind /cow "${rootmnt}/${LIVE_MEDIA_PATH}/cow"\n|' $work_path/initrd/main/scripts/casper
+
 }
 
 # ??? where and what for this comment near initrd??? Clear out debconf database again to avoid confusing ubiquity later.
