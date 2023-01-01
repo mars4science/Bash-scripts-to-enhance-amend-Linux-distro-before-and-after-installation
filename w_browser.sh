@@ -21,7 +21,7 @@ display_help "$help_message$common_help"
 # see https://unix.stackexchange.com/questions/676608/bash-negation-of-a-file-exists-does-not-change-result-whereas-for-e-chang
 if [ ! -f "$link_path" ]; then
     if [ ! -d $(dirname "$link_path") ]; then sudo mkdir --parents $(dirname "$link_path"); fi
-    if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
+    if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
     w_browser_archive_path=$software_path_root/$(ls --sort=time $software_path_root | grep browser | head --lines=1)
     if [ ! -f "$w_browser_archive_path" ]; then echo >&2 "  ERROR/Error: file with browser to add at path : $w_browser_archive_path not found, exiting with error code 1"; exit 1; fi
     sudo cp "$w_browser_archive_path" $(dirname "$link_path")

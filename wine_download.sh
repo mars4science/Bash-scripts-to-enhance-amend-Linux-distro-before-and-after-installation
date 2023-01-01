@@ -19,7 +19,7 @@ sudo sed --in-place '/winehq/d' $(grep winehq /etc/apt/sources.list /etc/apt/sou
 sudo apt-get update
 
 # https://wiki.winehq.org/Gecko
-path_to_gecko="/media/$(id -un)/usb/LM_20.2/wine-gecko"
+path_to_gecko="/media/$(id -un)/usb/LM/wine-gecko"
 if [ -e "$path_to_gecko" ]; then echo >&2 "folder for wine-gecko at $path_to_gecko already exists, exiting with error"; exit 1; fi
 mkdir $path_to_gecko
 mkdir $path_to_gecko/5.0 && cd $_
@@ -35,7 +35,7 @@ wget http://dl.winehq.org/wine/wine-gecko/2.47.2/wine-gecko-2.47.2-x86_64.msi
 wget http://dl.winehq.org/wine/wine-gecko/2.47.2/wine-gecko-2.47.2-x86_64.tar.xz
 
 # https://wiki.winehq.org/Mono
-path_to_mono="/media/$(id -un)/usb/LM_20.2/wine-mono"
+path_to_mono="/media/$(id -un)/usb/LM/wine-mono"
 if [ -e "$path_to_mono" ]; then echo >&2 "folder for wine-mono at $path_to_mono already exists, exiting with error"; exit 1; fi
 mkdir $path_to_mono
 

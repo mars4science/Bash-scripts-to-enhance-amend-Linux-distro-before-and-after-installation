@@ -16,7 +16,7 @@ link_path="$(get_software_path.sh)/$app_name"
 
 if [ ! -e "$link_path" ]; then
     if [ ! -d $(dirname "$link_path") ]; then sudo mkdir $(dirname "$link_path"); fi
-    if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
+    if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
 
     # not moved to /bin/appimages as cannot be run w/out workaround below
     copyfrom_path="$software_path_root/kiwix-desktop_x86_64_2.1.0.appimage"

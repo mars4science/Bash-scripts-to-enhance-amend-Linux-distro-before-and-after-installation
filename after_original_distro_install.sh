@@ -8,7 +8,7 @@
 
 # set variables in case run this script directly (not via _make_custom_liveusb.sh)
 
-if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; export software_path_root ; fi
+if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; export software_path_root ; fi
 if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; export work_path ; fi
 if [ "x${liveiso_path_scripts_root}" = "x" ] ; then liveiso_path_scripts_root=/usr/bin/am-scripts ; export liveiso_path_scripts_root ; fi
 

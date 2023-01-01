@@ -13,7 +13,7 @@ if [ -h "$ff_installed_link" ]; then ff_link_symbolic=true; else ff_link_symboli
 # therefore when $ff_installed_link is empty, then only one argument: -h so exprsssion AFAIK evaluates to true
 # added "" (below too), so now expression has two arguments: -h and a string
 
-if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
+if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
 ff_archive_name=$(ls --sort=time $software_path_root | grep firefox- | head --lines=1)
 ff_archive=$software_path_root/$ff_archive_name
 if [ ! -f "$ff_archive" ]; then echo >&2 "Firefox archive to install from not found in $software_path_root, next is exit of the script"; exit 1; fi

@@ -25,7 +25,7 @@ else
 fi
 # ===== #
 
-if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM_20.2 ; fi
+if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
 if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; fi
 default_local_debs="$software_path_root/debs"
 
