@@ -15,14 +15,14 @@ parameter_1st=$1
 parameter_qty=$#
 
 # not only file name, can remove suffix too
-script_name=$(basename $script_path .sh)
+script_name="$(basename "$script_path" .sh)"
 
 # a line below is not needed as basename does it (removed specific suffix)
 # script_name="${script_name%%.*}" # remove .sh
 
 install_path=$(get_install_path.sh)
 source_path=$(get_source_path.sh)/$script_name.sh
-common_help="Also for: "\""$script_name update"\"" programmed response is updating script itself from "\""$source_path"\""\n"
+common_help="Also for "\""$script_name update"\"" programmed response is updating script itself from "\""$source_path"\""\n"
 
 # need to install and update it, so next line would stands in the way
 # if [ $script_name = "common_arguments_to_scripts" ]; then echo "common_arguments_to_scripts.sh is not supposed to be run on its own, exiting"; exit 1; fi

@@ -3,7 +3,7 @@
 # TODO change hardcoded location of kiwix file to copy from
 
 # for install and update arguments
-source common_arguments_to_scripts.sh
+source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
 help_message="  Runs kiwix appimage with some variables set as a workaround to libGL error (see footnote 1 in the script).
   Usage: $script_name\n"

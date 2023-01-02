@@ -7,7 +7,7 @@ run_path=/media/ramdisk/w_browser
 link_path="$(get_software_path.sh)"/w_browser # path to archive to extract and run
 
 # for "install" and "update" arguments
-source common_arguments_to_scripts.sh
+source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
 help_message="  Runs additional browser from $run_path (first extracts that application from archive expected to be located in $link_path).
   Usage: $script_name\n"

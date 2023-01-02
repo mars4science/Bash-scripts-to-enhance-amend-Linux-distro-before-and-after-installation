@@ -3,7 +3,7 @@
 trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 # ====== #
-source common_arguments_to_scripts.sh
+source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
 help_message="  Gets Firefox profile from USB (/media/$(id -un)/usb/) tar archive and places as default profile.
   If same path already taken, asks to confirm overwrite. If declined (neither y not Y answer), does not copy.

@@ -8,7 +8,7 @@ params=" --write-info-json --write-description --write-auto-sub --sub-langs en-e
 # if [ ! -d $default_location ]; then default_location=/media/data/_all/Misc_vids; fi
 
 # for install and update arguments
-source common_arguments_to_scripts.sh
+source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
 help_message="  calls yt-dlp $params [formats in accordance with args] URL
 Args l for 720 quality and h for 1440p quality.

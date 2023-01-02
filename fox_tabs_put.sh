@@ -6,7 +6,7 @@ backups_path=/media/$(id -un)/usb
 ff_path=/home/$(id -un)/.mozilla/firefox
 
 # ====== #
-source common_arguments_to_scripts.sh
+source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
 help_message="  Puts tabs backup of default Firefox profile in tar format to: $backups_path.
   if path is given as argument, tabs files are backed up to that location.

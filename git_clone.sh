@@ -6,7 +6,7 @@
 trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
 # for "install" and "update" arguments
-source common_arguments_to_scripts.sh
+source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
 help_message="  Clones remote/original repository to local as mirrow one (as tested clones all branches that way). Then changes config file to one that looks as one for regular repo as many git commands do not work on/in repository with core.bare true, some work differently with fetch set for mirroring.
   Usage: $script_name path_to_original_git [path_to_dest_folder, . (current folder) if omitted]\n"

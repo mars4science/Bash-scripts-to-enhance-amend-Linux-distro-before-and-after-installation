@@ -10,7 +10,7 @@ remote_path=/media/$(id -un)/usb/Projects/Scripts
 options="--archive --verbose --recursive --update --progress --backup --suffix=`date +'.%Y-%m-%d_%H-%M-%S.bak'` --no-owner --no-group --no-perms"
 
 # for "install" and "update" arguments
-source common_arguments_to_scripts.sh
+source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
 help_message="  Written to run rsync with options (current date/time is taken, below is example to dsiplay format):
 $options

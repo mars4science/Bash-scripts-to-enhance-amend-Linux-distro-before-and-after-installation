@@ -3,7 +3,7 @@
 # to delete usually unneeded files in memory gets low on booted to RAM system
 
 # ====== #
-source common_arguments_to_scripts.sh
+source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
 help_message="  For current user: deletes caches, empties Trash, deletes wine user files/data in user wine prefix folder.
   Usage: $script_name\n"

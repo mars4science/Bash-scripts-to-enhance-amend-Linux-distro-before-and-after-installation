@@ -11,7 +11,7 @@
 backups_path=/media/$(id -un)/usb
 
 # ====== #
-source common_arguments_to_scripts.sh
+source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
 help_message="  Puts default Firefox profile on USB, currently per available to script info into /media/$(id -un)/usb/ in tar format.
   No compression because there were issues of corruption, verification option is available in tar for uncompressed only.

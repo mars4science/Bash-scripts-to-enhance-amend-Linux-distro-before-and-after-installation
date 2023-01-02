@@ -4,27 +4,6 @@
 # Uses apt and dpkg
 # Help message below might explain usage and what the script does
 
-# for install, update arguments, help message output
-if [ -e common_arguments_to_scripts.sh ] ; then
-    source common_arguments_to_scripts.sh
-    # help
-    help_message="  The Script is written to read from standard input.
-      Script is written to download deb packages with dependancies and stores them locally.
-      Lines to be read are expected to be names of packages (not fully qualified) from standard input, use
-      1st argument (if not omitted) that is not -d, -i or for help used as location for downloaded files.
-
-      Example: $script_name -i /media/alex/usb/LM_20.2/debs /home/alex/Documents/apt_dpkg_state
-      usage: $script_name [-i | -d ] [location_to_store] [folder with dpkg status file (dpkg_orig_status e.g. copied from /var/lib/dpkg/status) and apt sources locations, (sources.list file and sources.list.d folder, e.g. copied from /etc/apt)] < filename
-      or echo -e 'package_unqualified_name"'[\\n'"package_unqualified_name] etc' | $script_name [-i | -d] [location_to_store] [folder with dpkg status file and apt sources location]
-      -i means install right after downloaded.
-      -d means download only to default path with default location of dpkg status file and apt sources.
-      If dpkg status and/or apt sources not found at supplied location, substitution not done.\n"
-    display_help "$help_message$common_help"
-else
-    if [ $1 = "install" ] ; then echo "apt_get not going to be installed"; exit 1; fi
-fi
-# ===== #
-
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
 if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; fi
 default_local_debs="$software_path_root/debs"
@@ -37,6 +16,30 @@ apt_dpkg_folder_tmp="$work_path/apt_dpkg_state"
 status_file_path_tmp="$apt_dpkg_folder_tmp/dpkg_status"
 sources_file_path_tmp="$apt_dpkg_folder_tmp/sources.list"
 sources_dir_path_tmp="$apt_dpkg_folder_tmp/sources.list.d"
+
+# for install, update arguments, help message output
+# check for availability of common_arguments_to_scripts.sh added for Example 1 of using scripts
+commons_path="$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
+if [ -e "${commons_path}" ] ; then
+    source "${commons_path}"
+    # help
+    help_message="  The Script is written to read from standard input.
+      Script is written to download deb packages with dependancies and stores them locally.
+      Lines to be read are expected to be names of packages (not fully qualified) from standard input.
+      If called w/out any parameters, default parameters are used: -i $default_local_debs $default_local_apt_dpkg_folder
+
+      Example: $script_name -i /media/alex/usb/LM_20.2/debs /home/alex/Documents/apt_dpkg_state
+      usage: $script_name [-i | -d ] [location_to_store] [folder with dpkg status file (dpkg_orig_status e.g. copied from /var/lib/dpkg/status) and apt sources locations, (sources.list file and sources.list.d folder, e.g. copied from /etc/apt)] < filename
+      or echo -e 'package_unqualified_name"'[\\n'"package_unqualified_name] etc' | $script_name [-i | -d] [location_to_store] [folder with dpkg status file and apt sources location]
+      -i means install right after downloaded.
+      -d means download only to default path with default location of dpkg status file and apt sources.
+      If dpkg status and/or apt sources not found at supplied location, substitution not done.\n"
+    display_help "$help_message$common_help"
+else
+    if [ "x$1" = "xinstall" ] ; then echo "apt_get not going to be installed due to not locating common_arguments_to_scripts.sh"; exit 1; fi
+fi
+
+# ===== #
 
 if [ -e "$apt_dpkg_folder_tmp" ]
     then
@@ -298,8 +301,8 @@ while read line; do
 
         debs_storage_folder=$1/$line
         if [ -d $debs_storage_folder ] ; then 
-            1>&2 echo "folder "\`"$debs_storage_folder"\`" exists, not copying of deb files"
-            install_local            
+            1>&2 echo "folder "\`"$debs_storage_folder"\`" exists already, not copying of deb files"
+            install_local
         else
             1>&2 echo "    Package(s)  $line  being downloaded..."
             # download-only of deb packages including dependencies

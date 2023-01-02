@@ -13,7 +13,7 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 # why is this link here?
 
 # for "install" and "update" arguments
-source common_arguments_to_scripts.sh
+source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
 help_message="  Usage: run $script_name when in working tree of a repository\n"
 display_help "$help_message$common_help"
