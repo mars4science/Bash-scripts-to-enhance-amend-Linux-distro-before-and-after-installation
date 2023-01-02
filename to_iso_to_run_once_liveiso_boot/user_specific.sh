@@ -8,11 +8,11 @@ full_path=`realpath $0` # man realpath : Print the resolved absolute file name;
 dir_name=$(dirname $full_path)
 
 $dir_name/add_ramdisk_and_ramcache.sh
-$dir_name/after_login_config.sh
+$dir_name/user_bash_home_bookmarks.sh
 $dir_name/transmission_setup.sh
 $dir_name/xscreensaver_setup.sh
 $dir_name/dconf_config.sh
-$dir_name/after_wine_run.sh
+# $dir_name/after_wine_run.sh # it is user specific, but seems to useful to run at boot/login/GUI load time
 $dir_name/memory_notify_config.sh
 
 # change git config, e.g. colors of output for better visibility  

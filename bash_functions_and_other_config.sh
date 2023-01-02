@@ -1,9 +1,16 @@
 #!/bin/bash
 
+bashrc=/etc/bash.bashrc
+
+echo '' | sudo tee --append $bashrc
+echo '# bash prompt, LM original and setting it'  | sudo tee --append $bashrc
+echo '# \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$'  | sudo tee --append $bashrc
+echo 'PS1='\''\[\033[01;34m\]\w\[\033[00m\]\$ '\''' | sudo tee --append $bashrc
+
 # useful info who eject works:
 # https://unix.stackexchange.com/questions/35508/eject-usb-drives-eject-command/83587
 
-# Not sure a function need to be exported each time of login (initially was part of login scripts), but count not find an asnwer to that in man bash and do not want to google now.
+# Not sure a function need to be exported each time of login (initially was part of login scripts), but could not find an asnwer to that in man bash and do not want to google now.
 # Therefore to be on the safe side below (adding to user profile) is expected to be Ok (multiple re-export did not output any errors):
 
 # simplier version
@@ -15,8 +22,6 @@
 # Not sure a function need to be exported each time of login, but count not find an asnwer to that in man bash and do not want to google now. Therefore to be on the safe side below (adding to user profile) is expected to be Ok (multiple re-export did not output any errors):
 
 # ADDED: sometimes produced error at time of power-off, hypothesis is that umounting took longer than exit from eject, so added a cycle
-
-bashrc=/etc/bash.bashrc
 
 echo '' | sudo tee --append $bashrc
 # echo 'e_ject() { dev=$(mount | grep --ignore-case $1 | awk --field-separator " " '\''{ FS = " " ; print $1 ; exit }'\'');2>/dev/null eject $dev;udisksctl power-off -b $dev; }; export -f e_ject' | sudo tee --append $bashrc
