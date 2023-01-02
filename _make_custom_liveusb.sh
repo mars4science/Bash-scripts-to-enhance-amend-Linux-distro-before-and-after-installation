@@ -209,6 +209,9 @@ change_initrd(){
     # add mount of /cow of initramfs to /casper of resultant fs
     sudo sed --in-place --regexp-extended -- 's|(if [[] -n "[$][{]SHOWMOUNTS[}]" []]; then)|\1\n\n        mkdir -p "${rootmnt}/${LIVE_MEDIA_PATH}/cow"\n        mount --bind /cow "${rootmnt}/${LIVE_MEDIA_PATH}/cow"\n|' $work_path/initrd/main/scripts/casper
 
+    # change mount option for e.g. squashfs files as "-o move" results in empty folder
+    sudo sed --in-place --regexp-extended -- 's|(mount )-o move( "[$][{]d[}]" "[$][{]rootmnt[}]/[$][{]LIVE_MEDIA_PATH[}]/[$][{]d[#][#][*]/[}]")|\1--bind\2|' $work_path/initrd/main/scripts/casper
+
 }
 
 # ??? where and what for this comment near initrd??? Clear out debconf database again to avoid confusing ubiquity later.
