@@ -104,7 +104,7 @@ Other minor tweaks, including:
     - `mntro`, `mntrw` to make mount read-only and read-write respectively, 
     - `e_ject` - eject usb storage
     - `git_pull` to pull (with fast-forward merge only) all tracked branches from "origin"
-    - `git_mrge` to merge (fast-forward only) current branch into all other local branches
+    - `git_merge` to merge (fast-forward only) current branch into all other local branches
 
 ##### Scripts to amend ISO are written to be run as ordinary user, they use sudo in themselves
 
