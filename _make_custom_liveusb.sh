@@ -8,7 +8,7 @@
 # script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
 
 # ---- parameters ---- #
-distro_label="GNU-Linux_1_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
+distro_label="GNU-Linux_1_b21-init2" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
 software_path_root=/media/ramdisk/LM # the script is written to look for software to take from there
 original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
@@ -17,7 +17,7 @@ work_path=/media/ramdisk/work # the script is written to create temporary files 
 change_boot_menu="true" # set to "true" to edit boot menu (which adds options e.g. boot to ram, change id of live user, add rights for virt manager usage)
 new_legacy_menu_title="GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)"
 
-change_initramfs="true" # change early boot envinonment, now changing of user name is programmed
+change_initramfs="true" # set to true to change early boot envinonment, now changing of user name is programmed
 user_name=somebody # in case of change_initramfs=true put arbitrary name to set for user, in case of "false" put user name as set in the distro (used in run_at_boot_liveusb.sh - custom init script and systemd_to_run_as_user.sh - run as user during boot)
 
 # array, list separated by space; correct syntax of each entry can be found in /etc/locale.gen (languagecode_COUNTRYCODE); used to generate locales, set keyboard layouts available for switching
@@ -64,6 +64,7 @@ change_squash() {
 
     sudo cp $script_path/to_iso_to_run_once_liveiso_boot/* $scripts_to_copy_to
     sudo sed --in-place --regexp-extended -- "s|liveiso_path_scripts_root|$liveiso_path_scripts_in_chroot|" $scripts_to_copy_to/systemd_to_run_as_user.sh
+    sudo sed --in-place --regexp-extended -- "s|liveiso_path_scripts_root|$liveiso_path_scripts_in_chroot|" $scripts_to_copy_to/user_bash_home_bookmarks_prompt.sh
     sudo sed --in-place --regexp-extended -- "s|user=mint|user=$user_name|" $scripts_to_copy_to/systemd_to_run_as_user.sh
     sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" $scripts_to_copy_to/run_at_boot_liveusb.sh
 

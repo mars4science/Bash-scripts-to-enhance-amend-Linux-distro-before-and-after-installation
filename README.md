@@ -78,7 +78,7 @@ $work_path should have sufficient free space, now around several Gb, if fails du
     - setting desktop background
 - Nemo tweaks:
     - add columns: permissions, owner
-    - add bookmarks for ramdisk (Ramdisk), zramdisk (Compressed RAM) - via `after_login_config.sh`
+    - add bookmarks for ramdisk (Ramdisk), zramdisk (Compressed RAM) - via `user_bookmarks_add.sh` / `user_bash_home_bookmarks_prompt.sh` (later also changes bash prompt)
 
 
 Scripts added to /usr/local/bin:
@@ -100,7 +100,7 @@ Other minor tweaks, including:
 - installs python scripts, i.e. `files.py` (program from my other repo), placed in software_path_root by `Utils_misc_install.sh`
 - disables swap (`disable_swap.sh`)
 - notifies on low memory (`memory_notify_config.sh`)
-- add functions to bash (added to `/etc/bash.bashrc` via `bash_functions.sh` )
+- add functions to bash (added to `/etc/bash.bashrc` via `bash_functions_and_other_config.sh`)
     - `mntro`, `mntrw` to make mount read-only and read-write respectively, 
     - `e_ject` - eject usb storage
     - `git_pull` to pull (with fast-forward merge only) all tracked branches from "origin"
@@ -138,7 +138,7 @@ Other minor tweaks, including:
 
 #### TODO 
 
-- fix `after_login_config.sh` where Nemo bookmarks set do not correspond to actual folders in $HOME in case of interface language change
+- DONE: fix `after_login_config.sh` where Nemo bookmarks set do not correspond to actual folders in $HOME in case of interface language change
 - find out if notifications can be displayed on top of `mpv` in full-screen (now see ones made by `notify-send` don't) 
 - at the end of install remove folder $path_to_software_in_chroot set in `_make_custom_liveusb.sh`  (path were data to be added is mounted during install)
 - DONE: move copying of data from `_make_custom_liveusb.sh` to `after_original_distro_install.sh` - as of now decided not needed as this copying needed for liveISO modification only, for running system `after_original_distro_install.sh` have code to call the scripts and copy settings
