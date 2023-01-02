@@ -308,17 +308,37 @@ if [ "$interactive_mode" = "true" ]; then
 fi
 
 if [ "${change_initramfs}" = "true" ] ; then
-    cd $work_path/initrd/main
-    echo "  repacking initrd ..."
 
+    echo "  repacking initrd ..."
+    sudo rm $initrd_path; sudo touch $initrd_path
+
+    # to make resultant file reproducible
+    # --reproducible requires cpio >= 2.12
     if [ "x${SOURCE_DATE_EPOCH}"="x" ]; then SOURCE_DATE_EPOCH=$(date "+%F")" 00:00:00" ; fi # SOURCE_DATE_EPOCH="Dec 31 00:00:00 UTC 2022" ;fi
     # ensure that no timestamps are newer than $SOURCE_DATE_EPOCH
     find "$work_path/initrd" -newermt "${SOURCE_DATE_EPOCH}" -print0 | \
 	    sudo xargs -0r touch --no-dereference --date="${SOURCE_DATE_EPOCH}"
+    
+    # now process folders as unmkinitramfs script code as understood and watched makes them
 
-    # --reproducible requires cpio >= 2.12
-    echo "    (ignoring firmware update files, etc., packing only files for rootfs)"
-    find . -print0 | cpio --null --create --reproducible --format=newc | xz --format=lzma | 1>/dev/null sudo tee $initrd_path
+    if [ -d $work_path/initrd/early ]; then
+        echo "    ...next firmware from early"
+        cd $work_path/initrd/early
+        find . -print0 | cpio --null --create --reproducible --format=newc | 1>/dev/null sudo tee --append $initrd_path
+    fi
+
+    for (( i=2 ; i<10 ; i++ )) ; do
+        if [ -d $work_path/initrd/early${i} ]; then
+            echo "    ...next firmware from early${i}"
+            cd $work_path/initrd/early${i}
+            find . -print0 | cpio --null --create --reproducible --format=newc | 1>/dev/null sudo tee --append $initrd_path
+        else break; fi
+    done
+
+    echo "    ...next main FS"
+    cd $work_path/initrd/main
+    find . -print0 | cpio --null --create --reproducible --format=newc | xz --format=lzma | 1>/dev/null sudo tee --append $initrd_path
+    echo "  ... repacking initrd code was before this line."
     cd $work_path
 fi
 
