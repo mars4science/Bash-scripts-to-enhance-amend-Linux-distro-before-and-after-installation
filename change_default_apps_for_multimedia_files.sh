@@ -23,6 +23,9 @@ echo 'application/epub+zip=com.github.johnfactotum.Foliate.desktop;' | sudo tee 
 # webp is not supported by Mint's default xviewer; pix.desktop does not list image/webp as supported MIME, but opens it
 echo 'image/webp=pix.desktop;' | sudo tee --append "$path_to_edit"
 
+# open desktop files with xed editor - noted NO effect in Nemo, still only via "Open With" context menu
+echo 'application/x-desktop=xed.desktop;' | sudo tee --append "$path_to_edit"
+
 # add xed and terminal to scripts's "open with" list in Nemo
 
 # After both xed and terminal will be added to "open with", as org is alphabetically earlier then default is terminal unless changed, idea is to edit by default
