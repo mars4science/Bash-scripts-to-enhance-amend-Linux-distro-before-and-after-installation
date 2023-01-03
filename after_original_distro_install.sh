@@ -105,7 +105,10 @@ $dir_name/tlp_config_battery.sh
 $dir_name/upower_battery_config.sh # inc. change critial battery level to take action
 $dir_name/change_default_apps_for_multimedia_files.sh
 $dir_name/mpv_config.sh
-$dir_name/after_wine_install.sh # installs gecko and mono
+
+# install gecko and mono for wine, before was separate script to run both with "source" command so that error installing 1st resulted in skipping 2nd
+$dir_name/install_wine-gecko.sh
+$dir_name/install_wine-mono.sh
 
 # would try to update from Internet
 $dir_name/setup_youtube-downloaders.sh
