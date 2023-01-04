@@ -154,12 +154,12 @@ gsettings set org.cinnamon.desktop.keybindings custom-list "['custom8', 'custom7
 
 # set custom monitor brightness adjustments
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/name "'Brightness up'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/binding "['MonBrightnessUp']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/binding "['<Primary>y']" # "['MonBrightnessUp']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/command "'night +1'"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9']"
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/name "'Brightness down'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/binding "['MonBrightnessDown']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/binding "['<Primary>g']" # "['MonBrightnessDown']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/command "'night -1'"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
@@ -176,7 +176,7 @@ dconf write /org/cinnamon/sounds/minimize-enabled false
 dconf write /org/cinnamon/sounds/switch-enabled false
 dconf write /org/cinnamon/sounds/tile-enabled false
 dconf write /org/cinnamon/sounds/plug-enabled false
-dconf write /org/cinnamon/sounds/unplug-enabled true
+dconf write /org/cinnamon/sounds/unplug-enabled false
 
 gsettings set ca.desrt.dconf-editor.Settings show-warning false # If “true”, Dconf Editor opens a popup when launched reminding the user to be careful.
 gsettings set org.gnome.nm-applet disable-disconnected-notifications true # Set this to true to disable notifications when disconnecting from a network.
@@ -187,10 +187,20 @@ gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_bac
 
 gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run)
 
+# TODO find out how to change theme for xed to Cobalt
+gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark'
+gsettings set org.cinnamon.theme name 'Mint-Y-Dark'
+
 exit
 
 
+
 [1]
+# Issue solved by running the script via:
+sudo -i --user=mint bash <<-EOF
+    exec dbus-run-session -- bash liveiso_path_scripts_root/user_specific.sh
+EOF
+
 # dconf write /org/cinnamon/desktop/interface/scaling-factor 1
 error: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
 root@alex:/# echo $?
@@ -200,19 +210,6 @@ root@alex:/# gsettings set org.cinnamon.desktop.interface scaling-factor 1
 (process:242481): dconf-WARNING **: 08:34:30.432: failed to commit changes to dconf: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
 root@alex:/# echo $?
 0
-
-[2] link for footnote is not here, task moved to cinnamon_config.sh
-# Adding cinnamon applets to right lower panel (to the left of all the rest - clock, wifi etc.)
-# did not result in panel change for some reason
-# DONE: find out the reasons to the above, see below:
-# looks like result depends on speed of boot process, based on response to created github issue moved panel editing to
-# editing /usr/share/glib-2.0/schemas org.cinnamon.gschema.xml or 10_cinnamon.gschema.override
-# in cinnamon_config.sh
-applets_orig=`dconf read /org/cinnamon/enabled-applets`
-applets_changed=`echo $applets_orig | perl -pe 's/(right:)([0-9]+)/$1.($2+2)/eg' | perl -pe "s/]/, 'panel1:right:0:mem-monitor-text\@datanom.net:100', 'panel1:right:1:temperature\@fevimu:101']/"`
-dconf write /org/cinnamon/enabled-applets "['']"
-gsettings set org.cinnamon enabled-applets "['']"
-dconf write /org/cinnamon/enabled-applets "$applets_changed"
 
 
 
