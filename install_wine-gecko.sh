@@ -25,8 +25,13 @@ Eval6=$?
 wine --version | grep wine-7
 Eval7=$?
 
-path_to_install=/usr/share/wine/gecko # this is one of places wine searches for gecko regardless of folder where wine itself is
-    
+wine_path=$(realpath $(which wine))
+if [ "$(basename $(dirname "$wine_path"))" = "bin" ] ; then
+    path_to_install="$(dirname $(dirname "$wine_path"))"/share/wine/gecko
+else
+    path_to_install=/usr/share/wine/gecko # this is one of places wine searches for gecko regardless of folder where wine itself is
+fi
+
 # looks like where is no "wine" way to find out where wine configs are, so just put from experience with Linun Mint:
 
 # man bash
@@ -59,15 +64,3 @@ else
     wine --version
 fi
 
-exit
-
-# previous version, then read path /usr/share/wine/gecko is one of places wine searches for gecko regardless of folder where wine itself is
-wine_path=$(realpath $(which wine))
-add if for "$wine_path" = "/opt/wine-devel/bin/wine", path to look before /usr/share/wine is $prefix/share/wine, where $prefix is wine main folder, like wine-devel
-if [[ "$wine_path" = "/opt/wine-stable/bin/wine" ]] ; then 
-    path_to_install=/opt/wine-stable/share/wine/gecko
-elif [[ ("$wine_path" = "/usr/bin/wine-stable") || ("$wine_path" = "/usr/bin/wine-devel") ]] ; then
-    path_to_install=/usr/share/wine/gecko
-else 
-    echo >&2 "---Error: not found suitable wine path (found: $wine_path) to add wine-gecko"; exit 1
-fi
