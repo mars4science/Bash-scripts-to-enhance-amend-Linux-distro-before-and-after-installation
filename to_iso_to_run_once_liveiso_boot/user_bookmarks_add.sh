@@ -21,6 +21,7 @@ if [ ! -e "$bookmarks_file" ]; then
     echo "file:///home/$(id -u -n)/Pictures" >> "$bookmarks_file"
 fi
 
-echo "file:///media/ramdisk RAM disk" >> "$bookmarks_file"
-echo "file:///media/zramdisk RAM compressed" >> "$bookmarks_file"
-
+if [[ ! $(grep "ramdisk" "$bookmarks_file") ]]; then # check if added already
+    echo "file:///media/ramdisk RAM disk" >> "$bookmarks_file"
+    echo "file:///media/zramdisk RAM compressed" >> "$bookmarks_file"
+fi
