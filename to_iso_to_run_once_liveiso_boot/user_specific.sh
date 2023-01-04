@@ -18,6 +18,10 @@ $dir_name/memory_notify_config.sh
 # change git config, e.g. colors of output for better visibility  
 $dir_name/git_config.sh
 
+# change default to preview (was edit after install, intent to continue to use xed to edit as ReText deleted BOM)
+$dir_name/retext_config.sh
+
+
 # for our old printer (TODO fix printer to enable color output)
 $dir_name/printer_color_as_gray.sh
 
