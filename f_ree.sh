@@ -11,7 +11,7 @@ display_help "$help_message$common_help"
 # ===== #
 
 remove_if_exists() {
-    if [ -d $1 ]; then rm --force --recursive $1/*; fi
+    if [ -d $1 ]; then rm --force --recursive $1/* $1/.[!.]*; fi # added for files starting with ., not selected by *; [!.] means all characters except ., to filter out . and ..
 }
 
 remove_if_exists ~/.cache
