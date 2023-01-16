@@ -85,11 +85,12 @@ echo '' | sudo tee --append $bashrc
 # git: pull all tracked local branches
 echo '' | sudo tee --append $bashrc
 echo 'git_pull() {' | sudo tee --append $bashrc
-echo '    echo "- pulling (fast-forward only) all tracked local branches from origin remote"' | sudo tee --append $bashrc
+echo '    echo "- pulling (fast-forward only) all tracked branches from [origin] remote, assumes names of local branches and corresponding branches on remote are same"' | sudo tee --append $bashrc
+echo '    if [ "x$1" = "x" ]; then set -- "origin"; fi' | sudo tee --append $bashrc
 echo '    git fetch || return 1' | sudo tee --append $bashrc
 echo '    orig_branch=$(git branch | grep "*" | sed "s/[ *]*//") # getting name of current branch via asterisk' | sudo tee --append $bashrc
 echo '    for branch in $(git branch | sed "s/[ *]*//") ; do # remove spaces and asterisk' | sudo tee --append $bashrc
-echo '        git checkout $branch && git merge --ff-only FETCH_HEAD' | sudo tee --append $bashrc
+echo '        git checkout $branch && git fetch $1 $branch && git merge --ff-only FETCH_HEAD' | sudo tee --append $bashrc
 echo '    done' | sudo tee --append $bashrc
 echo '    echo "- checking out to branch where function was called from"' | sudo tee --append $bashrc
 echo '    git checkout $orig_branch' | sudo tee --append $bashrc
