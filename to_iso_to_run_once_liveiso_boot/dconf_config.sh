@@ -187,9 +187,13 @@ gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_bac
 
 gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run)
 
-# TODO find out how to change theme for xed to Cobalt
+# change theme for Cinnamon
 gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark'
 gsettings set org.cinnamon.theme name 'Mint-Y-Dark'
+
+# change theme for xed to Cobalt (for dark Cinnamon theme)
+gsettings set org.x.editor.preferences.editor scheme 'cobalt'
+gsettings set org.x.editor.preferences.editor display-line-numbers false # AFAIK false by default, however added as could be useful to set to true for somebody
 
 exit
 
