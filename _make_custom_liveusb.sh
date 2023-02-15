@@ -8,7 +8,7 @@
 # script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
 
 # ---- parameters ---- #
-distro_label="GNU-Linux_1_b21-init2" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
+distro_label="GNU-Linux_1.2-1_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
 software_path_root=/media/ramdisk/LM # the script is written to look for software to take from there
 original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
@@ -28,6 +28,7 @@ locales=("fr_FR" "en_US" "de_DE")
 path_to_software_in_chroot="/tmp/path_for_mount_to_add_software_to_liveiso"
 liveiso_path_scripts_in_chroot=/usr/bin/amendedliveiso-scripts
 liveiso_path_settings_in_chroot=/usr/share/amendedliveiso-settings
+liveiso_sources_in_chroot=/usr/src/amendedliveiso # to copy all scripts to have sources on resulting ISO
 work_path_in_chroot=/tmp # used by apt_get.sh
 
 # ---- parameters end ---- #
@@ -42,7 +43,10 @@ change_squash() {
     # remove need to press ENTER at shutdown
     sudo perl -i -pe 's/prompt=1/prompt=/' $work_path/fin_sq/usr/sbin/casper-stop
 
-    # copy user specific scripts to be run later (later some [maybe all expect dconf_config as maybe it requires systemd running] expected to be moved to initrd change in change_boot() function)
+    # for reference when running to know the build version
+    echo "AMENDED_ISO_LABEL=$distro_label" | sudo tee --append $work_path/fin_sq/etc/os-release > /dev/null
+
+    # copy user specific scripts to be run later (later some [maybe all except dconf_config as maybe it requires systemd running] expected to be moved to initrd change in change_boot() function)
 
     scripts_to_copy_to="$work_path/fin_sq"$liveiso_path_scripts_in_chroot
     settings_to_copy_to="$work_path/fin_sq"$liveiso_path_settings_in_chroot
@@ -63,15 +67,20 @@ change_squash() {
     fi
 
     sudo cp $script_path/to_iso_to_run_once_liveiso_boot/* $scripts_to_copy_to
-    sudo sed --in-place --regexp-extended -- "s|liveiso_path_scripts_root|$liveiso_path_scripts_in_chroot|" $scripts_to_copy_to/systemd_to_run_as_user.sh
-    sudo sed --in-place --regexp-extended -- "s|liveiso_path_scripts_root|$liveiso_path_scripts_in_chroot|" $scripts_to_copy_to/user_bash_home_bookmarks_prompt.sh
-    sudo sed --in-place --regexp-extended -- "s|user=mint|user=$user_name|" $scripts_to_copy_to/systemd_to_run_as_user.sh
-    sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" $scripts_to_copy_to/run_at_boot_liveusb.sh
+    for f in ${scripts_to_copy_to}/*.sh ; do
+        sudo sed --in-place --regexp-extended -- "s|liveiso_path_scripts_root|$liveiso_path_scripts_in_chroot|" "$f"
+        sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" "$f"
+        sudo sed --in-place --regexp-extended -- "s|user=mint|user=$user_name|" "$f" # systemd_to_run_as_user.sh
+        sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" "$f" # run_at_boot_liveusb.sh
+    done
 
+    # copy sources of scripts to ISO
+    scripts_sources_to_copy_to="$work_path/fin_sq"$liveiso_sources_in_chroot/scripts-for-amendeding-iso
+    sudo mkdir --parents $scripts_sources_to_copy_to
+    sudo rsync -a --filter='exclude .*' $script_path/* $scripts_sources_to_copy_to
 
-    sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/transmission_setup.sh
-    sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/xscreensaver_setup.sh
-    sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" $scripts_to_copy_to/dconf_config.sh
+    # original apt and dpkg states before amendment with other deb packages
+    sudo rsync -a --filter='exclude .*' $software_path_root/apt_dpkg_state "$work_path/fin_sq"$liveiso_sources_in_chroot
 
     # sudo cp --recursive "${software_path_root}"/settings/* $settings_to_copy_to
     sudo rsync -a "${software_path_root}"/settings/ $settings_to_copy_to # replaced cp because IIRecalledC * expansion does not include dot prefixed files
