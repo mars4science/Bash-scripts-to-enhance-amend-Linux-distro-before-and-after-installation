@@ -20,8 +20,19 @@ script_name="$(basename "$script_path" .sh)"
 # a line below is not needed as basename does it (removed specific suffix)
 # script_name="${script_name%%.*}" # remove .sh
 
-install_path=$(get_install_path.sh)
-source_path=$(get_source_path.sh)/$script_name.sh
+if [ "x$(which get_install_path.sh)" != "x" ]; then
+    install_path=$(get_install_path.sh)
+else
+    install_path=$("$(dirname "$(realpath "$0")")"/get_install_path.sh)
+fi
+
+# source_path=$(get_source_path.sh)/$script_name.sh
+if [ "x$(which get_source_path.sh)" != "x" ]; then
+    source_path=$(get_source_path.sh)/$script_name.sh
+else
+    source_path=$("$(dirname "$(realpath "$0")")"/get_source_path.sh)/$script_name.sh
+fi
+
 common_help="Also for "\""$script_name update"\"" programmed response is updating script itself from "\""$source_path"\""\n"
 
 # need to install and update it, so next line would stands in the way
@@ -38,7 +49,7 @@ if [[ ! $# -eq 0 && $1 = "install" ]]; then
 fi
 
 # updates current file from designated path
-if [[ ! $# -eq 0 && $1 = "update" ]];then
+if [[ ! $# -eq 0 && $1 = "update" ]]; then
   sudo cp $source_path $script_path
   sudo chmod o+x $script_path
   echo updated script $script_path from $source_path
