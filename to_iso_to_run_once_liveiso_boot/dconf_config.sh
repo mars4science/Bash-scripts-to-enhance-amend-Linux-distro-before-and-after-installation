@@ -26,7 +26,7 @@ gsettings set org.cinnamon.desktop.a11y.magnifier mouse-tracking push
 
 # gsettings set org.gnome.libgnomekbd.keyboard layouts "['us', 'fr', 'de']" # now set in after_original_distro_install.sh and those script edits this line for liveISO
 # gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp', 'grp\tgrp:lalt_lshift_toggle']"
-gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp']"
+gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'grp\tgrp:ctrls_toggle', 'terminate\tterminate:ctrl_alt_bksp']"
 
 gsettings set org.nemo.desktop trash-icon-visible true
 
@@ -43,6 +43,7 @@ gsettings set org.nemo.preferences executable-text-activation 'display' # What t
 # seems to not have effect if "open with" and/or default desktop application is set for x-shellscript files (see change_default_apps_for_multimedia_files.sh)
 gsettings set org.nemo.preferences click-double-parent-folder true # If true, double click left on blank area will go to parent folder
 gsettings set org.nemo.preferences quick-renames-with-pause-in-between true # Enables renaming of icons by two times clicking with pause between clicks
+gsettings set org.nemo.preferences date-format 'iso' # to set time to 24 hours; e.g. 2023-01-17 15:00:00
 
 # peripherals, changed schema from LM 20.2 to LM 21
 gsettings set org.cinnamon.settings-daemon.peripherals.mouse double-click 550 # to ensure double click don't activate rename - increase default (400)
@@ -76,6 +77,8 @@ gsettings set org.gnome.gnome-system-monitor.proctree col-14-visible 'true' # Sh
 gsettings set org.gnome.gnome-system-monitor.proctree col-14-width 120 # Width of process “Command Line” column
 gsettings set org.gnome.gnome-system-monitor.proctree col-4-visible 'true' # Show process “Resident Memory” column on startup
 gsettings set org.gnome.gnome-system-monitor.proctree col-4-width 90 # Width of process “Resident Memory” column
+gsettings set org.gnome.gnome-system-monitor.proctree col-2-visible 'true' # Show process “Status” column on startup
+gsettings set org.gnome.gnome-system-monitor.proctree col-2-width 65 # Width of process “Status” column
 gsettings set org.gnome.gnome-system-monitor.proctree sort-col 8 # CPU %
 gsettings set org.gnome.gnome-system-monitor.proctree sort-order 0 # highest at top
 
@@ -85,6 +88,7 @@ gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/k
 
 gsettings set org.cinnamon.desktop.screensaver lock-delay 600 # seconds, ??? start delay not found via dconf Editor
 gsettings set org.cinnamon.settings-daemon.plugins.power lock-on-suspend false # in GUI it is in screensaver settings window, diaable as reported workaround for reported bug of scale reset after suspend on Linux Mint 21 (bundled screensaver does not lock screen when booted as liveUSB, xscreensaver does and has many programs/themes)
+gsettings set org.cinnamon.desktop.screensaver show-album-art false # to remote sometimes displyed youtube video picture from the screen
 gsettings set org.cinnamon.settings-daemon.plugins.power sleep-display-battery 900 # in seconds
 gsettings set org.cinnamon.settings-daemon.plugins.power sleep-inactive-battery-timeout 1800 # in seconds
 gsettings set org.cinnamon.settings-daemon.plugins.power idle-dim-time 300 # in seconds, dim screen after becoming idle; timeout
@@ -185,7 +189,7 @@ desktop_background=liveiso_path_settings_root/background.jpg
 if [ ! -e "$desktop_background" ] ; then desktop_background=/usr/share/backgrounds/linuxmint-ulyssa/echerkasski_countryside.jpg ; fi
 gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_background"
 
-gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run)
+gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run - UPDATE: setting not helping for some reason)
 
 # change theme for Cinnamon
 gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark'
