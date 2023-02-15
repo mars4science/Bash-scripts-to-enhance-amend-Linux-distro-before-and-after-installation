@@ -21,6 +21,8 @@ $dir_name/git_config.sh
 # change default to preview (was edit after install, intent to continue to use xed to edit as ReText deleted BOM)
 $dir_name/retext_config.sh
 
+# copy sql code colors for sqlite browser
+$dir_name/sqlitebrowser_setup.sh
 
 # for our old printer (TODO fix printer to enable color output)
 $dir_name/printer_color_as_gray.sh
