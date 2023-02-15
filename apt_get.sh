@@ -266,7 +266,13 @@ install_local(){
         # apt lacks --assume-yes option, so changing to apt-get
         
         # DEBIAN_FRONTEND=noninteractive added for wireshark-qt - see above
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends $debs_storage_folder/*.deb
+
+        # sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends $debs_storage_folder/*.deb
+        # above changed to run `install` for deb files located in apt/dpkg cache. Noted this way apt does not search for packages in sources repos, no "Tried to start delayed item" X ", but failed" warning in output (which is programmed in acquire.cc of apt package)
+        sudo cp $debs_storage_folder/*.deb $debs_cache_folder
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends $debs_cache_folder/*.deb
+        sudo apt-get clean
+
         Eval=$?
 
         if [ $Eval -eq 0 ];then
