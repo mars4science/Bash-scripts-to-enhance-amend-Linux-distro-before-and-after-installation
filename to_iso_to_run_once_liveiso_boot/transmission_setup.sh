@@ -13,6 +13,6 @@ if [ -e /home/$(id -u -n) ]; then
     transmission_home_folder="/home/$(id -un)/.config/transmission"
     if [ ! -d "$transmission_home_folder" ]; then mkdir --parents "$transmission_home_folder"; fi 
     cp --no-preserve=all "$software_path_root"/transmission/*.json "$transmission_home_folder"
-    sed --in-place 's`/mint/`/'$(id -un)'/`' $transmission_home_folder"/settings.json
-    chmod a=,u=rw $transmission_home_folder"/*
+    sed --in-place 's`/mint/`/'$(id -un)'/`' "$transmission_home_folder"/settings.json
+    chmod a=,u=rw "$transmission_home_folder"/*
 fi
