@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# script to be invoked from run_at_boot_liveusb with parameter.sh, after_original_distro_install.sh w/out
+# script to be invoked from run_at_boot_liveusb.sh with parameter, after_original_distro_install.sh w/out
 if [ $# -eq 0 ]; then user_name=$(id -un); else user_name=$1; fi
 
 # to fix Virtual Machine Manager error to add QEMU/KVM connection
