@@ -7,7 +7,7 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 # ! for zram, after some files deleted there, looks like needed to run manually `sudo fstrim /mountpoint` to discard memory (unused blocks)
 
 # new way for ramdisk
-echo 'tmpfs /media/ramdisk tmpfs size=100%,noatime,x-mount.mkdir,noatime 0 0' | sudo tee --append /etc/fstab
+echo 'tmpfs /media/ramdisk tmpfs size=100%,x-mount.mkdir,noatime 0 0' | sudo tee --append /etc/fstab
 # adding zramdisk via mount helper resulted in disk visible after boot, but not opening, so comment out /dev/zram0
 # echo '/dev/zram0 /media/zramdisk zramdisk x-systemd.automount,x-mount.mkdir,discard,noatime,dev,suid,exec 0 0' | sudo tee --append /etc/fstab
 echo 'tmpfs /home/root/.cache tmpfs size=1%,noatime 0 0' | sudo tee --append /etc/fstab
@@ -17,10 +17,10 @@ echo 'tmpfs /home/root/.cache tmpfs size=1%,noatime 0 0' | sudo tee --append /et
 # with this entry in fstab swap can be started either `swapon /dev/zram1` or `swapon --all`
 echo '/dev/zram1 none swap 0 0' | sudo tee --append /etc/fstab
 
-# the below moved to /boot/init_custom.sh as home is encrypted and links need to be added at boot, might be ok to add via systemd,
+# the below moved to /boot/init_custom.sh (made via run_at_boot_config.sh) as home is encrypted and links need to be added at boot,
+# might be ok to add via systemd,
 # but I decided to add script to run after kernel start before systemd (systemd processed /etc/fstab - see /var/log).
 # echo 'tmpfs /var tmpfs size=5% 0 0' | sudo tee --append /etc/fstab
-# echo 'tmpfs /tmp tmpfs size=5% 0 0' | sudo tee --append /etc/fstab
 
 # if home is encrypted, that entry is fstab would be overwritten when 
 # encryptfs is initialized: systemd: "Reached target Local Encrypted Volumes"
