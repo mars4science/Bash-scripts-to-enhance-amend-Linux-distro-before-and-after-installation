@@ -77,13 +77,15 @@ change_squash() {
     # copy sources of scripts to ISO
     scripts_sources_to_copy_to="$work_path/fin_sq"$liveiso_sources_in_chroot/scripts-for-amendeding-iso
     sudo mkdir --parents $scripts_sources_to_copy_to
-    sudo rsync -a --filter='exclude .*' $script_path/* $scripts_sources_to_copy_to
+    sudo rsync -rlptD --filter='exclude .*' $script_path/* $scripts_sources_to_copy_to
 
     # original apt and dpkg states before amendment with other deb packages
-    sudo rsync -a --filter='exclude .*' $software_path_root/apt_dpkg_state "$work_path/fin_sq"$liveiso_sources_in_chroot
+    sudo rsync -rlptD --filter='exclude .*' $software_path_root/apt_dpkg_state "$work_path/fin_sq"$liveiso_sources_in_chroot
 
     # sudo cp --recursive "${software_path_root}"/settings/* $settings_to_copy_to
-    sudo rsync -a "${software_path_root}"/settings/ $settings_to_copy_to # replaced cp because IIRecalledC * expansion does not include dot prefixed files
+    sudo rsync -rlptD "${software_path_root}"/settings/ $settings_to_copy_to # replaced cp because IIRecalledC * expansion does not include dot prefixed files
+
+    sudo rsync -rlptD --omit-dir-times "${software_path_root}"/to_root/ "$work_path/fin_sq" # copy what needs to be copied additionally to appropriate places along with paths
 
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp "${software_path_root}"/bin/stopfan $work_path/fin_sq/usr/local/bin
