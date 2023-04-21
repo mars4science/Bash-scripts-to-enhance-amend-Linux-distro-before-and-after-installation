@@ -8,12 +8,12 @@ Scripts are expected to be run from path that does not contain spaces and specia
 
 Some parts are specific to Linux Mint Cinnamon distribution (LM) and to ThinkPad laptops, scripts were tested on LM versions 20.2 and 21, ThinkPad Carbon X1 gen 6.
 
-##### Copyright (c) 2009-2022, Alex Martian. All rights reserved. 
+##### Copyright (c) 2009-2023, Alex Martian. All rights reserved.
 
 ##### The rights to the bash scripting code contained in these files and/or this git repository are granted under GNU GPL 3.0 license and GNU GPL 2.0 license.
 ##### Text of the licenses see in files LICENSE-* in this repo and/or https://www.gnu.org/licenses/gpl-3.0.en.html, https://www.gnu.org/licenses/gpl-2.0.en.html
 
-#### _make_custom_liveusb.sh - to amend liveUSB iso
+#### _make_custom_liveusb.sh - to amend liveUSB iso (including splitting squashfs into two files if its amended size exceeds 4Gb)
 - makes changes to initial boot environment (grub, isolinux), then
 - calls via chroot `after_original_distro_install.sh`, that in turn run many other scripts from the repo (repo contains some scripts which are not called, and also some that are are IMO also useful as standalone)
 
