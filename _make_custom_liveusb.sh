@@ -357,6 +357,22 @@ fi
 # putting in folder of previously created for new iso
 un_mount_in_squashfs # if not unmounted adds e.g. /proc, which I think it not how liveUSB is made to work and it would make it less properly working   
 sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 # -comp xz
+
+# if larger than 4Gb, split system to two squashfs files (casper scripts of Linux Mint support that); usr/lib by experince is about half
+if [ $(stat --format='%s' fin/casper/filesystem.squashfs) -ge 4294967296 ]; then
+
+    sudo rm fin/casper/filesystem.squashfs
+
+    sudo mkdir fin_sq/part1
+    echo "  "error \"cannot move to a subdirectory of itself\" is expected
+    sudo mv fin_sq/* fin_sq/part1
+    sudo mkdir --parents fin_sq/part2/usr
+    sudo mv fin_sq/part1/usr/lib fin_sq/part2/usr
+
+    sudo mksquashfs fin_sq/part1 fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22
+    sudo mksquashfs fin_sq/part2 fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22
+
+fi
 # --- end of squashfs ---
 
 # --- generate new iso image ---
