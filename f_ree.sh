@@ -27,7 +27,9 @@ if [ -e "$ff_profiles" ]; then
     firefox_profile_path=$(cat /home/$(id -un)/.mozilla/firefox/profiles.ini | grep ^Default | grep --invert-match "Default=1" | head --lines=1 | awk --field-separator "=" '{ FS = "=" ; print $2 ; exit }')
     remove_if_exists ~/.mozilla/firefox/$firefox_profile_path/storage
 fi
+
 sudo rm --force --recursive /var/log/*
+sudo rm --force --recursive /tmp/* /tmp/.[!.]*
 
 # end Windows (wine) processes after deleting Windows disks (~./wine)
 # often there are none, so 2>/dev/null to prevent an error displayed
