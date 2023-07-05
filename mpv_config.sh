@@ -29,6 +29,11 @@ echo 'sub-color=0.0/1.0/1.0/0.2' | sudo tee --append $conf_file
 echo 'sub-border-size=5' | sudo tee --append $conf_file
 echo 'sub-border-color=0.0/0.0/0.0/0.3' | sudo tee --append $conf_file
 echo 'sub-pos=70' | sudo tee --append $conf_file
+echo 'sub-pos=70' | sudo tee --append $conf_file
+echo '# older scaletempo might result in cleaner dialog at reduced speed' | sudo tee --append $conf_file
+echo '# af=scaletempo' | sudo tee --append $conf_file
+echo '# increase range of audio enabled speeds from default 0.25 to 4.0' | sudo tee --append $conf_file
+echo 'af=scaletempo2=min-speed=0.04:max-speed=25' | sudo tee --append $conf_file
 
 echo '' | sudo tee --append $conf_file
 echo 'fullscreen=yes' | sudo tee --append $conf_file
