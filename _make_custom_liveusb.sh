@@ -5,7 +5,7 @@
 # ---- auto script  ----- #
 # ---- manual way is after auto script (note: manual outdated, auto up-to-date)  ----- #
 
-# script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
+# Note: script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
 
 # ---- parameters ---- #
 distro_label="GNU-Linux_1.2-1_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
@@ -363,24 +363,33 @@ if [ $(stat --format='%s' fin/casper/filesystem.squashfs) -ge 4294967296 ]; then
 
     sudo rm fin/casper/filesystem.squashfs
 
-    sudo mkdir fin_sq/part1
-    echo "  "error \"cannot move to a subdirectory of itself\" is expected
-    sudo mv fin_sq/* fin_sq/part1
-    sudo mkdir --parents fin_sq/part2/usr
-    sudo mv fin_sq/part1/usr/lib fin_sq/part2/usr
+    # Below split to two files was initially implemented as moves of folders, however moves in overlay seems to take memory, also learned there is -no-strip option added in 2021 and of -e option usage from README (both are absent from man page)
+    sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -e "usr/lib"
+    cd fin_sq
+    sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
+    cd ..
 
-    sudo mksquashfs fin_sq/part1 fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22
-    sudo mksquashfs fin_sq/part2 fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22
+#    sudo mkdir fin_sq/part1
+#    echo "  "error \"cannot move to a subdirectory of itself\" is expected
+#    sudo mv fin_sq/* fin_sq/part1
+#    sudo mkdir --parents fin_sq/part2/usr
+#    sudo mv fin_sq/part1/usr/lib fin_sq/part2/usr
+
+#    sudo mksquashfs fin_sq/part1 fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22
+#    sudo mksquashfs fin_sq/part2 fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22
 
 fi
 # --- end of squashfs ---
 
 # --- generate new iso image ---
-if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - $(stat --printf="%s" fin/casper/filesystem.squashfs)/1048576 )) -le 500 ]; then
-    echo "Available memory is less than 500 MB larger that squashfs file, might need more memory to complete iso file creation"
+fs_size=0 # in MB
+for f in fin/casper/*.squashfs ; do fs_size=$(( fs_size + $(stat --printf="%s" $f)/1048576 )) ; done
+
+if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - fs_size*11/10 )) -le 200 ]; then
+    echo "Available memory is less than [110% of size of squashfs file(s) + 200 MB], might need more memory to complete iso file creation"
 # TODO if [ "$interactive_mode" = "true" ]; then
     echo "Press (y/Y) to delete working files in $work_path/fin_sq that made up filesystem.squashfs"
-    read -p "Any other key to open sub-shell to pause and add more free memory manually"  -n 1 -r
+    read -p "Any other key to open sub-shell to pause and maybe add more free memory manually"  -n 1 -r
     echo  # (optional) move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         un_mount_in_squashfs
@@ -391,10 +400,10 @@ if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - $(stat --printf="%s" fin/cas
     fi
 fi
 
-if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - $(stat --printf="%s" fin/casper/filesystem.squashfs)/1048576 )) -le 500 ]; then
-    echo "After deleting file available memory is still less than 500 MB larger that squashfs file, might need more memory to complete iso file creation"
+if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - fs_size*11/10 )) -le 200 ]; then
+    echo "After deleting files available memory is still less than [110% of size of squashfs file(s) + 200 MB], might need more memory to complete iso file creation"
 # TODO if [ "$interactive_mode" = "true" ]; then
-    echo "Press (a/A) to abort srcipt after deleting all files in $work_path"
+    echo "Press (a/A) to abort script after deleting all files in $work_path"
     read -p "Any other key to open sub-shell to pause and try to add more free memory manually"  -n 1 -r
     echo  # (optional) move to a new line
     if [[ $REPLY =~ ^[Aa]$ ]]; then
