@@ -29,7 +29,10 @@ if [ -e "$ff_profiles" ]; then
 fi
 
 sudo rm --force --recursive /var/log/*
+# /tmp/.X11-unix/X0 is a socket file, e.g. com.github.johnfactotum.Foliate version 2.6.4 seems to be needed it to work properly, renaming preserves it
+sudo mv /tmp/.X11-unix /tmp/..X11-unix
 sudo rm --force --recursive /tmp/* /tmp/.[!.]*
+sudo mv /tmp/..X11-unix /tmp/.X11-unix
 
 # end Windows (wine) processes after deleting Windows disks (~./wine)
 # often there are none, so 2>/dev/null to prevent an error displayed
