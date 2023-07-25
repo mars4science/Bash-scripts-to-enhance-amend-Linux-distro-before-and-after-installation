@@ -22,6 +22,7 @@ echo 'Shift+UP    no-osd seek  -60 exact' | sudo tee --append $conf_file
 echo 'Shift+DOWN no-osd seek 60 exact' | sudo tee --append $conf_file
 echo '' | sudo tee --append $conf_file
 echo '/ quit' | sudo tee --append $conf_file # set / key to quit player
+echo '$ cycle audio-pitch-correction' | sudo tee --append $conf_file # set $ key to enable/disable scaletempo(2) pitch correction
 
 conf_file=/etc/mpv/mpv.conf
 echo 'sub-font-size=45' | sudo tee --append $conf_file
@@ -31,10 +32,9 @@ echo 'sub-border-color=0.0/0.0/0.0/0.3' | sudo tee --append $conf_file
 echo 'sub-pos=70' | sudo tee --append $conf_file
 echo 'sub-pos=70' | sudo tee --append $conf_file
 echo '# older scaletempo might result in cleaner dialog at reduced speed' | sudo tee --append $conf_file
-echo '# af=scaletempo' | sudo tee --append $conf_file
+echo 'af=scaletempo' | sudo tee --append $conf_file
 echo '# increase range of audio enabled speeds from default 0.25 to 4.0' | sudo tee --append $conf_file
-echo 'af=scaletempo2=min-speed=0.04:max-speed=25' | sudo tee --append $conf_file
-
+echo '# af=scaletempo2=min-speed=0.04:max-speed=25' | sudo tee --append $conf_file
 echo '' | sudo tee --append $conf_file
 echo 'fullscreen=yes' | sudo tee --append $conf_file
 
