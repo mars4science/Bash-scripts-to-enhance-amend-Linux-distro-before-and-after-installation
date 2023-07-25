@@ -5,6 +5,11 @@ sudo -i --user=mint bash <<-EOF
     exec dbus-run-session -- bash liveiso_path_scripts_root/user_specific.sh
 EOF
 
+# for root too change theme for xed to Cobalt (for dark Cinnamon theme), some other settings just in case
+sudo -i --user=mint bash <<-EOF
+    exec dbus-run-session -- bash liveiso_path_scripts_root/dconf_config.sh
+EOF
+
 exit
 
 # Comments
