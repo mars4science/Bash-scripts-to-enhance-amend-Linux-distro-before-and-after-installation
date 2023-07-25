@@ -1,11 +1,7 @@
 #!/bin/bash
 
-params=" --write-info-json --write-description --write-auto-sub --sub-langs en-en,en,ru-ru,ru,uk,uk-uk,fr,fr-fr,de,de-de " # encountered both "en-en" and "en"
-
-# TODO default location, current folder for now
-# for downloaded data
-# default_location=/media/$(id -un)/data/_all/Misc_vids
-# if [ ! -d $default_location ]; then default_location=/media/data/_all/Misc_vids; fi
+# 2023/07 List produced by `yt-dlp --list-subs URL` contained certain subtitles but on download they did not contain useful info, therefore adding language codes encountered and filtering out empty later
+params=" --write-info-json --write-description --write-auto-sub --sub-langs en-en,en,fr,fr-en,fr-en-US,de,de-en,de-en-US,ru,ru-en,ru-en-US,uk,uk-en,uk-en-US " # from 2023/07 translations from English are codes as ??-en
 
 # for install and update arguments
 source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
@@ -30,10 +26,42 @@ if [ $# -eq 2 ]; then
         echo "next code to try without format arguments"
         yt-dlp $params $2
     fi
+    URL=$2
 else
     yt-dlp $params $1
+    URL=$1
 fi
     echo
+
+# deleting subtitle files that are empty - w/out words (only timestamps), 2023/07 noted there are those like "de" when "de-en" were introduced.
+video_id=$(echo "$URL" | awk 'BEGIN { FS = "=" } { print $2 }')
+
+# for f in $(ls | grep "$video_id" | grep vtt) ; do # makes many parts of file names as separate f
+for f in *"$video_id"*vtt  ; do
+
+    lines_with_digits=$(grep [0-9] "$f" | wc -l)
+    lines_empty=$(grep -E "^[ \t]*$" "$f" | wc -l)
+    lines_total=$(cat "$f" | wc -l)
+
+    # as of 2023/07 there are 3 additional lines at start of the file, I make 10 as some guess of future-proof
+    if [[ $(( lines_total - lines_with_digits - lines_empty )) -le 10 ]] ; then rm "$f" ; fi
+
+done
+
+# rename subtitle files for loading by mpv (e.g. suffix de-en.vtt to de.vtt)
+for f in *"$video_id"*-en.vtt  ; do
+    f1="${f/-en.vtt/.vtt}"
+    if [ ! -e "${f1}" ] && [ -e "${f}" ] ; then
+        mv "${f}" "${f1}"
+    fi
+done
+for f in *"$video_id"*-en-US.vtt  ; do
+    f1="${f/-en-US.vtt/.vtt}"
+    if [ ! -e "${f1}" ] && [ -e "${f}" ] ; then
+        mv "${f}" "${f1}"
+    fi
+done
+
 exit
 
 ---
@@ -46,4 +74,8 @@ yt-dlp --list-formats https://www.youtube.com/watch?v=IrBlWB2bxQU | tee >(grep -
 echo $aaa # empty as expected, grep was run in a subshell, so see above: decided not to check
 ---
 
+#    some other way to distinguish files
+#    digits=$(tr -dc '[:digit:]' < "$f" | wc -c)
+#    number_of_digits=${#digits}
+#    size=$(stat "$f" | grep -i size | awk '{ print $2 }')
 
