@@ -67,6 +67,12 @@ for f in *"$video_id"*-en-US.vtt ; do
     fi
 done
 
+# delete duplicate subtitles (i.e. en and en-en), works if only two files found; ! string comparison seems to be needing escape in bash
+find . -name "*$video_id*[.-]en.vtt" -exec sh -c 'if [ $# -eq 2 ] ; then cmp --quiet "${1}" "${2}" && if [ "${1}" \< "${2}" ] ; then rm "${1}" ; else rm "${2}" ; fi ; fi' sh {} + # [2]
+
+# make "en" default (picking first from sorted by name I guess) for mpv
+find . -name "*$video_id*.en.vtt" -exec bash -c 'mv "${1}" "${1/.en.vtt/.En.vtt}"' bash {} \; # [2]
+
 exit
 
 ---
@@ -83,4 +89,11 @@ echo $aaa # empty as expected, grep was run in a subshell, so see above: decided
 #    digits=$(tr -dc '[:digit:]' < "$f" | wc -c)
 #    number_of_digits=${#digits}
 #    size=$(stat "$f" | grep -i size | awk '{ print $2 }')
+
+[2]
+https://unix.stackexchange.com/questions/389705/understanding-the-exec-option-of-find
+# find's exec works as filter for next command,e.g.
+   -exec grep -q 'test' {} ';' -exec echo {} ';'
+# shell's -c accepts arguments
+sh -c 'echo  "$1"' sh "printed"
 
