@@ -2,49 +2,51 @@
 
 # 2023/07 List produced by `yt-dlp --list-subs URL` contained certain subtitles but on download they did not contain useful info, therefore adding language codes encountered and filtering out empty later
 # "--format-sort ext" helped to select "--prefer-free-formats" over "quality" (see "Filtering Formats" in README of yt-dlp)
-params=" --prefer-free-formats --format-sort ext --write-info-json --write-description --write-auto-sub --sub-langs en-en,en,fr,fr-en,fr-en-US,de,de-en,de-en-US,ru,ru-en,ru-en-US,uk,uk-en,uk-en-US " # from 2023/07 translations from English are codes as ??-en
+params=" --prefer-free-formats --format-sort ext --write-info-json --write-description --write-sub --write-auto-sub --sub-langs en-en,en,fr,fr-en,fr-en-US,de,de-en,de-en-US,ru,ru-en,ru-en-US,uk,uk-en,uk-en-US " # from 2023/07 translations from English are codes as ??-en
+
+# see yt-dlp README for syntax, h looks for up to 1200p no less than 800p horizontal, trying for <=30 fps 1) merged, then 2) separate video+audio then drop fps constraint
+# l looks for up to 800p no less than 600p horizontal, trying for <=30 fps 1) merged, then 2) separate video+audio then 3) drop minimum horizontal constraint
+format_params_h=' --format best[height<=1200][height>=800][fps<=30]/bv[height<=1200][height>=1800][fps<=30]+ba/bv[height<=1200][height>=1800]+ba/bv[height<=1200]+ba '
+format_params_l=' --format best[height<=800][height>=600][fps<=30]/bv[height<=800][height>=600][fps<=30]+ba/bv[height<=800][fps<=30]+ba '
 
 # for install and update arguments
 source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 # help
-help_message="  calls yt-dlp $params [formats in accordance with args] URL
-Args l for 720 quality and h for 1440p quality.
-if path is given as argument, it is passed to tabs files are backed up to that location.
-  Usage: $script_name [l|h] URL\n"
+help_message="  Calls yt-dlp $params [formats in accordance with h|l] [other parameters] URL
+  To prioritize video quality use args l for 720 quality or lower and h for 1080p quality.
+(h: $format_params_h) (l: $format_params_h)
+  Other parameters given on command line are passed to yt-dlp.
+  Usage: $script_name [h|l] [other parameters] URL\n"
 display_help "$help_message$common_help"
 # ====== #
 
-params_add=" -- "
-if [ $# -eq 2 ]; then
-    case $1 in
-# see yt-dlp README for syntax, h looks for up to 1200p no less than 800p horizontal, trying for <=30 fps 1) merged, then 2) separate video+audio then drop fps constraint
-        "h" ) params_add=' -f best[height<=1200][height>=800][fps<=30]/bv[height<=1200][height>=1800][fps<=30]+ba/bv[height<=1200][height>=1800]+ba/bv[height<=1200]+ba -- ';;
-# h looks for up to 800p  no less than 600p horizontal, trying for <=30 fps 1) merged, then 2) separate video+audio then 3) drop minimum horizontal constraint
-        "l" ) params_add=' -f best[height<=800][height>=600][fps<=30]/bv[height<=800][height>=600][fps<=30]+ba/bv[height<=800][fps<=30]+ba -- ';;
-    esac
+params_add=""
+case $1 in
+    "h" ) params_add="$format_params_h" ; shift ;;
+    "l" ) params_add="$format_params_l" ; shift ;;
+esac
 #    set -x # bash option "Print commands and their arguments as they are executed"
-    yt-dlp $params $params_add $2
+yt-dlp $params $params_add $@
 #    set +x
-    if [ $? -eq 1 ];then 
-        echo "exit status 1 (fail?) after code to try to download, hypothesis is that selected format is not available; "
-#        echo "next code to try without format arguments"
-#        yt-dlp $params $2
-        exit 1
-    fi
-    URL=$2
-else
-    yt-dlp $params $1
-    URL=$1
+ret_status=$?
+if [ $ret_status -ne 0 ];then
+    echo "  Exit status not 0 (fail?) after code to try to download, one hypothesis is that selected video/audio format is not available, in such case use --list-formats parameter to get list of formats"
+    exit $ret_status
 fi
-    echo
+
+URL=${!#} # ! bash's indirect substitution, get last positional parameter
+video_id=$(echo "$URL" | awk 'BEGIN { FS = "=" } { print $2 }')
 
 # deleting subtitle files that are empty - w/out words (only timestamps), 2023/07 noted there are those like "de" when "de-en" were introduced.
-video_id=$(echo "$URL" | awk 'BEGIN { FS = "=" } { print $2 }')
+
+# but need to check if any matching files present, otherwise * is not expanded by shell.
+ls *"$video_id"*vtt &>/dev/null
+if [ $? -ne 0 ] ; then exit 3 ; fi
 
 # for f in $(ls | grep "$video_id" | grep vtt) ; do # makes many parts of file names as separate f
 for f in *"$video_id"*vtt  ; do
 
-    lines_with_digits=$(grep [0-9] "$f" | wc -l)
+    lines_with_digits=$(grep "[0-9]" "$f" | wc -l)
     lines_empty=$(grep -E "^[ \t]*$" "$f" | wc -l)
     lines_total=$(cat "$f" | wc -l)
 
@@ -68,7 +70,7 @@ for f in *"$video_id"*-en-US.vtt ; do
 done
 
 # delete duplicate subtitles (i.e. en and en-en), works if only two files found; ! string comparison seems to be needing escape in bash
-find . -name "*$video_id*[.-]en.vtt" -exec sh -c 'if [ $# -eq 2 ] ; then cmp --quiet "${1}" "${2}" && if [ "${1}" \< "${2}" ] ; then rm "${1}" ; else rm "${2}" ; fi ; fi' sh {} + # [2]
+find . -name "*$video_id*.en[-.][ev][nt]*" -exec sh -c 'if [ $# -eq 2 ] ; then cmp --quiet "${1}" "${2}" && if [ "${1}" \< "${2}" ] ; then rm "${1}" ; else rm "${2}" ; fi ; fi' sh {} + # [2]
 
 # make "en" default (picking first from sorted by name I guess) for mpv
 find . -name "*$video_id*.en.vtt" -exec bash -c 'mv "${1}" "${1/.en.vtt/.En.vtt}"' bash {} \; # [2]
