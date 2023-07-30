@@ -28,6 +28,10 @@ gsettings set org.cinnamon.desktop.a11y.magnifier mouse-tracking push
 # gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp', 'grp\tgrp:lalt_lshift_toggle']"
 gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'grp\tgrp:ctrls_toggle', 'terminate\tterminate:ctrl_alt_bksp']"
 
+# change keyboard layout icon in cinnamon panel to upper font text
+gsettings set org.cinnamon.desktop.interface keyboard-layout-show-flags false
+gsettings set org.cinnamon.desktop.interface keyboard-layout-use-upper true
+
 gsettings set org.nemo.desktop trash-icon-visible true
 
 gsettings set org.nemo.list-view default-visible-columns "['name', 'size', 'type', 'date_modified', 'date_accessed', 'owner', 'permissions']"
