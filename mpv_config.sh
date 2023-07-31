@@ -1,6 +1,21 @@
 #!/bin/bash
-# add config for subtitles size
-trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+# adds config items to customize mpv - e.g. subtitles look, runtime key bindings
+
+# trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+
+conf_file=/etc/mpv/mpv.conf
+echo 'sub-font-size=45' | sudo tee --append $conf_file
+echo 'sub-color=0.0/1.0/1.0/0.2' | sudo tee --append $conf_file
+echo 'sub-border-size=5' | sudo tee --append $conf_file
+echo 'sub-border-color=0.0/0.0/0.0/0.3' | sudo tee --append $conf_file
+echo 'sub-pos=70' | sudo tee --append $conf_file
+echo 'sub-pos=70' | sudo tee --append $conf_file
+echo '# older scaletempo might result in cleaner dialog at reduced speed' | sudo tee --append $conf_file
+echo 'af=scaletempo' | sudo tee --append $conf_file
+echo '# increase range of audio enabled speeds from default 0.25 to 4.0' | sudo tee --append $conf_file
+echo '# af=scaletempo2=min-speed=0.04:max-speed=25' | sudo tee --append $conf_file
+echo '' | sudo tee --append $conf_file
+echo 'fullscreen=yes' | sudo tee --append $conf_file
 
 conf_file=/etc/mpv/input.conf
 # first tee does not use append as script may be run not one time to change settings and it is as of now decided to overwrite previous settings
@@ -23,22 +38,25 @@ echo 'Shift+DOWN no-osd seek 60 exact' | sudo tee --append $conf_file
 echo '' | sudo tee --append $conf_file
 echo '/ quit' | sudo tee --append $conf_file # set / key to quit player
 echo '$ cycle audio-pitch-correction' | sudo tee --append $conf_file # set $ key to enable/disable scaletempo(2) pitch correction
-
-conf_file=/etc/mpv/mpv.conf
-echo 'sub-font-size=45' | sudo tee --append $conf_file
-echo 'sub-color=0.0/1.0/1.0/0.2' | sudo tee --append $conf_file
-echo 'sub-border-size=5' | sudo tee --append $conf_file
-echo 'sub-border-color=0.0/0.0/0.0/0.3' | sudo tee --append $conf_file
-echo 'sub-pos=70' | sudo tee --append $conf_file
-echo 'sub-pos=70' | sudo tee --append $conf_file
-echo '# older scaletempo might result in cleaner dialog at reduced speed' | sudo tee --append $conf_file
-echo 'af=scaletempo' | sudo tee --append $conf_file
-echo '# increase range of audio enabled speeds from default 0.25 to 4.0' | sudo tee --append $conf_file
-echo '# af=scaletempo2=min-speed=0.04:max-speed=25' | sudo tee --append $conf_file
 echo '' | sudo tee --append $conf_file
-echo 'fullscreen=yes' | sudo tee --append $conf_file
+echo 'ALT+3 set sub-color 1.0/0.0/0.0/0.7' | sudo tee --append $conf_file
+echo 'ALT+4 set sub-color 0.0/1.0/0.0/0.7' | sudo tee --append $conf_file
+echo 'ALT+5 set sub-color 0.0/0.0/1.0/0.7' | sudo tee --append $conf_file
+echo 'ALT+6 set sub-color 1.0/1.0/0.0/0.7' | sudo tee --append $conf_file
+echo 'ALT+7 set sub-color 0.0/1.0/1.0/0.7' | sudo tee --append $conf_file
+echo 'ALT+8 set sub-color 1.0/0.0/1.0/0.7' | sudo tee --append $conf_file
+echo 'ALT+9 set sub-color 1.0/1.0/1.0/0.7' | sudo tee --append $conf_file
+echo '' | sudo tee --append $conf_file
+echo 'ALT+# set sub-color 1.0/0.0/0.0/0.2' | sudo tee --append $conf_file
+echo 'ALT+$ set sub-color 0.0/1.0/0.0/0.2' | sudo tee --append $conf_file
+echo 'ALT+% set sub-color 0.0/0.0/1.0/0.2' | sudo tee --append $conf_file
+echo 'ALT+^ set sub-color 1.0/1.0/0.0/0.2' | sudo tee --append $conf_file
+echo 'ALT+& set sub-color 0.0/1.0/1.0/0.2' | sudo tee --append $conf_file
+echo 'ALT+* set sub-color 1.0/0.0/1.0/0.2' | sudo tee --append $conf_file
+echo 'ALT+( set sub-color 1.0/1.0/1.0/0.2' | sudo tee --append $conf_file
 
 exit
+
 # on live USB live user is made as part of boot process, 
 # this script is developed tp be run at creation of USB time when user home folder does not exist
 # so add all to system wide config
