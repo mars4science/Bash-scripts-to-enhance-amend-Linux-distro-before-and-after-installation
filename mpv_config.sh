@@ -39,6 +39,7 @@ echo '' | sudo tee --append $conf_file
 echo '/ quit' | sudo tee --append $conf_file # set / key to quit player
 echo '$ cycle audio-pitch-correction' | sudo tee --append $conf_file # set $ key to enable/disable scaletempo(2) pitch correction
 echo '' | sudo tee --append $conf_file
+echo '# various combinations with "add sub-color" to gradually change part of RGB/transparency failed to produce desired result' | sudo tee --append $conf_file
 echo 'ALT+3 set sub-color 1.0/0.0/0.0/0.7' | sudo tee --append $conf_file
 echo 'ALT+4 set sub-color 0.0/1.0/0.0/0.7' | sudo tee --append $conf_file
 echo 'ALT+5 set sub-color 0.0/0.0/1.0/0.7' | sudo tee --append $conf_file
