@@ -124,6 +124,8 @@ $dir_name/cinnamon_config.sh
 # copy additional color profiles
 sudo cp "${software_path_root}/color-profiles/"* /usr/share/color/icc/colord
 
+# change some text for some of the system reference manual pages to make them more easily found by apropos and for understanding; includes `updatedb` call to update database used by `locate` utility to find files.
+$dir_name/man_pages_edits.sh
 
 # to fix bug on X1 carbon gen 6 (seems not to fix the issue, maybe investigate further, for now resorted to using custom key bindings
 $dir_name/systemd_on_resume_config.sh

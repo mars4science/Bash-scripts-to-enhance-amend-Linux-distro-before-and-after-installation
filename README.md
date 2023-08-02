@@ -52,6 +52,7 @@ $work_path should have sufficient free space, now around several Gb, if fails du
 - *-browser-* files - most recent selected and added (tar or zip archives of web browsers expected, used by `w_browser.sh`)
 - firefox-*.tar.bz2 files - most recent selected and added
 - files.py, files_functions.py - scripts to add from my other repo (used for removing duplicates, sync, and some other tasks with files) to path hardcoded in `get_install_path.sh`
+- man_pages_edits.txt - list of changes to the system reference manual pages
 - apt_dpkg_state with dpkg_orig_status (dpkg status file) and sources.list and sources.list.d (apt sources) - used by `apt_get.sh` to install files in debs folder mentioned above (expected debs were downloaded with those files via `apt_get.sh` earlier) - TODO: think about getting them from original ISO
 
 #### List of changes programmed to be made by _make_custom_liveusb.sh:
@@ -68,6 +69,7 @@ $work_path should have sufficient free space, now around several Gb, if fails du
 - change thresholds of remaining battery % for shutdown (via upower)
 - switching layouts by ctrl-space (no such option in GUI btw)
 - add columns to system monitor: resident memory, command line
+- makes some of of the system reference manual pages more easily found by `apropos` | `man -k` and for understanding
 - Cinnamon tweaks:
     - zooming enabled with "cursor pushes contents around", keys to zoom are super(win)+alt+(+/-)
     - horizontal scrolling enabled
