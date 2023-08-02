@@ -37,7 +37,7 @@ link_path=$(realpath "$link_path") # needed for grep below
 
 # extract
 if [ $(echo "$link_path" | grep ".tar") ] ; then
-    tar x -f "$link_path" --atime-preserve --one-top-level="$run_path"
+    tar --extract --warning=no-timestamp -f "$link_path" --atime-preserve --one-top-level="$run_path"
 elif [ $(echo "$link_path" | grep ".zip") ] ; then
     unzip "$link_path" -d "$run_path"
 else

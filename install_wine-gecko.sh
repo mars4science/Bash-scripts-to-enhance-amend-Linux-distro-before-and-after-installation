@@ -50,13 +50,13 @@ if [ $Eval5 -eq 0 ];then
     #  -p, --parents
     #          no error if existing, make parent directories as needed
     sudo mkdir --parents $path_to_install
-    find /$path_to_gecko/5.0 -name '*.bz2' -exec sudo tar x -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
+    find /$path_to_gecko/5.0 -name '*.bz2' -exec sudo tar --extract --warning=no-timestamp -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
     # below checks resuls of ? I guess, not errors on archive extract
     # if [ $? ];then echo "copied gecko to $path_to_install"; else echo "error: maybe NOT copied gecko to $path_to_install"; fi
     echo "copied (installed) gecko to $path_to_install"
 elif [ $Eval6 -eq 0 -o $Eval7 -eq 0 ];then # 6 mono is latest as of 2022/1/21
     sudo mkdir --parents $path_to_install
-    find $path_to_gecko/6.0 -name '*.xz' -exec sudo tar x -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
+    find $path_to_gecko/6.0 -name '*.xz' -exec sudo tar --extract --warning=no-timestamp --warning=no-timestamp -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
     # if [ $? ];then echo "copied gecko to $path_to_install"; else echo "error: maybe NOT copied gecko to $path_to_install"; fi
     echo "copied (installed) gecko to $path_to_install"
 else

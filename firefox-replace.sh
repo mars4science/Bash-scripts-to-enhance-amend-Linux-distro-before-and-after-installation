@@ -36,7 +36,7 @@ fi
 
 # extract
 if [ $(echo "$ff_archive" | grep ".tar") ] ; then
-    sudo tar --extract --file="$ff_archive" --atime-preserve --one-top-level="$ff_toinstall_folder"
+    sudo tar --extract --warning=no-timestamp --file="$ff_archive" --atime-preserve --one-top-level="$ff_toinstall_folder"
 elif [ $(echo "$ff_archive" | grep ".zip") ] ; then
     unzip "$ff_archive" -d "$ff_toinstall_folder"
 else

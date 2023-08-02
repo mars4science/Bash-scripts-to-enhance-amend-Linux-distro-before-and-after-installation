@@ -25,7 +25,7 @@ else
 fi
 
 sudo mkdir --parents $path_to_install
-find $path_to_mono -name $mono_archive -exec sudo tar x -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
+find $path_to_mono -name $mono_archive -exec sudo tar --extract --warning=no-timestamp -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
 # if [ $? ];then echo "copied mono to $path_to_install"; else echo "error: maybe NOT copied mono to $path_to_install"; fi
 echo "copied (installed) mono to $path_to_install"
 
