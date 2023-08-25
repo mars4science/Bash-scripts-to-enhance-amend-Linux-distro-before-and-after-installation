@@ -3,11 +3,12 @@
 
 # trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 
-conf_file=/etc/mpv/mpv.conf
-if [ ! -e "${conf_file}" ] ; then
-  echo "  ERROR: ${conf_file} not found; probably mpv is not installed or file's location changed"
+mpv_conf_folder="/etc/mpv/"
+if [ ! -e "${mpv_conf_folder}" ] ; then
+  echo "  ERROR: ${mpv_conf_folder} not found; probably mpv is not installed or mpv config files location changed"
   exit
 fi
+conf_file="${mpv_conf_folder}"/mpv.conf
 echo 'sub-font-size=45' | sudo tee --append $conf_file
 echo 'sub-color=0.0/1.0/1.0/0.2' | sudo tee --append $conf_file
 echo 'sub-border-size=5' | sudo tee --append $conf_file
@@ -20,11 +21,7 @@ echo '# af=scaletempo2=min-speed=0.04:max-speed=25' | sudo tee --append $conf_fi
 echo '' | sudo tee --append $conf_file
 echo 'fullscreen=yes' | sudo tee --append $conf_file
 
-conf_file=/etc/mpv/input.conf
-if [ ! -e "${conf_file}" ] ; then
-  echo "  ERROR: ${conf_file} not found; probably mpv is not installed or file's location changed"
-  exit
-fi
+conf_file="${mpv_conf_folder}"/input.conf
 # first tee does not use append as script may be run not one time to change settings and it is as of now decided to overwrite previous settings
 echo '# increase subtitle font size' | sudo tee $conf_file
 echo 'ALT+k add sub-scale +0.1' | sudo tee --append $conf_file
