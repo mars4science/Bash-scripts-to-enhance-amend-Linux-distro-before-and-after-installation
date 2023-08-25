@@ -4,9 +4,10 @@ As of 2022/12/8 it is a small project, no formal QA. [testing] branch contains c
 
 ##### Disclaimer: some scripts produce modified ISO files which might no longer be considered original distros and might have no legal rights to be called by original names and distributed with original labels and other content. Only personal use for testing is implied.
 
-Scripts are expected to be run from path that does not contain spaces and special characters (not all variables are quoted).
-
-Some parts are specific to Linux Mint Cinnamon distribution (LM) and to ThinkPad laptops, scripts were tested on LM versions 20.2 and 21, ThinkPad Carbon X1 gen 6.
+- Scripts are expected to be run from path that does not contain spaces and special characters (not all variables are quoted).
+- Some parts are specific to Linux Mint Cinnamon distribution (LM) and to ThinkPad laptops, scripts were tested on LM versions 20.2 and 21, ThinkPad Carbon X1 gen 6.
+- Creating ISO files larger than 4Gb needs `mksquashfs` supporting `-no-strip` option, LM 21 has it.
+- It's been noted `unmkinitramfs` somehow does not work correcty if scripts are run on a system based on distro different from the one of original ISO file (noted for LM 21 / 20), it affects changing initramfs (functionality can be turned on/off via change_initramfs control variable).
 
 ##### Copyright (c) 2009-2023, Alex Martian. All rights reserved.
 
