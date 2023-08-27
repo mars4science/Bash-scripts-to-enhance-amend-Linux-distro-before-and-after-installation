@@ -5,7 +5,9 @@
 # ---- auto script  ----- #
 # ---- manual way is after auto script (note: manual outdated, auto up-to-date)  ----- #
 
-# Note: script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
+# Note 1: script produced errors when run from location in path containing spaces, not all variables are fully quoted in scripts (TODO)
+# Note 2: Creating ISO files larger than 4Gb needs `mksquashfs` supporting `-no-strip` option, LM 21 has it.
+# Note 3: It's been noted `unmkinitramfs` somehow does not work correcty if scripts are run on a system based on distro different from the one of original ISO file (noted for LM 21 / 20), it affects changing initramfs (functionality can be turned on/off via change_initramfs control variable).
 
 # ---- parameters ---- #
 distro_label="GNU-Linux_1.2-1_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
@@ -382,10 +384,26 @@ fi
 # --- end of squashfs ---
 
 # --- generate new iso image ---
+
+# check if enough memory is still available for the image
 fs_size=0 # in MB
 for f in fin/casper/*.squashfs ; do fs_size=$(( fs_size + $(stat --printf="%s" $f)/1048576 )) ; done
 
-if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - fs_size*11/10 )) -le 200 ]; then
+# for tmpfs `df` can show more available space than available RAM, hence second check in the function
+check_free_memory(){
+    fs_type=$(df --print-type "${work_path}" | tail -1 | awk '{print $2}')
+    fs_free_memory=$(df --block-size=1048576 "${work_path}" | tail -1 | awk '{print $4}')
+    if [ $(( fs_free_memory - fs_size*11/10 )) -le 200 ]; then
+        false
+    elif [ ${fs_type}="tmpfs" ] && [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - fs_size*11/10 )) -le 200 ]; then
+        false
+    else
+        true
+    fi
+}
+
+check_free_memory
+if [ $? -ne 0 ]; then
     echo "Available memory is less than [110% of size of squashfs file(s) + 200 MB], might need more memory to complete iso file creation"
 # TODO if [ "$interactive_mode" = "true" ]; then
     echo "Press (y/Y) to delete working files in $work_path/fin_sq that made up filesystem.squashfs"
@@ -400,7 +418,8 @@ if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - fs_size*11/10 )) -le 200 ]; 
     fi
 fi
 
-if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - fs_size*11/10 )) -le 200 ]; then
+check_free_memory
+if [ $? -ne 0 ]; then
     echo "After deleting files available memory is still less than [110% of size of squashfs file(s) + 200 MB], might need more memory to complete iso file creation"
 # TODO if [ "$interactive_mode" = "true" ]; then
     echo "Press (a/A) to abort script after deleting all files in $work_path"
@@ -421,7 +440,6 @@ if [ $(( $(free -wm | awk '/^Mem:/ { print $8 }') - fs_size*11/10 )) -le 200 ]; 
         bash -i
     fi
 fi
-
 
 # added -allow-limited-size for squashfs file size > 2GB 
 # omitting `-eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot` resulted in USB able to boot in legacy mode only
