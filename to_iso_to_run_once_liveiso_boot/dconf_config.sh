@@ -17,6 +17,7 @@ dpm=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4/$(NF-1)}') # 
 dpi=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4/$(NF-1)*25.4}') # dots per inch, rounded
 horizontal_relosution=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4}')
 
+# does not seem to work in LM 21; GUI scaling controls work
 if [ $dpm -ge 8 ] && [ $horizontal_relosution -ge 2000 ];then # maybe will be run on small displays, not change default scaling in such case
     gsettings set org.cinnamon.desktop.interface scaling-factor 2
     gsettings set org.cinnamon.desktop.interface text-scaling-factor 1.0
@@ -32,6 +33,10 @@ gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggl
 gsettings set org.cinnamon.desktop.interface keyboard-layout-show-flags false
 gsettings set org.cinnamon.desktop.interface keyboard-layout-use-upper true
 
+# Nemo
+gsettings set org.nemo.preferences show-hidden-files true
+gsettings set org.nemo.preferences show-advanced-permissions true # Show advanced permissions in the file property dialog
+gsettings set org.nemo.preferences show-open-in-terminal-toolbar true
 gsettings set org.nemo.desktop trash-icon-visible true
 
 gsettings set org.nemo.list-view default-visible-columns "['name', 'size', 'type', 'date_modified', 'date_accessed', 'owner', 'permissions']"
@@ -66,8 +71,6 @@ if [ $? -ne 0 ] ; then # noted above schema depricated for Linux Mint 21
     gsettings set org.cinnamon.desktop.peripherals.touchpad tap-to-click true
 fi
 
-
-gsettings set org.nemo.preferences show-advanced-permissions true # Show advanced permissions in the file property dialog
 gsettings set org.cinnamon.desktop.media-handling automount false # If set to true, then Nautilus will automatically mount media such as user-visible hard disks and removable media on start-up and media insertion.
 gsettings set org.cinnamon.desktop.media-handling automount-open false # Whether to automatically open a folder for automounted media (happens in Nemo)
 gsettings set org.cinnamon.desktop.media-handling autorun-never true # If set to true, then Nautilus will never prompt nor autorun/autostart programs when a medium is inserted.
@@ -130,18 +133,6 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/binding
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'display_rotate_inverted.sh'"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3']"
 
-# <Primary> was Ctrl on some thinkpad, set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/name "'Volume Up'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/binding "['<Primary>u']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/command "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
-
-# <Primary> was Ctrl on some thinkpad, set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/name "'Volume Down'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/binding "['<Primary>j']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/command "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5']"
-
 # fix TrackPoint issue om carbon X1 gen 6
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/name "'TrackPoint X1G6 fix'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/binding "['<Super><Alt>t']"
@@ -156,23 +147,45 @@ gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'cust
 
 # screen lock binding, TODO check if xscreensaver deamon is started when ISO is booted with its debs installed
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/name "'Screen lock'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/binding "['<Super><Alt>l']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/binding "['<Super><Alt>z']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/command "'sh -c \'xscreensaver-command -lock || xscreensaver-command -pref\''"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
+# set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/name "'Volume Up'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/binding "['<Alt>AudioRaiseVolume']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/command "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'"
+gsettings set org.cinnamon.desktop.keybindings custom-list "['custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
+
+# set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/name "'Volume Down'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/binding "['<Alt>AudioLowerVolume']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/command "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'"
+gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5']"
+
 # set custom monitor brightness adjustments
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/name "'Brightness up'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/binding "['<Primary>y']" # "['MonBrightnessUp']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/binding "['<Alt>MonBrightnessUp']" # "['MonBrightnessUp']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/command "'night +1'"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9']"
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/name "'Brightness down'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/binding "['<Primary>g']" # "['MonBrightnessDown']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/binding "['<Alt>MonBrightnessDown']" # "['MonBrightnessDown']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/command "'night -1'"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
-gsettings set org.nemo.preferences show-hidden-files true
-gsettings set org.nemo.preferences show-open-in-terminal-toolbar true
+# to replace opening Linux Mint web page on F1 press
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/name "'Help'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/binding "['F1']"
+# dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/command "'notify-send \'NoNo help in GUI available, some info via man pages\''"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/command "'yelp'" # GUI help app (not included in the distro: to be istalled)
+gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11']"
+
+# additional shortcut for working with windows
+# <Primary> was Ctrl on some thinkpad
+gsettings set org.cinnamon.desktop.keybindings.wm close "['<Alt>F4', '<Primary><Shift>w']" # same as in terminal
+gsettings set org.cinnamon.desktop.keybindings.wm maximize "['<Alt><Shift>Up']"
+gsettings set org.cinnamon.desktop.keybindings.wm minimize "['<Alt><Shift>Down']"
 
 # sounds
 dconf write /org/cinnamon/sounds/login-enabled false
@@ -193,7 +206,8 @@ desktop_background=liveiso_path_settings_root/background.jpg
 if [ ! -e "$desktop_background" ] ; then desktop_background=/usr/share/backgrounds/linuxmint-ulyssa/echerkasski_countryside.jpg ; fi
 gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_background"
 
-gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run - UPDATE: setting not helping for some reason)
+# UPDATE: setting not helping for some reason
+gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run)
 
 # change theme for Cinnamon
 gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark'
