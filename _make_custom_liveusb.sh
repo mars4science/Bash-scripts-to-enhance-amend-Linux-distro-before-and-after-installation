@@ -293,7 +293,7 @@ mkdir iso to temp fin initrd
 # makes sense : if ro, then probably user knows about write-protection already.
 sudo mount $original_iso iso #  -o loop
 
-# maybe graft parameter of genisoimage can be used instead of overlayfs to amend mounted original iso contents
+# TODO: check: maybe graft parameter of genisoimage can be used instead of overlayfs to amend mounted original iso contents
 sudo mount -t overlay -o lowerdir=iso,upperdir=to,workdir=temp overlay fin
 
 # mount squashfs for modification
@@ -441,12 +441,14 @@ if [ $? -ne 0 ]; then
     fi
 fi
 
+set -x # -x  Print commands and their arguments as they are executed
 # added -allow-limited-size for squashfs file size > 2GB 
 # omitting `-eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot` resulted in USB able to boot in legacy mode only
-sudo genisoimage -allow-limited-size -lJr -o "$distro_label.iso" -V "$distro_label" -b isolinux/isolinux.bin -c isolinux/boot.cat \
+# -quiet removed all output, not only progress, but totals too; so use grep
+2>&1 sudo genisoimage -quiet -allow-limited-size -lJr -o "$distro_label.iso" -V "$distro_label" -b isolinux/isolinux.bin -c isolinux/boot.cat \
 -no-emul-boot -boot-load-size 4 --boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot fin
-sudo isohybrid --uefi "$distro_label.iso"
-
+sudo isohybrid --uefi "$distro_label.iso" | grep --invert-match "done, estimate finish"
+set +x
 # not can write to USB stick, was tested to boot both legacy and EFI
 # may check via below, should output like "DOS/MBR boot sector; partition 2 : ID=0xef, start-CHS (0x3ff,254,63), end-CHS (0x3ff,254,63), startsector 640, 7936 sectors"
 echo -e "\nNewly created distro hybrid iso file:"
