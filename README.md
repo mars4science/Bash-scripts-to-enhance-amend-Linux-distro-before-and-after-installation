@@ -70,7 +70,7 @@ $work_path should have sufficient free space, now around several Gb, if fails du
 - change thresholds of remaining battery % for shutdown (via upower)
 - switching layouts by ctrl-space (no such option in GUI btw)
 - add columns to system monitor: resident memory, command line
-- makes some of of the system reference manual pages more easily found by `apropos` | `man -k` and for understanding
+- makes some of of the system reference manual pages more easily found by `apropos` | `man -k` and for understanding (via `man_pages_edits.sh` script, processing list of changes from `man_pages_edits.txt`, for format and location of txt file see comments in the script code)
 - Cinnamon tweaks:
     - zooming enabled with "cursor pushes contents around", keys to zoom are super(win)+alt+(+/-)
     - horizontal scrolling enabled
