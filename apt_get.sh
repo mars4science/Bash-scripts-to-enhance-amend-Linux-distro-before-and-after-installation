@@ -107,7 +107,7 @@ eval $(apt-config shell ARCHIVES Dir::Cache::archives)
 debs_cache_folder=/${CACHE}/${ARCHIVES}
 
 
-# make named pipe to collect errors for packets and output all errors at the end
+# TODO: make named pipe to collect errors for packets and output all errors at the end
 # mkfifo errors_apt_get
 # named pipes are useful when one need input to hang and wait to output, also it mixes sequence (when sereval outputs echo > pipe and then one read from pipe cat < pipe)
 errors_apt_get=/errors_apt_get
@@ -271,9 +271,8 @@ install_local(){
         # above changed to run `install` for deb files located in apt/dpkg cache. Noted this way apt does not search for packages in sources repos, no "Tried to start delayed item" X ", but failed" warning in output (which is programmed in acquire.cc of apt package)
         sudo cp $debs_storage_folder/*.deb $debs_cache_folder
         sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends $debs_cache_folder/*.deb
-        sudo apt-get clean
-
         Eval=$?
+        sudo apt-get clean
 
         if [ $Eval -eq 0 ];then
             echo "    Package(s)  $line  installed (at least seems like it)"
