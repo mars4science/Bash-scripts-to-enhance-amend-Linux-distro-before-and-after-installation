@@ -343,9 +343,12 @@ done # reading lines of names of packages
 restore_status
 
 if [ -e $errors_apt_get ]; then 
-    echo "=====    Errors during script:     =====" | sudo tee --append "${amend_log}"
-    1>&2 cat $errors_apt_get  | sudo tee --append "${amend_log}"
-    echo "===== End of errors during script: ====="  | sudo tee --append "${amend_log}"
+    echo "=====    Errors during script:     =====" | tee --append "${amend_log}" # no sudo as location is assigned to be in /tmp
+
+    # TODO: understand why with just |, not |& output of `cat` is not appened to log
+    cat $errors_apt_get |& tee --append "${amend_log}"
+
+    echo "===== End of errors during script: ====="  | tee --append "${amend_log}"
     sudo rm $errors_apt_get
 fi
 
