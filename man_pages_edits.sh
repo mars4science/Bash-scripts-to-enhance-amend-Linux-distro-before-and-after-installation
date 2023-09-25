@@ -17,7 +17,7 @@ man_section="man" # changed due to: now section number included in input file li
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
 man_pages_edits="${software_path_root}/to_root/usr/share/src/amendedliveiso/man_pages_edits.txt"
 
-if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk/work ; fi
+if [ "x${work_path}" = "x" ] ; then work_path=/tmp ; fi
 amend_log="${work_path}/amend_errors.log"
 
 echo "  Processing changes to the system reference manual pages from ${man_pages_edits}"
