@@ -7,6 +7,7 @@
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
 if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; fi
 default_local_debs="$software_path_root/debs"
+amend_log="${work_path}/amend_errors.log"
 
 # where to take from dpkg status file and apt sources if not supplied as argument (passed as one argument via shift)
 default_local_apt_dpkg_folder="$software_path_root/apt_dpkg_state/"
@@ -342,9 +343,9 @@ done # reading lines of names of packages
 restore_status
 
 if [ -e $errors_apt_get ]; then 
-    echo "=====    Errors during script:     ====="
-    1>&2 cat $errors_apt_get
-    echo "===== End of errors during script: ====="
+    echo "=====    Errors during script:     =====" | sudo tee --append "${amend_log}"
+    1>&2 cat $errors_apt_get  | sudo tee --append "${amend_log}"
+    echo "===== End of errors during script: ====="  | sudo tee --append "${amend_log}"
     sudo rm $errors_apt_get
 fi
 

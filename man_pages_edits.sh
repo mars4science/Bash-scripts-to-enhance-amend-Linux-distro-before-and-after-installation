@@ -17,6 +17,9 @@ man_section="man" # changed due to: now section number included in input file li
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
 man_pages_edits="${software_path_root}/to_root/usr/share/src/amendedliveiso/man_pages_edits.txt"
 
+if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk/work ; fi
+amend_log="${work_path}/amend_errors.log"
+
 echo "  Processing changes to the system reference manual pages from ${man_pages_edits}"
 sudo updatedb # to update database used by `locate`
 IFS=''
@@ -30,12 +33,12 @@ while read -r line; do
     otext="$line"
 # printf "%s\n%s\n%s\n" $page $itext $otext
     if [ $(locate "/${page}." "${man_section}" gz | wc -l) -ne 1 ] ;  then
-      echo "    ERROR: it seems locate cannot find unique gz archive of ${page} in ${man_section}, skipping" # after adding "/" and "." to ${page} multiples are not expected to happen, only no one found
+      echo "    ERROR: it seems locate cannot find unique gz archive of ${page} in ${man_section}, skipping"  | sudo tee --append "${amend_log}" # after adding "/" and "." to ${page} multiples are not expected to happen, only no one found
       continue
     fi
     man_page_gzip=$(locate "/${page}." "${man_section}" gz)
     if [ $(gzip --list "${man_page_gzip}" | wc -l) -ne 2 ] ; then
-      echo "    ERROR: it seems ${man_page_gzip} contains more than 1 file, skipping"
+      echo "    ERROR: it seems ${man_page_gzip} contains more than 1 file, skipping"  | sudo tee --append "${amend_log}"
       continue
     fi
 
