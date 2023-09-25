@@ -5,7 +5,7 @@
 # Help message below might explain usage and what the script does
 
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
-if [ "x${work_path}" = "x" ] ; then work_path=/media/ramdisk ; fi
+if [ "x${work_path}" = "x" ] ; then work_path=/tmp ; fi
 default_local_debs="$software_path_root/debs"
 amend_log="${work_path}/amend_errors.log"
 
