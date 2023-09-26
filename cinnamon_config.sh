@@ -45,7 +45,7 @@ fi
 path_to_edit=/usr/share/applications/libreoffice-calc.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sudo sed --in-place 's/Keywords=/Keywords=Tables;/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=/Keywords=Tables;/' "$path_to_edit"
     else
         echo -e '\nKeywords=Tables;' | sudo tee --append "$path_to_edit"
     fi
@@ -55,7 +55,7 @@ fi
 path_to_edit=/usr/share/applications/virt-manager.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sudo sed --in-place 's/Keywords=/Keywords=Emulators;Virtualization;KVM;QEMU;/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=/Keywords=Emulators;Virtualization;KVM;QEMU;/' "$path_to_edit"
     else
         echo -e '\nKeywords=Emulators;Virtualization;KVM;QEMU;' | sudo tee --append "$path_to_edit"
     fi
@@ -65,7 +65,7 @@ fi
 path_to_edit=/usr/share/applications/kazam.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sudo sed --in-place 's/Keywords=/Keywords=capture;/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=/Keywords=capture;/' "$path_to_edit"
     else
         echo -e '\nKeywords=capture;record;video;screen;' | sudo tee --append "$path_to_edit"
     fi
@@ -75,7 +75,7 @@ fi
 path_to_edit=/usr/share/applications/com.github.maoschanz.drawing.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sudo sed --in-place 's/Keywords=/Keywords=image;picture;photo;paint;draw;/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=/Keywords=image;picture;photo;paint;draw;/' "$path_to_edit"
     else
         echo -e '\nKeywords=image;picture;photo;' | sudo tee --append "$path_to_edit"
     fi
@@ -87,13 +87,13 @@ fi
 path_to_edit=/usr/share/applications/dwww.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sudo sed --in-place 's/Keywords=/Keywords=help;/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=/Keywords=help;/' "$path_to_edit"
     else
         echo -e '\nKeywords=documentation;information;manual;help;' | sudo tee --append "$path_to_edit"
     fi
 
-    if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sudo sed --in-place 's|Comment=|Comment=Browse, search documentation files in /usr/share/doc, man pages;|' "$path_to_edit"
+    if [[ $(grep "^Comment" "$path_to_edit") ]]; then # true if grep finds
+        sudo sed --in-place 's|Comment=.*|Comment=Browse, search documentation files in /usr/share/doc, man pages;|' "$path_to_edit"
     else
         echo -e '\nComment=Browse, search documentation files in /usr/share/doc, man pages' | sudo tee --append "$path_to_edit"
     fi
@@ -101,9 +101,14 @@ if [[ -e "$path_to_edit" ]]; then
     # TODO: try to understand how to use _BROWSER variables in /etc/dwww/dwww.conf
     # for now to use dwww in text mode run `dwww` in bash, to run in GUI (firefox) use Cinnamon menu
 
-    # TODO: understand why extra escapes with \ needed for $ and also three of \, not just '\''\'\'''\''\n'\''\'\'''\'', which is double replacement of ' with '\'' for '\n'
+    # TODO: understand why extra escapes with \ needed for $ and also three of \, not just '\''\'\'''\''\n'\''\'\'''\'', which is double replacement of ' with '\'' for '\n'; as cgid waw started instead of cgi the below was commented out, left here for TODO
     # passing grep on command line two PATTERNS separated by a line break (man grep) via $'\n' (man bash)
-    sudo sed --in-place -- 's~^Exec=.*~Exec=bash -c '\''a2dismod cgi |\& grep "not found"\$'\''\\'\'''\''\\n'\''\\'\'''\''"already disabled"; if [ $? -eq 0 ] ; then zenity --info --width=500 --text="sudo a2enmod cgi ; sudo service apache2 restart - suggestion: successful executition of those two commands needed for dwww to work.    TL;DR Seems cgi module of apache is disabled/not found. Suggestion is to copy and run commands displayed at the end of this message (after :) in terminal to enable functionality, then start dwww from Cinnamon menu again (note: proper functioning of text browser run from terminal by command dwww also requires cgi module to be enabled): sudo a2enmod cgi ; sudo service apache2 restart" ; else firefox localhost/dwww  ; fi'\''~' "$path_to_edit"
+#    sudo sed --in-place -- 's~^Exec=.*~Exec=bash -c '\''a2dismod cgi |\& grep "not found"\$'\''\\'\'''\''\\n'\''\\'\'''\''"already disabled"; if [ $? -eq 0 ] ; then zenity --info --width=500 --text="sudo a2enmod cgi ; sudo service apache2 restart - suggestion: successful executition of those two commands needed for dwww to work.    TL;DR Seems cgi module of apache is disabled/not found. Suggestion is to copy and run commands displayed at the end of this message (after :) in terminal to enable functionality, then start dwww from Cinnamon menu again (note: proper functioning of text browser run from terminal by command dwww also requires cgi module to be enabled): sudo a2enmod cgi ; sudo service apache2 restart" ; else firefox localhost/dwww  ; fi'\''~' "$path_to_edit"
+
+    # TODO learn format of text for Zenity, using "sudo a2enmod cgi \\\&\\\& sudo service apache2 restart" results in
+    # Gtk-WARNING **: ... :Failed to set text ... from markup due to error parsing markup: Error on line 1: Entity name “& sudo service apache2 restart - suggestion: successful executition of that beforehand is needed for documentation browser to work.    TL” is not known
+    # TODO add format description to man page of zenity
+    sudo sed --in-place -- 's~^Exec=.*~Exec=bash -c '\''a2enmod cgi ; if [ $? -eq 127 ] ; then zenity --info --width=500 --text="Seems apache is not running; this code is written not to try to start documentation browser in that case"; elif [ -e "/etc/apache2/mods-enabled/cgid.conf" ] || [ -e "/etc/apache2/mods-enabled/cgid.conf" ] ; then firefox localhost/dwww ; else zenity --info --width=500 --text="sudo a2enmod cgi ; sudo service apache2 restart - suggestion: successful executition of that beforehand is needed for documentation browser to work.    TL;DR Seems cgi module of apache is disabled. Suggestion is to copy and run commands displayed at the end of this message (after :) in terminal to enable functionality, then use same Cinnamon menu entry again (note: proper functioning of text-based browser run from terminal by command dwww also required cgi module to be enabled): sudo a2enmod cgi ; sudo service apache2 restart" ; fi'\''~' "$path_to_edit"
 
 fi
 
