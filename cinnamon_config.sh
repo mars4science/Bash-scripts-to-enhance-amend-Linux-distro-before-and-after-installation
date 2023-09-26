@@ -39,7 +39,7 @@ if [ $qty_to_activate -gt 0 ]; then
     sudo glib-compile-schemas "${glib_schemas_location}"
 fi
 
-## edit applications in menu
+## edit applications in menu for better discoverability
 
 # add search keyword for LibreOffice Calc
 path_to_edit=/usr/share/applications/libreoffice-calc.desktop
@@ -79,6 +79,32 @@ if [[ -e "$path_to_edit" ]]; then
     else
         echo -e '\nKeywords=image;picture;photo;' | sudo tee --append "$path_to_edit"
     fi
+fi
+
+## change how dwww is executed (add check for apache status)
+
+# add search keywords, comment and browser for Debian Documentation Browser
+path_to_edit=/usr/share/applications/dwww.desktop
+if [[ -e "$path_to_edit" ]]; then
+    if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
+        sudo sudo sed --in-place 's/Keywords=/Keywords=help;/' "$path_to_edit"
+    else
+        echo -e '\nKeywords=documentation;information;manual;help;' | sudo tee --append "$path_to_edit"
+    fi
+
+    if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
+        sudo sudo sed --in-place 's|Comment=|Comment=Browse, search documentation files in /usr/share/doc, man pages;|' "$path_to_edit"
+    else
+        echo -e '\nComment=Browse, search documentation files in /usr/share/doc, man pages' | sudo tee --append "$path_to_edit"
+    fi
+
+    # TODO: try to understand how to use _BROWSER variables in /etc/dwww/dwww.conf
+    # for now to use dwww in text mode run `dwww` in bash, to run in GUI (firefox) use Cinnamon menu
+
+    # TODO: understand why extra escapes with \ needed for $ and also three of \, not just '\''\'\'''\''\n'\''\'\'''\'', which is double replacement of ' with '\'' for '\n'
+    # passing grep on command line two PATTERNS separated by a line break (man grep) via $'\n' (man bash)
+    sudo sed --in-place -- 's~^Exec=.*~Exec=bash -c '\''a2dismod cgi |\& grep "not found"\$'\''\\'\'''\''\\n'\''\\'\'''\''"already disabled"; if [ $? -eq 0 ] ; then zenity --info --width=500 --text="sudo a2enmod cgi ; sudo service apache2 restart - suggestion: successful executition of those two commands needed for dwww to work.    TL;DR Seems cgi module of apache is disabled/not found. Suggestion is to copy and run commands displayed at the end of this message (after :) in terminal to enable functionality, then start dwww from Cinnamon menu again (note: proper functioning of text browser run from terminal by command dwww also requires cgi module to be enabled): sudo a2enmod cgi ; sudo service apache2 restart" ; else firefox localhost/dwww  ; fi'\''~' "$path_to_edit"
+
 fi
 
 exit
