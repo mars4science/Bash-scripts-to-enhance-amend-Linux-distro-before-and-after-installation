@@ -85,7 +85,7 @@ echo '' | sudo tee --append $bashrc
 # git: pull all tracked local branches
 echo '' | sudo tee --append $bashrc
 echo 'git_pull() {' | sudo tee --append $bashrc
-echo '    echo "- pulling (fast-forward only) all tracked branches from [origin] remote; assumes names of local branches and corresponding branches on remote are same (to push one can use: git push --all <remote repository>)"' | sudo tee --append $bashrc
+echo '    echo "- pulling (fast-forward only) all tracked branches from [origin] remote; assumes names of local branches and corresponding branches on remote are same (to push all branches: git push --all <remote repository>)"' | sudo tee --append $bashrc
 echo '    if [ "x$1" = "x" ]; then set -- "origin"; fi' | sudo tee --append $bashrc
 echo '    git fetch $1 || return 1' | sudo tee --append $bashrc
 echo '    orig_branch=$(git branch | grep "*" | sed "s/[ *]*//") # getting name of current branch via asterisk' | sudo tee --append $bashrc
