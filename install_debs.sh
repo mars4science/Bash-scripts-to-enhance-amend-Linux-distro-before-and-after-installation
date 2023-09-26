@@ -6,7 +6,8 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 # In fact the developed does not recall why longer code [1] was developed in the first place
 
 # changed to sort by modification date of folders, newest last; that way latest downloaded are installed last
-ls -1tr "$(./apt_get.sh printpath)" | ./apt_get.sh -i
+ls -1tr "$(./apt_get.sh printpath)" | ./apt_get.sh -i # (list files by modification time reversed)
+# TODO: # understand why there are errors during installation if list of folders with debs is ordered alphabetically (want to switch because consider it more convenient to ensure desired ordering). Part of the cause (hypothesis): Errors are due to diffeent ordering from order in which packages were added.
 exit
 
 ===== previous version follows =====
