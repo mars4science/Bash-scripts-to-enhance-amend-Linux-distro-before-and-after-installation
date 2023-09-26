@@ -30,7 +30,7 @@ locales=("fr_FR" "en_US" "de_DE")
 path_to_software_in_chroot="/tmp/path_for_mount_to_add_software_to_liveiso"
 liveiso_path_scripts_in_chroot=/usr/share/amendedliveiso-scripts
 liveiso_path_settings_in_chroot=/usr/share/amendedliveiso-settings
-liveiso_sources_in_chroot=/usr/share/src/amendedliveiso # to copy all scripts to have sources on resulting ISO
+liveiso_sources_in_chroot=/usr/src/amendedliveiso # to copy all scripts to have sources on resulting ISO
 work_path_in_chroot=/tmp # used by apt_get.sh
 
 # ---- parameters end ---- #
@@ -446,8 +446,8 @@ set -x # -x  Print commands and their arguments as they are executed
 # omitting `-eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot` resulted in USB able to boot in legacy mode only
 # -quiet removed all output, not only progress, but totals too; so use grep
 2>&1 sudo genisoimage -allow-limited-size -lJr -o "$distro_label.iso" -V "$distro_label" -b isolinux/isolinux.bin -c isolinux/boot.cat \
--no-emul-boot -boot-load-size 4 --boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot fin
-sudo isohybrid --uefi "$distro_label.iso" | grep --invert-match "done, estimate finish"
+-no-emul-boot -boot-load-size 4 --boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot fin | grep --invert-match "done, estimate finish"
+sudo isohybrid --uefi "$distro_label.iso"
 set +x
 # not can write to USB stick, was tested to boot both legacy and EFI
 # may check via below, should output like "DOS/MBR boot sector; partition 2 : ID=0xef, start-CHS (0x3ff,254,63), end-CHS (0x3ff,254,63), startsector 640, 7936 sectors"
