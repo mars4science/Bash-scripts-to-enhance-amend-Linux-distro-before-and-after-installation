@@ -10,7 +10,7 @@
 # Note 3: It's been noted `unmkinitramfs` somehow does not work correcty if scripts are run on a system based on distro different from the one of original ISO file (noted for LM 21 / 20), it affects changing initramfs (functionality can be turned on/off via change_initramfs control variable).
 
 # ---- parameters ---- #
-distro_label="GNU-Linux_1.2-1_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
+distro_label="GNU-Linux_1.64_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
 
 software_path_root=/media/ramdisk/LM # the script is written to look for software to take from there
 original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
@@ -28,9 +28,9 @@ locales=("fr_FR" "en_US" "de_DE")
 
 # as after_original_distro_install.sh to be run in chrooted environment there is code to map (via mount) software_path_root to  path_to_software_in_chroot - where above mentioned script is written to look for software
 path_to_software_in_chroot="/tmp/path_for_mount_to_add_software_to_liveiso"
-liveiso_path_scripts_in_chroot=/usr/bin/amendedliveiso-scripts
+liveiso_path_scripts_in_chroot=/usr/share/amendedliveiso-scripts
 liveiso_path_settings_in_chroot=/usr/share/amendedliveiso-settings
-liveiso_sources_in_chroot=/usr/src/amendedliveiso # to copy all scripts to have sources on resulting ISO
+liveiso_sources_in_chroot=/usr/share/src/amendedliveiso # to copy all scripts to have sources on resulting ISO
 work_path_in_chroot=/tmp # used by apt_get.sh
 
 # ---- parameters end ---- #
@@ -445,7 +445,7 @@ set -x # -x  Print commands and their arguments as they are executed
 # added -allow-limited-size for squashfs file size > 2GB 
 # omitting `-eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot` resulted in USB able to boot in legacy mode only
 # -quiet removed all output, not only progress, but totals too; so use grep
-2>&1 sudo genisoimage -quiet -allow-limited-size -lJr -o "$distro_label.iso" -V "$distro_label" -b isolinux/isolinux.bin -c isolinux/boot.cat \
+2>&1 sudo genisoimage -allow-limited-size -lJr -o "$distro_label.iso" -V "$distro_label" -b isolinux/isolinux.bin -c isolinux/boot.cat \
 -no-emul-boot -boot-load-size 4 --boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot fin
 sudo isohybrid --uefi "$distro_label.iso" | grep --invert-match "done, estimate finish"
 set +x
@@ -461,6 +461,7 @@ bash -i
 un_mount # was un_mount_in_work_path, I still do not understand why the result after next rm -R is same - all deleted
 sudo rm -R iso to temp fin iso_sq fin_sq temp_sq to_sq initrd
 echo "This line is after code to delete working files"
+sudo chmod a+rw $"$work_path/$distro_label.iso"
 
 # to leave terminal open with interactive bash if started from GUI
 # ps output list processes' paths as called (relative), so use "$0" 
