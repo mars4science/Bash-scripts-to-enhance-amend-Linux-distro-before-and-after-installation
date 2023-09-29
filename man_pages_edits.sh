@@ -14,8 +14,9 @@
 #man_section=man1
 man_section="man" # changed due to: now section number included in input file like grep.1
 
-if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
-man_pages_edits="${software_path_root}/to_root/usr/share/src/amendedliveiso/man_pages_edits.txt"
+if [ "x${liveiso_path_sources_root}" = "x" ] ; then liveiso_path_sources_root=/media/$(id -un)/usb/LM/to_root/usr/src/amendedliveiso ; fi
+
+man_pages_edits="${liveiso_path_sources_root}/man_pages_edits.txt"
 
 if [ "x${work_path}" = "x" ] ; then work_path=/tmp ; fi
 amend_log="${work_path}/amend_errors.log"

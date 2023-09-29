@@ -110,7 +110,13 @@ change_squash() {
     # note which looks as made before `mount /proc` was added: # mount  ----- output: mount: failed to read mtab: No such file or directory
 
     locales=$(echo "${locales[@]@A}" | sed "s/"\""/'/g") # A operator of bash generate declare line with double quotes, need to replace for bash -c below
-    sudo chroot $work_path/fin_sq /bin/bash -c "export software_path_root=${path_to_software_in_chroot}; export liveiso_path_scripts_root=${liveiso_path_scripts_in_chroot}; export locales="\""${locales}"\""; export liveiso_path_scripts_root=$liveiso_path_scripts_in_chroot; export work_path=${work_path_in_chroot}; /media/root/Scripts/after_original_distro_install.sh"
+    sudo chroot $work_path/fin_sq /bin/bash -c "\
+        export software_path_root=${path_to_software_in_chroot}; \
+        export liveiso_path_scripts_root=${liveiso_path_scripts_in_chroot}; \
+        export locales="\""${locales}"\"";\
+        export liveiso_path_sources_root="${liveiso_sources_in_chroot}"; \
+        export work_path=${work_path_in_chroot}; \
+        /media/root/Scripts/after_original_distro_install.sh"
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
 }
 
