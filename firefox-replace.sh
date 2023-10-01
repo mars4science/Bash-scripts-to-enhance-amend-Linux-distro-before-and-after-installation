@@ -14,7 +14,7 @@ if [ -h "$ff_installed_link" ]; then ff_link_symbolic=true; else ff_link_symboli
 # added "" (below too), so now expression has two arguments: -h and a string
 
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
-ff_archive_name=$(ls --sort=time $software_path_root | grep firefox- | head --lines=1)
+ff_archive_name="$(ls --sort=time $software_path_root | grep "^firefox-" | head --lines=1)"
 ff_archive=$software_path_root/$ff_archive_name
 if [ ! -f "$ff_archive" ]; then echo >&2 "Firefox archive to install from not found in $software_path_root, next is exit of the script"; exit 1; fi
 
@@ -26,7 +26,7 @@ if [ $(echo $ff_installed_folder | grep --ignore-case firefox) ] ; then
     echo "Firefox found on the system in $ff_installed_folder, next replacing"
     ff_toinstall_folder=$ff_installed_folder
     cd $ff_toinstall_folder
-    sudo rm --recursive ./* # to replace previous firefox folder
+    sudo rm --recursive ./* # to replace contents of previous firefox folder
 else
     ff_toinstall_folder=$liveiso_path_scripts_root/firefox
     echo "Firefox folder not found on the system, next adding firefox to $liveiso_path_scripts_root"
@@ -48,7 +48,7 @@ if [ $(ls "$ff_toinstall_folder" | wc | awk '{print $1}') -eq 1 ] ; then ff_toin
 
 # restore link that the srcipt code as written is supposed to break
 if [ "$ff_link_symbolic" = "true" ]; then
-    sudo ln --symbolic --force $ff_toinstall_folder/firefox $ff_installed_link
+    sudo ln --symbolic --force --no-target-directory $ff_toinstall_folder/firefox $ff_installed_link # adding --no-target-directory as sometimes ff_toinstall_folder points to existing directory and seems in that case ln defaults to creating link in a directory (BTW seems for bash "$a/b" in case of "a" being link to a directory resolves to "b" in that directory)
 else
     # if firefox is found in delicated folder and `which firefox` is not a link, that hints that folder is in search path for executables (PATH) already
     if [[ ! ("$ff_toinstall_folder" = "$ff_installed_folder") ]]; then sudo ln --symbolic --force $ff_toinstall_folder/firefox $(get_install_path.sh) ; fi
