@@ -63,9 +63,9 @@ else
     if [[ ! ("$ff_toinstall_folder" = "$ff_installed_folder") ]]; then sudo ln --symbolic --force $ff_toinstall_folder/firefox $(get_install_path.sh) ; fi
 fi
 
-# disable updates (inc. reminders) - maybe works, checkDefaultBrowser - not works, now default browser is to be set via dconf
+# disable updates (inc. reminders) - seems to work, checkDefaultBrowser - seems to work (both seem to work due to edit of policies.json; editing distribution.ini is left here just in case)
 ff_distribution_folder=$ff_toinstall_folder/distribution
 sudo mkdir --parents $ff_distribution_folder # --parents : no error if existing, make parent directories as needed
-echo '{"policies": {"DisableAppUpdate": true}}' | 1>/dev/null sudo tee $ff_distribution_folder/policies.json
+echo '{"policies": {"DisableAppUpdate": true, "DontCheckDefaultBrowser": true}}' | 1>/dev/null sudo tee $ff_distribution_folder/policies.json
 echo -e '[Preferences]\napp.update.enabled=false\nbrowser.shell.checkDefaultBrowser=false' | 1>/dev/null sudo tee $ff_distribution_folder/distribution.ini
 
