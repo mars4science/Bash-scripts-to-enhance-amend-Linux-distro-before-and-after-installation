@@ -44,7 +44,16 @@ else
 fi
 
 # in case archive have single top folder where all is
-if [ $(ls "$ff_toinstall_folder" | wc | awk '{print $1}') -eq 1 ] ; then ff_toinstall_folder="$ff_toinstall_folder/"$(ls "$ff_toinstall_folder"); fi
+if [ $(ls "$ff_toinstall_folder" | wc | awk '{print $1}') -eq 1 ] ; then
+
+    # ff_toinstall_folder="$ff_toinstall_folder/"$(ls "$ff_toinstall_folder");
+    # now remove extra level instead:
+
+    ff_folder_temp_name="temporary_name" # rename in case folder same as one of files - usually "firefox"
+    mv "${ff_toinstall_folder}/$(ls "${ff_toinstall_folder}")" "${ff_toinstall_folder}/${ff_folder_temp_name}"
+    mv "${ff_toinstall_folder}/${ff_folder_temp_name}"/* "${ff_toinstall_folder}"
+    rmdir "${ff_toinstall_folder}/${ff_folder_temp_name}"
+fi
 
 # restore link that the srcipt code as written is supposed to break
 if [ "$ff_link_symbolic" = "true" ]; then
