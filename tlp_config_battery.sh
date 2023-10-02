@@ -7,10 +7,12 @@ trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
 # tlp - thinkpad ? power
 # man sed: -E, -r, --regexp-extended
 # ( )	Defines a marked subexpression. The string matched within the parentheses can be recalled later (see the next entry, \n). 
-sudo sed -E --in-place=bak 's/#{0,1}START_CHARGE_THRESH_BAT([0-1])=[0-9]{1,3}/START_CHARGE_THRESH_BAT\1=65/' /etc/tlp.conf
-sudo sed -E --in-place=bak 's/#{0,1}STOP_CHARGE_THRESH_BAT([0-1])=[0-9]{1,3}/STOP_CHARGE_THRESH_BAT\1=70/' /etc/tlp.conf
+sudo sed -E --in-place=".bak" 's/#{0,1}START_CHARGE_THRESH_BAT([0-1])=[0-9]{1,3}/START_CHARGE_THRESH_BAT\1=65/' /etc/tlp.conf
+sudo sed -E --in-place=".bak" 's/#{0,1}STOP_CHARGE_THRESH_BAT([0-1])=[0-9]{1,3}/STOP_CHARGE_THRESH_BAT\1=70/' /etc/tlp.conf
 
-sudo sed --in-place=bak 's/#DEVICES_TO_DISABLE_ON_STARTUP="bluetooth wifi wwan"/DEVICES_TO_DISABLE_ON_STARTUP="bluetooth wifi wwan"/' /etc/tlp.conf
+# sudo sed --in-place=bak 's/#DEVICES_TO_DISABLE_ON_STARTUP="bluetooth wifi wwan"/DEVICES_TO_DISABLE_ON_STARTUP="bluetooth wifi wwan"/' /etc/tlp.conf
+# now (2023/10/02) correctly removes comment sign ("#"), still wifi was on during test)
+sudo sed -E --in-place=".bak" 's/#DEVICES_TO_DISABLE_ON_STARTUP=(.*)/DEVICES_TO_DISABLE_ON_STARTUP=\1/' /etc/tlp.conf
 
 # --- notifies of low level of BAT0 once per crossing threshold ---
 
