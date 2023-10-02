@@ -9,6 +9,6 @@ conf_file=/etc/UPower/UPower.conf
 # > If any value is invalid, or not in descending order, the defaults
 # > will be used.
 sudo sed -E --in-place=bak 's/^UsePercentageForPolicy=false/UsePercentageForPolicy=true/' $conf_file
-sudo sed -E --in-place=bak 's/^PercentageLow=[0-9]{1,}/PercentageLow=20/' $conf_file
-sudo sed -E --in-place=bak 's/^PercentageCritical=[0-9]{1,}/PercentageCritical=15/' $conf_file
+sudo sed -E --in-place=bak 's/^PercentageLow=[0-9]{1,}/PercentageLow=30/' $conf_file
+sudo sed -E --in-place=bak 's/^PercentageCritical=[0-9]{1,}/PercentageCritical=20/' $conf_file
 sudo sed -E --in-place=bak 's/^PercentageAction=[0-9]{1,}/PercentageAction=10/' $conf_file
