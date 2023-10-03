@@ -77,3 +77,19 @@ EOF
     sudo chmod a+x "$file_fully_qualified_name"
 fi
 
+
+# to activate screensaver before suspend to try to get rid of image of the workspace displayed for a moment after resume
+file_contents='#!/bin/sh
+
+case $1 in
+  pre)
+    xscreensaver-command -suspend
+    ;;
+  post) ;;
+esac'
+
+file_name=xscreensaver_lock_screen
+file_fully_qualified_name="${folder_for_code_to_run_on_suspend}/${file_name}"
+
+add_file_to_systemd_system-sleep
+
