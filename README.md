@@ -100,7 +100,7 @@ Other minor tweaks, including:
 - replaces Firefox (`firefox-replace.sh`) with downloaded (and w/out google search engine selection disabled in Mint) version; the script's code is written to process tar or zip archives with `firefox` executable to start Firefox located in root of archive or in single top folder of the archive (usually named "firefox")
 - makes mpv default for video/audio file types, configures some mpv keys (`mpv_config.sh`)
 - workaround of problem of specific old color printer (`printer_color_as_gray.sh`)
-- installs python scripts, i.e. `files.py` (program from my other repo), placed in software_path_root by `Utils_misc_install.sh`
+- installs python scripts, i.e. `files.py` (program from my other repo), placed in software_path_root by `utils_misc_install.sh`
 - disables swap (`disable_swap.sh`)
 - notifies on low memory (`memory_notify_config.sh`)
 - add functions to bash (added to `/etc/bash.bashrc` via `bash_functions_and_other_config.sh`)

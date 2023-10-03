@@ -77,7 +77,7 @@ w_browser
 $dir_name/firefox-replace.sh
 
 # install phython scripts, i.e. files.py
-$dir_name/Utils_misc_install.sh
+$dir_name/utils_misc_install.sh
 
 # includes making ramdisk now (used in debs install)
 # also kind of user specific as during liveUSB boot /etc/fstab file in squashfs gets overshadowed,
