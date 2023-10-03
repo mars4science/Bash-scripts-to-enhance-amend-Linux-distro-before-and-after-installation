@@ -97,3 +97,20 @@ file_fully_qualified_name="${folder_for_code_to_run_on_suspend}/${file_name}"
 
 add_file_to_systemd_system-sleep
 
+
+# to save datetime of suspend to check duration of suspend/sleep later
+file_contents='#!/bin/sh
+
+case $1 in
+  pre)
+    date --iso-8601=seconds | tee /tmp/amendediso_suspended_datetime.txt
+    ;;
+  post)
+    date --iso-8601=seconds | tee --append /tmp/amendediso_suspended_datetime.txt ;;
+esac'
+
+file_name=suspended_datetime
+file_fully_qualified_name="${folder_for_code_to_run_on_suspend}/${file_name}"
+
+add_file_to_systemd_system-sleep
+
