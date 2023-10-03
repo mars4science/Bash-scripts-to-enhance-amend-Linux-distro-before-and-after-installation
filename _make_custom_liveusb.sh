@@ -145,13 +145,13 @@ change_boot() {
     sudo mv --force ${grub_config}_tmp ${grub_config}
 
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts toram ${custom_init_boot_option}--|" ${grub_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| rfkill.default_state=0 showmounts toram ${custom_init_boot_option}--|" ${grub_config}
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit to RAM, verbose (UEFI: all menu entries)"/' ${grub_config}
     # change second manu entry to make text mode boot, add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts nopersistent level 3 ${custom_init_boot_option}--|" ${grub_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| rfkill.default_state=0 showmounts nopersistent level 3 ${custom_init_boot_option}--|" ${grub_config}
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, text mode, verbose"/' ${grub_config}
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts nopersistent ${custom_init_boot_option}--|" ${grub_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| rfkill.default_state=0 showmounts nopersistent ${custom_init_boot_option}--|" ${grub_config}
     sudo sed --in-place --regexp-extended -- '0,/64-bit"/s//64-bit, verbose"/' ${grub_config}
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash ${custom_init_boot_option}--|" ${grub_config}
@@ -188,15 +188,15 @@ change_boot() {
     # change first manu entry to boot to ram, add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label ram/' ${legacy_config}
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (to RAM, verbose)/' ${legacy_config}
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts toram ${custom_init_boot_option}--|" ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| rfkill.default_state=0 showmounts toram ${custom_init_boot_option}--|" ${legacy_config}
     # change second manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label text/' ${legacy_config}
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (text mode, verbose)/' ${legacy_config}
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts nopersistent level 3 ${custom_init_boot_option}--|" ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| rfkill.default_state=0 showmounts nopersistent level 3 ${custom_init_boot_option}--|" ${legacy_config}
     # change third manu entry to add custom init script, make verbose; 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- '0,/label.*/s//label verbose/' ${legacy_config}
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (verbose)/' ${legacy_config}
-    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| showmounts nopersistent ${custom_init_boot_option}--|" ${legacy_config}
+    sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| rfkill.default_state=0 showmounts nopersistent ${custom_init_boot_option}--|" ${legacy_config}
     # change forth menu entry to add custom init script, 0,/ needed to edit first occurence only
     sudo sed --in-place --regexp-extended -- "0,/ quiet splash --/s|| quiet splash ${custom_init_boot_option}--|" ${legacy_config}
     sudo sed --in-place --regexp-extended -- '0,/( *menu label.*Mint)$/s//\1 (quiet)/' ${legacy_config}

@@ -14,6 +14,13 @@ sudo sed -E --in-place=".bak" 's/#{0,1}STOP_CHARGE_THRESH_BAT([0-1])=[0-9]{1,3}/
 # now (2023/10/02) correctly removes comment sign ("#"), still wifi was on during test)
 sudo sed -E --in-place=".bak" 's/#DEVICES_TO_DISABLE_ON_STARTUP=(.*)/DEVICES_TO_DISABLE_ON_STARTUP=\1/' /etc/tlp.conf
 
+# as of 2023/10/03 noted above does not turn wifi off
+# below code does (at least as shown by Network Manager applet):
+echo "  configuring to have wifi turned off at first boot time..."
+echo -e "[main]\nNetworkingEnabled=true\nWirelessEnabled=false\nWWANEnabled=false" | sudo tee /var/lib/NetworkManager/NetworkManager.state
+echo "  done."
+# P.S. adding "rfkill.default_state=0" to kernel parameters during boot w/out having NetworkManager.state file as above did not disable wifi (but decided to add anyway maybe it will prevent wifi from turning on initially as kernel docs IIRC states kernel turns wireless devices on by default; TODO: check what actually happens)
+
 # --- notifies of low level of BAT0 once per crossing threshold ---
 
 low_path=/home/$(id -un)/.cache/battery_level_low
