@@ -22,7 +22,7 @@ if [ -e /etc/modprobe.d/thinkpad_acpi.conf ]; then
     fi
 fi
 
-# can be disabled after reboot only as have not found a way to reload module / to apply new config file
+# can be disabled after reboot only, because developer has not found a way to reload module / to apply new config file
 echo fan control is not enabled, restart might be needed after writing that option:
 echo 'options thinkpad_acpi fan_control=1' | sudo tee -a /etc/modprobe.d/thinkpad_acpi.conf
 
