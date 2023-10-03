@@ -79,6 +79,10 @@ fi
 
 
 # to activate screensaver before suspend to try to get rid of image of the workspace displayed for a moment after resume
+# Edit: did not work
+# manually running xscreensaver-systemd resulted in "failed to connect as org.freedesktop.ScreenSaver: File exists"
+# meaning AFAIK Cinnamon screensaver had already registered with D-Bus and only one screensaver can do that
+# TODO fix the issue mentioned in line 1 of those block of comments
 file_contents='#!/bin/sh
 
 case $1 in
