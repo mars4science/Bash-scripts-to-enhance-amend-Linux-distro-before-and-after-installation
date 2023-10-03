@@ -35,12 +35,12 @@ while read -r line; do
 # printf "%s\n%s\n%s\n" $page $itext $otext
     if [ $(locate "/${page}." "${man_section}" gz | wc -l) -ne 1 ] ;  then
       echo "    ERROR: it seems locate cannot find unique gz archive of ${page} in ${man_section}, skipping"  | sudo tee --append "${amend_log}" # after adding "/" and "." to ${page} multiples are not expected to happen, only no one found
-      continue
+      continue # to next cycle of while
     fi
     man_page_gzip=$(locate "/${page}." "${man_section}" gz)
     if [ $(gzip --list "${man_page_gzip}" | wc -l) -ne 2 ] ; then
       echo "    ERROR: it seems ${man_page_gzip} contains more than 1 file, skipping"  | sudo tee --append "${amend_log}"
-      continue
+      continue # to next cycle of while
     fi
 
     man_page=$(gzip --list "${man_page_gzip}" | tail --lines=1 | awk '{print $4}')
@@ -53,17 +53,27 @@ while read -r line; do
     # grep --fixed-strings --quiet -- "${itext}" "${man_page}" # -- needed in case "${itext}" starts with "-"
     # after adding line breaks replaced grep with perl (as grep works with single lines)
     rtext="replaced_replaced_replaced"
+
     perl -s -0777 -p -e 's/\Q$itext\E/$otext/' -- -itext="${itext}" -otext="${rtext}" "${man_page}" | grep --fixed-strings --quiet -- "${rtext}"
 
     if [ $? -ne 0 ]; then
       echo "    ERROR: it seems ${man_page} does not contain: ${itext}"
-    else
-
-      # sudo sed --in-place "s|${itext}|${otext}|" "${man_page}"
-      sudo perl -s -0777 -pi -e 's/\Q$itext\E/$otext/' -- -itext="${itext}" -otext="${otext}" "${man_page}" # this is expected to work with meta characters (backslashes - escapes, etc); per what I've read perl expands variables in replacement once, so it is safe to have $ and @ in replacement variable (but writing $ / @ directily like s//$@/ is expected to result in interpreting symbols after $ / @ as variable names)
-
-      gzip -c "${man_page}" | 1>/dev/null sudo tee "${man_page_gzip}" # tee w/out --append deletes previous file
+      sudo rm "${man_page}"
+      continue # to next cycle of while
     fi
+
+    perl -s -0777 -p -e 's/\Q$itext\E/$otext/' -- -itext="${otext}" -otext="${rtext}" "${man_page}" | grep --fixed-strings --quiet -- "${rtext}"
+
+    if [ $? -ne 0 ]; then
+      echo "    ERROR: it seems ${man_page} already contains: ${otext}"
+      sudo rm "${man_page}"
+      continue # to next cycle of while
+    fi
+
+    # sudo sed --in-place "s|${itext}|${otext}|" "${man_page}"
+    sudo perl -s -0777 -pi -e 's/\Q$itext\E/$otext/' -- -itext="${itext}" -otext="${otext}" "${man_page}" # this is expected to work with meta characters (backslashes - escapes, etc); per what I've read perl expands variables in replacement once, so it is safe to have $ and @ in replacement variable (but writing $ / @ directily like s//$@/ is expected to result in interpreting symbols after $ / @ as variable names)
+
+    gzip -c "${man_page}" | 1>/dev/null sudo tee "${man_page_gzip}" # tee w/out --append deletes previous file
     sudo rm "${man_page}" # gzip can delete input file when decompressing, but seems to not do that when compressing, in the future error here might point for the fact gzip will have changed that
   fi
 done < "${man_pages_edits}"
