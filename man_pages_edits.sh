@@ -46,14 +46,20 @@ while read -r line; do
     man_page=$(gzip --list "${man_page_gzip}" | tail --lines=1 | awk '{print $4}')
     sudo gzip --keep --uncompress "${man_page_gzip}" # using --keep to keep input (original) file
 
-    # replace \n with line breaks
-    itext="$(printf "%s" "${itext}" | perl -p -e 's/\Q\n\E/\n/g')"
-    otext="$(printf "%s" "${otext}" | perl -p -e 's/\Q\n\E/\n/g')"
+    # replace \n with line breaks (Note: man bash: Command substitution...any trailing newlines deleted)
+    # itext="$(printf "%s" "${itext}" | perl -p -e 's/\Q\n\E/\n/g')"
+    # otext="$(printf "%s" "${otext}" | perl -p -e 's/\Q\n\E/\n/g')"
+    # using Pattern substitution (bash's specific) of Parameter Expansion keeps trailing newlines
+    itext="${itext//\\n/$'\n'}"
+    otext="${otext//\\n/$'\n'}"
+    # POSIX way could be to add something (e.g. ".") at the end of command substitution and then to remove it:
+    # output=$(cmd; ret=$?; echo .; exit "$ret")
+    # ret=$?
+    # output=${output%.})
 
     # grep --fixed-strings --quiet -- "${itext}" "${man_page}" # -- needed in case "${itext}" starts with "-"
     # after adding line breaks replaced grep with perl (as grep works with single lines)
     rtext="replaced_replaced_replaced"
-
     perl -s -0777 -p -e 's/\Q$itext\E/$otext/' -- -itext="${itext}" -otext="${rtext}" "${man_page}" | grep --fixed-strings --quiet -- "${rtext}"
 
     if [ $? -ne 0 ]; then
