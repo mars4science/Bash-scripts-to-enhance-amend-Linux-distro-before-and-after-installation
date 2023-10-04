@@ -12,10 +12,12 @@ if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)
 sudo perl -i -p0777 -e "s/nothing/percentage_time/" /usr/share/cinnamon/applets/power@cinnamon.org/settings-schema.json
 
 ## edit panel
+# [1] (but maybe running `glib-compile-schemas` at the end fixed [1])
 
 # editing either /usr/share/glib-2.0/schemas/org.cinnamon.gschema.xml or 10_cinnamon.gschema.override is expected to work, decided to work via override file.
 path_of_applets_to_activate="$software_path_root/cinnamon-applets/to_add_and_activate/"
 glib_schemas_location=/usr/share/glib-2.0/schemas
+schema_base_file="${glib_schemas_location}"/org.cinnamon.gschema.xml
 schema_override_file="${glib_schemas_location}"/10_cinnamon.gschema.override
 if [ ! -e "$schema_override_file" ]; then
     echo '[org.cinnamon]' | sudo tee "$schema_override_file" > /dev/null
@@ -23,19 +25,32 @@ fi
 
 to_add_via_sed="s/]/"
 qty_to_activate=0
+override_already_used=1 # false
 for d in "${path_of_applets_to_activate}"* ; do
     applet_UUID="$(basename ${d})"
-    to_add_via_sed="${to_add_via_sed}"", 'panel1:right:"$qty_to_activate":""${applet_UUID}""'"
-    ((qty_to_activate++))
+    grep "${applet_UUID}" "${schema_override_file}"
+    if [ $? -eq 0 ]; then
+        override_already_used=1
+    else
+        to_add_via_sed="${to_add_via_sed}"", 'panel1:right:"$qty_to_activate":""${applet_UUID}""'"
+        ((qty_to_activate++))
+    fi
 done
 to_add_via_sed="${to_add_via_sed}""]/"
 
 if [ $qty_to_activate -gt 0 ]; then
-    # [1]
-    changed_panel=`grep 'panel1:right:' /usr/share/glib-2.0/schemas/org.cinnamon.gschema.xml | perl -pe 's/ *.{1,2}default.//g' | perl -pe 's/(right:)([0-9]+)/$1.($2+'$qty_to_activate")/eg" | sed "${to_add_via_sed}"`
-# perl -pe "${to_add_via_...}"` - changed to sed as for perl @ symbol is for variables, along with $ (Cinnamon applet UUIDs are often in the form of notation like for e-mail: a@b.c)
+    if [ override_already_used -eq 1 ]; then # override not used
 
-    echo "enabled-applets=${changed_panel}" | sudo tee --append "${schema_override_file}" > /dev/null
+        # find needed line; remove "default." from beginning of the line; change positional numbers of applets to free room for new ones to be placed at the beginning (on the left); replacing closing bracket "]" with new applets and bracket
+        changed_panel=`grep 'panel1:right:' "${schema_base_file}" | perl -pe 's/ *.{1,2}default.//g' | perl -pe 's/(right:)([0-9]+)/$1.($2+'$qty_to_activate")/eg" | sed "${to_add_via_sed}"`
+    # perl -pe "${to_add_via_...}"` - changed to sed as for perl @ symbol is for variables, along with $ (Cinnamon applet UUIDs are often in the form of notation like for e-mail: a@b.c)
+
+        echo "enabled-applets=${changed_panel}" | sudo tee --append "${schema_override_file}" > /dev/null
+    else
+        changed_panel=`grep 'panel1:right:' "${schema_override_file}" | perl -pe 's/(right:)([0-9]+)/$1.($2+'$qty_to_activate")/eg" | sed "${to_add_via_sed}"`
+        sudo sed --in-place "s//${changed_panel}/" "${schema_override_file}"
+    fi
+
     sudo glib-compile-schemas "${glib_schemas_location}"
 fi
 
@@ -81,7 +96,7 @@ if [[ -e "$path_to_edit" ]]; then
     fi
 fi
 
-## change how dwww is executed (add check for apache status)
+## change how dwww is executed (add check for apache status) - after addding search keywords
 
 # add search keywords, comment and browser for Debian Documentation Browser
 path_to_edit=/usr/share/applications/dwww.desktop
