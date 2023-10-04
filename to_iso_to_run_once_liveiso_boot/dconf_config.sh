@@ -150,7 +150,7 @@ gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'cust
 # screen lock binding, TODO check if xscreensaver deamon is started when ISO is booted with its debs installed
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/name "'Screen lock'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/binding "['<Super><Alt>z']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/command "'sh -c \'xscreensaver-command -lock || xscreensaver-command -pref\''"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/command "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
 # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
