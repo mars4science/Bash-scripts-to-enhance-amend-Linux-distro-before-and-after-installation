@@ -101,7 +101,7 @@ echo "===== This line is after install code, next in a few seconds going to cont
 sleep 5 # pause n seconds
 
 # to be run after programs install
-$dir_name/tlp_config_battery.sh # TODO: fix for re-run: crontab again
+$dir_name/tlp_config_battery.sh
 $dir_name/upower_battery_config.sh # includes change critial battery level to take action
 $dir_name/change_default_apps_for_multimedia_files.sh # TODO: check whether safe for re-run
 $dir_name/mpv_config.sh

@@ -21,8 +21,10 @@ echo -e "[main]\nNetworkingEnabled=true\nWirelessEnabled=false\nWWANEnabled=fals
 echo "  done."
 # P.S. adding "rfkill.default_state=0" to kernel parameters during boot w/out having NetworkManager.state file as above did not disable wifi (but decided to add anyway maybe it will prevent wifi from turning on initially as kernel docs IIRC states kernel turns wireless devices on by default; TODO: check what actually happens)
 
+
 # --- notifies of low level of BAT0 once per crossing threshold ---
 
+# Note: seems crontab works for already logged in user (not during amending of liveISO)
 low_path=/home/$(id -un)/.cache/battery_level_low
 # if [ ! -d $config_path ]; then mkdir $config_path; fi
 
@@ -40,9 +42,15 @@ low_path=/home/$(id -un)/.cache/battery_level_low
 #       backslash (\), will be changed into newline characters, and all data after the first % will be sent to the command as standard input.  There is no  way
 #       to split a single command line onto multiple lines, like the shell's trailing "\".
 
-(crontab -l 2>/dev/null; echo '* * * * * if [ ! -f '$low_path' -a  $(upower --dump | sed -n '\''0,/percentage/p'\''| awk '\''/percentage:/ { print $2 }'\'' | sed '\''s/\%//'\'') -le 30 ]; then touch '$low_path' ; XDG_RUNTIME_DIR=/run/user/$(id -u) notify-send -u normal '\''Battery level low: 30\%'\''; fi') | crontab -
+# checking whether entries are already there
+crontab -l 2>/dev/null | grep 'upower --dump' 1>/dev/null
+if [ $? -ne 0 ]; then
 
-(crontab -l 2>/dev/null; echo '* * * * * if [ -f '$low_path' -a  $(upower --dump | sed -n '\''0,/percentage/p'\''| awk '\''/percentage:/ { print $2 }'\'' | sed '\''s/\%//'\'') -ge 31 ]; then rm '$low_path'; fi') | crontab -
+    (crontab -l 2>/dev/null; echo '* * * * * if [ ! -f '$low_path' -a  $(upower --dump | sed -n '\''0,/percentage/p'\''| awk '\''/percentage:/ { print $2 }'\'' | sed '\''s/\%//'\'') -le 30 ]; then touch '$low_path' ; XDG_RUNTIME_DIR=/run/user/$(id -u) notify-send -u normal '\''Battery level low: 30\%'\''; fi') | crontab -
+
+    (crontab -l 2>/dev/null; echo '* * * * * if [ -f '$low_path' -a  $(upower --dump | sed -n '\''0,/percentage/p'\''| awk '\''/percentage:/ { print $2 }'\'' | sed '\''s/\%//'\'') -ge 31 ]; then rm '$low_path'; fi') | crontab -
+
+fi
 
 # set charge threshholds now
 sudo tlp setcharge 65 70 BAT0
