@@ -11,12 +11,10 @@ if [ $? -ne 0 ]; then
 fi
 
 add_function(){
-    # remove previous version if in the file
-    sudo perl -0777 -pi -e "s/$1().*?export -f $1//sg" "${bashrc}" # sg modifiers for perl regex: g - global, replace more than once; s - makes "." cross line boundaries. "?" needed to make regex lazy, otherwise greedy: selects up to past occurence of "export -f", not first
+    # remove previous version if in the file; $'\n' is line break in bash (using $'\' notation)
+    sudo perl -0777 -pi -e "s/"$'\n'"$1().*?export -f $1"$'\n'$'\n'"//sg" "${bashrc}" # sg modifiers for perl regex: g - global, replace more than once; s - makes "." cross line boundaries. "?" needed to make regex lazy, otherwise greedy: selects up to past occurence of "export -f", not first
 
-    echo '' | 1>/dev/null sudo tee --append "${bashrc}"
-    echo "$1() {$2}; export -f $1" | 1>/dev/null sudo tee --append "${bashrc}"
-    echo '' | 1>/dev/null sudo tee --append "${bashrc}"
+    echo $'\n'"$1() {$2}; export -f $1"$'\n' | 1>/dev/null sudo tee --append "${bashrc}"
 }
 
 # useful info how eject works:
