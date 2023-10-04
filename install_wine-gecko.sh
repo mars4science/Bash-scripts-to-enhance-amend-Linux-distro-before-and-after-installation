@@ -7,7 +7,7 @@
 
 path_to_gecko="${software_path_root}/wine-gecko"
 # man bash -e file True if file exists
-if [ ! -e "$path_to_gecko" ]; then echo >&2 "wine-gecko path $path_to_gecko not found, exiting with error"; exit 1; fi
+if [ ! -e "$path_to_gecko" ]; then echo >&2 "wine-gecko: path $path_to_gecko where files to be copied were programmed to take from was not found, exiting with error"; exit 1; fi
 
 wine --version
 if [ $? -ne 0 ]; then echo "wine not found, exiting gecko install"; exit 1 ; fi
@@ -32,6 +32,9 @@ else
     path_to_install=/usr/share/wine/gecko # this is one of places wine searches for gecko regardless of folder where wine itself is
 fi
 
+# check if was added already, currently not programmed to replace
+if [ -e "${path_to_install}" ]; then echo "wine-gecko: path $path_to_install where files were programmed to be copied to already exists, exiting"; exit 2; fi
+
 # looks like where is no "wine" way to find out where wine configs are, so just put from experience with Linun Mint:
 
 # man bash
@@ -54,7 +57,7 @@ if [ $Eval5 -eq 0 ];then
     # below checks resuls of ? I guess, not errors on archive extract
     # if [ $? ];then echo "copied gecko to $path_to_install"; else echo "error: maybe NOT copied gecko to $path_to_install"; fi
     echo "copied (installed) gecko to $path_to_install"
-elif [ $Eval6 -eq 0 -o $Eval7 -eq 0 ];then # 6 mono is latest as of 2022/1/21
+elif [ $Eval6 -eq 0 -o $Eval7 -eq 0 ];then # 6 gecko is latest as of 2022/1/21
     sudo mkdir --parents $path_to_install
     find $path_to_gecko/6.0 -name '*.xz' -exec sudo tar --extract --warning=no-timestamp --warning=no-timestamp -f "{}" --atime-preserve --one-top-level="$path_to_install" \;
     # if [ $? ];then echo "copied gecko to $path_to_install"; else echo "error: maybe NOT copied gecko to $path_to_install"; fi
