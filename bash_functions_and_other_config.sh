@@ -2,7 +2,7 @@
 
 bashrc=/etc/bash.bashrc
 
-grep 'bash prompt, LM original and setting it' "${bashrc}"
+grep 'bash prompt, LM original and setting it' "${bashrc}" 1>/dev/null
 if [ $? -ne 0 ]; then
     echo '' | sudo tee --append $bashrc
     echo '# bash prompt, LM original and setting it'  | sudo tee --append $bashrc
@@ -12,11 +12,11 @@ fi
 
 add_function(){
     # remove previous version if in the file
-    sudo perl -0777 -pi -e "s/$1().*export -f $1//sg" "${bashrc}" # sg modifiers for perl regex: g - global, replace more than once; s - makes "." cross line boundaries
+    sudo perl -0777 -pi -e "s/$1().*?export -f $1//sg" "${bashrc}" # sg modifiers for perl regex: g - global, replace more than once; s - makes "." cross line boundaries. "?" needed to make regex lazy, otherwise greedy: selects up to past occurence of "export -f", not first
 
-    echo '' | sudo tee --append "${bashrc}"
-    echo "$1() {$2}; export -f $1" | sudo tee --append "${bashrc}"
-    echo '' | sudo tee --append "${bashrc}"
+    echo '' | 1>/dev/null sudo tee --append "${bashrc}"
+    echo "$1() {$2}; export -f $1" | 1>/dev/null sudo tee --append "${bashrc}"
+    echo '' | 1>/dev/null sudo tee --append "${bashrc}"
 }
 
 # useful info how eject works:
