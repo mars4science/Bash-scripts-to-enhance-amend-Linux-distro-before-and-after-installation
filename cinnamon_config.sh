@@ -60,9 +60,9 @@ fi
 path_to_edit=/usr/share/applications/libreoffice-calc.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=/Keywords=Tables;/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=.*/Tables;Accounting;Stats;OpenDocument Spreadsheet;Chart;Microsoft Excel;Microsoft Works;OpenOffice/' "$path_to_edit"
     else
-        echo -e '\nKeywords=Tables;' | sudo tee --append "$path_to_edit"
+        echo -e '\nKeywords=Tables;Accounting;Stats;OpenDocument Spreadsheet;Chart;Microsoft Excel;Microsoft Works;OpenOffice' | sudo tee --append "$path_to_edit"
     fi
 fi
 
@@ -70,9 +70,9 @@ fi
 path_to_edit=/usr/share/applications/virt-manager.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=/Keywords=Emulators;Virtualization;KVM;QEMU;/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=.*/Keywords=Emulators;Virtualization;KVM;QEMU;vmm/' "$path_to_edit"
     else
-        echo -e '\nKeywords=Emulators;Virtualization;KVM;QEMU;' | sudo tee --append "$path_to_edit"
+        echo -e '\nKeywords=Emulators;Virtualization;KVM;QEMU;vmm' | sudo tee --append "$path_to_edit"
     fi
 fi
 
@@ -80,9 +80,9 @@ fi
 path_to_edit=/usr/share/applications/kazam.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=/Keywords=capture;/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=.*/Keywords=capture;screenshot;screencast;videorecord;desktop recording/' "$path_to_edit"
     else
-        echo -e '\nKeywords=capture;record;video;screen;' | sudo tee --append "$path_to_edit"
+        echo -e '\nKeywords=capture;screenshot;screencast;videorecord;desktop recording' | sudo tee --append "$path_to_edit"
     fi
 fi
 
@@ -90,9 +90,9 @@ fi
 path_to_edit=/usr/share/applications/com.github.maoschanz.drawing.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=/Keywords=image;picture;photo;paint;draw;/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=.*/Keywords=image;picture;photo;paint;draw;Paint;Sketch;Pencil/' "$path_to_edit"
     else
-        echo -e '\nKeywords=image;picture;photo;' | sudo tee --append "$path_to_edit"
+        echo -e '\nKeywords=image;picture;photo;paint;draw;Paint;Sketch;Pencil' | sudo tee --append "$path_to_edit"
     fi
 fi
 
@@ -102,9 +102,9 @@ fi
 path_to_edit=/usr/share/applications/dwww.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=/Keywords=help;/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=.*/Keywords=help;documentation;information;manual/' "$path_to_edit"
     else
-        echo -e '\nKeywords=documentation;information;manual;help;' | sudo tee --append "$path_to_edit"
+        echo -e '\nKeywords=documentation;information;manual;help' | sudo tee --append "$path_to_edit"
     fi
 
     if [[ $(grep "^Comment" "$path_to_edit") ]]; then # true if grep finds

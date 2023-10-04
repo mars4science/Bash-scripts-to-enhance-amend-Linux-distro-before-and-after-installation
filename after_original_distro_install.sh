@@ -86,7 +86,7 @@ $dir_name/to_iso_to_run_once_liveiso_boot/add_ramdisk_and_ramcache.sh
 
 $dir_name/disable_swap.sh
 $dir_name/display_backlight_control_setup.sh
-$dir_name/bash_functions_and_other_config.sh # TODO: fix of: will add again and again if run again
+$dir_name/bash_functions_and_other_config.sh # TODO: fix for re-run: will add again and again if run again
 
 # enable packet forwarding for IPv4, IPv6
 $dir_name/networking_tweaks.sh
@@ -101,7 +101,7 @@ echo "===== This line is after install code, next in a few seconds going to cont
 sleep 5 # pause n seconds
 
 # to be run after programs install
-$dir_name/tlp_config_battery.sh # TODO: fix of: crontab again
+$dir_name/tlp_config_battery.sh # TODO: fix for re-run: crontab again
 $dir_name/upower_battery_config.sh # includes change critial battery level to take action
 $dir_name/change_default_apps_for_multimedia_files.sh # TODO: check whether safe for re-run
 $dir_name/mpv_config.sh
@@ -120,7 +120,7 @@ $dir_name/y_tube.sh install
 
 # add applets/desklets software to Cinnamon
 $dir_name/cinnamon_add_software.sh
-$dir_name/cinnamon_config.sh # TODO: make re-runnable
+$dir_name/cinnamon_config.sh
 
 # copy additional color profiles
 sudo cp "${software_path_root}/color-profiles/"* /usr/share/color/icc/colord
