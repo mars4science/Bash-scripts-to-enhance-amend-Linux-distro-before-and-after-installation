@@ -27,22 +27,3 @@ if [ -e /home/$(id -u -n)/.profile ]; then
     echo "mount /home/$(id -u -n)/.cache" >> /home/$(id -u -n)/.profile
     echo '' >> /home/$(id -u -n)/.profile
 fi
-
-# ----- BOOKMARKS ----- #
-
-autostart_dir=/home/$(id -u -n)/.config/autostart
-mkdir --parents $autostart_dir
-
-# file created by GUI had Name[en_US] but no Name w/out locale, so in other system language interface boot it was not run
-tee $autostart_dir/nemo.bookmarks.add.desktop << EOF
-[Desktop Entry]
-Name=bookmarks-add-to-nemo
-Comment=No description
-Type=Application
-Exec=liveiso_path_scripts_root/user_bookmarks_add.sh
-X-GNOME-Autostart-enabled=true
-NoDisplay=false
-Hidden=false
-X-GNOME-Autostart-Delay=0
-EOF
-
