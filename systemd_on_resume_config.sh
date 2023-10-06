@@ -10,6 +10,8 @@ if [ ! -e "${liveiso_path_scripts_root}" ] ; then liveiso_path_scripts_root=/usr
 folder_for_code_to_run_on_suspend="/lib/systemd/system-sleep/"
 
 add_file_to_systemd_system-sleep () {
+
+    file_fully_qualified_name="${folder_for_code_to_run_on_suspend}/${file_name}"
     if [ -e "$file_fully_qualified_name" ];then 
         1>&2 echo -e "$file_fully_qualified_name exists, next is programmed not to add\n\n$file_contents\n\nto code potentially to be run via systemd suspend/resume"
     else
@@ -18,6 +20,7 @@ add_file_to_systemd_system-sleep () {
         sudo chmod a+x "$file_fully_qualified_name"
     fi
 }
+
 
 # reset trackpoint if stops working after suspend (happens on some ThinkPads)
 # decided to use keyboard binding later - key) not post) - as only some models need that
@@ -34,8 +37,6 @@ case $1 in
 esac'
 
 file_name=trackpoint_reset
-file_fully_qualified_name="${folder_for_code_to_run_on_suspend}/${file_name}"
-
 add_file_to_systemd_system-sleep
 
 
@@ -93,8 +94,6 @@ case $1 in
 esac'
 
 file_name=xscreensaver_lock_screen
-file_fully_qualified_name="${folder_for_code_to_run_on_suspend}/${file_name}"
-
 add_file_to_systemd_system-sleep
 
 
@@ -110,7 +109,5 @@ case $1 in
 esac'
 
 file_name=suspended_datetime
-file_fully_qualified_name="${folder_for_code_to_run_on_suspend}/${file_name}"
-
 add_file_to_systemd_system-sleep
 
