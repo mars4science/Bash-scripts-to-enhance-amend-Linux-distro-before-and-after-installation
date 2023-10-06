@@ -1,5 +1,5 @@
 #!/bin/bash
-# copy configs that set upload speed limit and seeding limits.
+# copy xscreensaver config file
 
 # if current user is root (e.g. chrooted duriong liveUSB creation), then ~ would exist, but not /home/$(id -u -n)
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
