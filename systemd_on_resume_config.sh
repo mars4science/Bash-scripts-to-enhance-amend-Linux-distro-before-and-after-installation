@@ -81,21 +81,24 @@ fi
 
 # to activate screensaver before suspend to try to get rid of image of the workspace displayed for a moment after resume
 # Edit: did not work
-# manually running xscreensaver-systemd resulted in "failed to connect as org.freedesktop.ScreenSaver: File exists"
+#
+# Trying another (seemingly advised by man pages of xscreensaver): manually running xscreensaver-systemd resulted in "failed to connect as org.freedesktop.ScreenSaver: File exists"
 # meaning AFAIK Cinnamon screensaver had already registered with D-Bus and only one screensaver can do that
 # TODO fix the issue mentioned in line 1 of those block of comments
-file_contents='#!/bin/sh
 
-case $1 in
-  pre)
-    xscreensaver-command -suspend
-    ;;
-  post) ;;
-esac'
-
-file_name=xscreensaver_lock_screen
-add_file_to_systemd_system-sleep
-
+# Seems running via systemd service with Before=systemd-suspend.service works, so comment out here:
+#file_contents='#!/bin/sh
+#
+#case $1 in
+#  pre)
+#    xscreensaver-command -suspend
+#    ;;
+#  post) ;;
+#esac'
+#
+#file_name=xscreensaver_lock_screen
+#add_file_to_systemd_system-sleep
+#
 
 # to save datetime of suspend to check duration of suspend/sleep later
 file_contents='#!/bin/sh
@@ -110,4 +113,3 @@ esac'
 
 file_name=suspended_datetime
 add_file_to_systemd_system-sleep
-
