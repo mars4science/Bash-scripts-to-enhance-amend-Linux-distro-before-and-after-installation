@@ -60,18 +60,18 @@ while read -r line; do
     # grep --fixed-strings --quiet -- "${itext}" "${man_page}" # -- needed in case "${itext}" starts with "-"
     # after adding line breaks replaced grep with perl (as grep works with single lines)
     rtext="replaced_replaced_replaced"
-    perl -s -0777 -p -e 's/\Q$itext\E/$otext/' -- -itext="${itext}" -otext="${rtext}" "${man_page}" | grep --fixed-strings --quiet -- "${rtext}"
+    perl -s -0777 -p -e 's/\Q$itext\E/$otext/' -- -itext="${otext}" -otext="${rtext}" "${man_page}" | grep --fixed-strings --quiet -- "${rtext}"
 
-    if [ $? -ne 0 ]; then
-      echo "    ERROR: it seems ${man_page} does not contain: ${itext}"
+    if [ $? -eq 0 ]; then
+      echo "    WARNING: it seems ${man_page} already contains: ${otext}"
       sudo rm "${man_page}"
       continue # to next cycle of while
     fi
 
-    perl -s -0777 -p -e 's/\Q$itext\E/$otext/' -- -itext="${otext}" -otext="${rtext}" "${man_page}" | grep --fixed-strings --quiet -- "${rtext}"
+    perl -s -0777 -p -e 's/\Q$itext\E/$otext/' -- -itext="${itext}" -otext="${rtext}" "${man_page}" | grep --fixed-strings --quiet -- "${rtext}"
 
     if [ $? -ne 0 ]; then
-      echo "    ERROR: it seems ${man_page} already contains: ${otext}"
+      echo "    ERROR: it seems ${man_page} does not contain: ${itext}"
       sudo rm "${man_page}"
       continue # to next cycle of while
     fi
