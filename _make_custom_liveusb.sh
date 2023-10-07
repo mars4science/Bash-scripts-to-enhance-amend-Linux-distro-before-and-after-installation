@@ -23,8 +23,7 @@ change_initramfs="true" # set to true to change early boot envinonment, now chan
 user_name=somebody # in case of change_initramfs=true put arbitrary name to set for user, in case of "false" put user name as set in the distro (used in run_at_boot_liveusb.sh - custom init script and systemd_to_run_as_user.sh - run as user during boot)
 
 # array, list separated by space; correct syntax of each entry can be found in /etc/locale.gen (languagecode_COUNTRYCODE); used to generate locales, set keyboard layouts available for switching
-# first in array also used to set system interface language, set to empty () for not doing locales changes
-locales=("fr_FR" "en_US" "de_DE")
+locales=("fr_FR" "en_US" "de_DE") # first in array also used to set system interface language; set to empty () for not doing locales changes (so for liveISO layouts will be default - Eng only, as layouts are set via amended to that setting script during boot time)
 
 # as after_original_distro_install.sh to be run in chrooted environment there is code to map (via mount) software_path_root to  path_to_software_in_chroot - where above mentioned script is written to look for software
 path_to_software_in_chroot="/tmp/path_for_mount_to_add_software_to_liveiso"
@@ -54,16 +53,18 @@ change_squash() {
     settings_to_copy_to="$work_path/fin_sq"$liveiso_path_settings_in_chroot
 
     if [ -e $scripts_to_copy_to ]; then
-        echo path for scripts exists, suspect possible collision. exiting...
-        echo run script again and type d to delete contents within working files, then Ctrl-C when asked for interactive
-        exit 1
+        echo "  WARNING: path for scripts to run during liveISO boot exists, suspect possible collision, removing scripts there..."
+        sudo rm --force "${scripts_to_copy_to}"/*.sh
+#        echo path for scripts exists, suspect possible collision. exiting...
+#        echo run script again and type d to delete contents within working files, then Ctrl-C when asked for interactive
+#        exit 1
     else
         sudo mkdir $scripts_to_copy_to
     fi
     if [ -e $settings_to_copy_to ]; then
-        echo path for settings exists, suspect possible collision. exiting...
-        echo run script again and type d to delete contents within working files, then Ctrl-C when asked for interactive
-        exit 1
+        echo "  WARNING: path for settings exists, suspect possible collision..."
+#        echo run script again and type d to delete contents within working files, then Ctrl-C when asked for interactive
+#        exit 1
     else
         sudo mkdir $settings_to_copy_to
     fi
