@@ -30,6 +30,12 @@ if [ ! -f "$link_path" ]; then
     exit 0
 fi
 
+# check if run by ordinary user
+if [ "$(id -u -n)" = "root" ]; then
+    echo "  WARNING: Check indicates $0 is being run by '$(id -u -n)', possibly due to being run during live ISO amendment of ISO already containing the additional browser files"
+    exit 0
+fi
+
 # delete previous run
 if [ -d "$run_path" ]; then rm --recursive "$run_path"/*; fi
 
