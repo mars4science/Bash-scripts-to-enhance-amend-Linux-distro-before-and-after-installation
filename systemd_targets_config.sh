@@ -8,7 +8,7 @@ add_service(){
     service_file_fully_qualified_name=/lib/systemd/system/$service_file_name
 
     if [ -e "$service_file_fully_qualified_name" ];then
-        1>&2 echo "  $service_file_fully_qualified_name exists, the script had been programmed NOT to replace"
+        1>&2 echo "  WARNING: $service_file_fully_qualified_name exists, the script had been programmed NOT to replace"
     else
         # /dev/null not to output to terminal
         echo "$service_file_contents" | 1>/dev/null sudo tee "$service_file_fully_qualified_name"

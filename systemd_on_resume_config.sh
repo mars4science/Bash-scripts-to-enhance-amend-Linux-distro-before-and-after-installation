@@ -13,7 +13,7 @@ add_file_to_systemd_system-sleep () {
 
     file_fully_qualified_name="${folder_for_code_to_run_on_suspend}/${file_name}"
     if [ -e "$file_fully_qualified_name" ];then 
-        1>&2 echo -e "$file_fully_qualified_name exists, next is programmed not to add\n\n$file_contents\n\nto code potentially to be run via systemd suspend/resume"
+        1>&2 echo -e "\n  WARNING: $file_fully_qualified_name exists, next is programmed NOT to add\n$file_contents\n  to code potentially to be run via systemd suspend/resume\n"
     else
         # /dev/null not to output to terminal
         echo "$file_contents" | 1>/dev/null sudo tee "$file_fully_qualified_name"
@@ -46,7 +46,7 @@ file_name=scaling_factor
 file_fully_qualified_name="${folder_for_code_to_run_on_suspend}/${file_name}"
 
 if [ -e "$file_fully_qualified_name" ];then
-    1>&2 echo "$file_fully_qualified_name exists, next is programmed not to configure code to run on resume for dconf scaling-factor issue fix"
+    1>&2 echo "  WARNING: $file_fully_qualified_name exists, next is programmed not to configure code to run on resume for dconf scaling-factor issue fix (as probably configured already)"
 else
     # /dev/null not to output to terminal
     # EOF is quoted to prevend expansion/substitution
