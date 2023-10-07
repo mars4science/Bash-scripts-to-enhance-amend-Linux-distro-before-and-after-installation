@@ -14,7 +14,7 @@ add_line (){
   if [ $? -ne 0 ]; then
     echo "$1" | sudo tee --append "${file_fully_qualified_name}"
   else
-    sudo sed --in-place -- "s/^$line_beginning.*/$1/" "${file_fully_qualified_name}" # no meta characters expected in fstab enties to add
+    sudo sed --in-place -- "s|^$line_beginning.*|$1|" "${file_fully_qualified_name}" # no meta characters expected in fstab enties to add
   fi
 }
 
@@ -38,6 +38,7 @@ add_line '/dev/zram1 none swap 0 0'
 # if home is encrypted, that entry is fstab would be overwritten when 
 # encryptfs is initialized: systemd: "Reached target Local Encrypted Volumes"
 # therefore using noauto in /etc//fstab and mounting in user .profile file.
+# when run during liveISO amendment, user is root and so line is not added as somilar to one above for root
 add_line 'tmpfs /home/'$(id -u -n)'/.cache tmpfs size=5%,noauto,user,noatime 0 0'
 
 # add noatime, then access time not changed on access, saving SSD, even if timestamp of access is older then 1 day (man mount
