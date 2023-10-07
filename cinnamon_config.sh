@@ -28,7 +28,7 @@ qty_to_activate=0
 override_already_used=1 # false
 for d in "${path_of_applets_to_activate}"* ; do
     applet_UUID="$(basename ${d})"
-    grep "${applet_UUID}" "${schema_override_file}"
+    grep --quiet -- "${applet_UUID}" "${schema_override_file}"
     if [ $? -eq 0 ]; then
         override_already_used=1
     else
@@ -38,8 +38,8 @@ for d in "${path_of_applets_to_activate}"* ; do
 done
 to_add_via_sed="${to_add_via_sed}""]/"
 
-if [ $qty_to_activate -gt 0 ]; then
-    if [ override_already_used -eq 1 ]; then # override not used
+if [ "${qty_to_activate}" -gt 0 ]; then
+    if [ "${override_already_used}" -eq 1 ]; then # override not used
 
         # find needed line; remove "default." from beginning of the line; change positional numbers of applets to free room for new ones to be placed at the beginning (on the left); replacing closing bracket "]" with new applets and bracket
         changed_panel=`grep 'panel1:right:' "${schema_base_file}" | perl -pe 's/ *.{1,2}default.//g' | perl -pe 's/(right:)([0-9]+)/$1.($2+'$qty_to_activate")/eg" | sed "${to_add_via_sed}"`
