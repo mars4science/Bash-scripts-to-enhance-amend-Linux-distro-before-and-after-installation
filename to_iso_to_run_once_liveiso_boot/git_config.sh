@@ -9,4 +9,4 @@ git config --global color.diff.old yellow
 git config --global color.interactive.error "red white" # "foreground background"
 git config --global color.push.error "red white"
 git config --global color.remote.error "red white"
-
+git config --global color.status.untracked "red white"
