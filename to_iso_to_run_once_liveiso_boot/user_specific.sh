@@ -1,5 +1,5 @@
 #!/bin/bash
-# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
+# trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
 # to run those scripts after liveUSB boot that are user specific (set to run by systemd on boot WantedBy=multi-user.target)
 # as casper scripts in initrd are not edited yet

@@ -1,5 +1,5 @@
 #!/bin/bash
-trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
+trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
 echo Configuring zram disk
 sudo modprobe zram num_devices=2 # use `modprobe -r` to turn zram off (after umount zramdisk)

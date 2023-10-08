@@ -1,6 +1,6 @@
 #!/bin/bash
 # tested for Brave browser downloaded archive 
-# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
+# trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
 run_path=/media/ramdisk/w_browser
 #link_path="$(get_software_path.sh)"/$(ls --sort=time "$(get_software_path.sh)" | grep w_browser | head --lines=1)

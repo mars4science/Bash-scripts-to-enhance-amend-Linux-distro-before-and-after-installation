@@ -1,5 +1,5 @@
 #!/bin/bash
-# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; sleep 10; exit $err' ERR
+# trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; sleep 10; exit $err' ERR
 
 # code mentioned in lauchpad bug 1791427 (for X1 carbon gen 6 with NFC to fix non working after resume trackpoint), do not know how to check for PC model, seems now do not cause problems if run for others
 # TODO test if fixes the issue if run on resume as programmed here (works if run manually after full wake up)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # script does one task, makes sense to abort if fails
-trap 'err=$?; echo >&2 "Exiting $0 on error $err"; sleep 10; exit $err' ERR
+trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; sleep 10; exit $err' ERR
 
 # install scripts etc. to:
 default_local_software_path=/usr/local/bin

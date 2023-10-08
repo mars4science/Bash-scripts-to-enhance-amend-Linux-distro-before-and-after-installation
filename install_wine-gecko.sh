@@ -2,7 +2,7 @@
 
 # https://unix.stackexchange.com/questions/97101/how-to-catch-an-error-in-a-linux-bash-script/254675
 # you can specify a command that's executed in case a command returns a nonzero status, with the ERR trap, 
-# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
+# trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 # here non-zero status is processed other way
 
 path_to_gecko="${software_path_root}/wine-gecko"

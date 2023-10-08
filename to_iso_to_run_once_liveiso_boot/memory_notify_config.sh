@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
+trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
 # https://stackoverflow.com/questions/4880290/how-do-i-create-a-crontab-through-a-script
 

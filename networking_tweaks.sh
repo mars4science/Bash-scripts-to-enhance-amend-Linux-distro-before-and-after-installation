@@ -1,5 +1,5 @@
 #!/bin/bash
-trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
+trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
 # for future use
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi

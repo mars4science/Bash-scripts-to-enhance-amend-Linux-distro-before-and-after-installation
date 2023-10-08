@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
+# trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
 # system wide
 # /etc/gnome/defaults.list does not see to effect anything, if others are emptied, its contents did not show in Nemo

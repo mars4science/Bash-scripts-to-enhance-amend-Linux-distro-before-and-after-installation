@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
+trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
 # adding bookmarks to Nemo is programmed based on try-and-error and https://forums.linuxmint.com/viewtopic.php?t=170398
 bookmarks_file=/home/$(id -u -n)/.config/gtk-3.0/bookmarks

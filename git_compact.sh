@@ -7,7 +7,7 @@
 # git config --bool core.bare false
 # git checkout anybranch
 
-trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
+trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
 # https://stackoverflow.com/questions/20348097/bash-extract-string-before-a-colon
 # why is this link here?
