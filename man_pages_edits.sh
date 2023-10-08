@@ -71,7 +71,7 @@ while read -r line; do
     perl -s -0777 -p -e 's/\Q$itext\E/$otext/' -- -itext="${itext}" -otext="${rtext}" "${man_page}" | grep --fixed-strings --quiet -- "${rtext}"
 
     if [ $? -ne 0 ]; then
-      echo "    ERROR: it seems ${man_page} does not contain: ${itext}"
+      echo "    ERROR: it seems ${man_page} does not contain: ${itext}" | sudo tee --append "${amend_log}"
       sudo rm "${man_page}"
       continue # to next cycle of while
     fi
