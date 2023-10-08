@@ -20,18 +20,20 @@ glib_schemas_location=/usr/share/glib-2.0/schemas
 schema_base_file="${glib_schemas_location}"/org.cinnamon.gschema.xml
 schema_override_file="${glib_schemas_location}"/10_cinnamon.gschema.override
 if [ ! -e "$schema_override_file" ]; then
-    echo '[org.cinnamon]' | sudo tee "$schema_override_file" > /dev/null
+    echo '[org.cinnamon]' | sudo tee "${schema_override_file}" > /dev/null
+    override_already_used=1 # false
+elif [ -n "$(grep "enabled-applets=" "${schema_override_file}")" ]; then # -n string: True if the length of string is non-zero.
+    override_already_used=0 # true
+else
+    override_already_used=1 # false
 fi
 
 to_add_via_sed="s/]/"
 qty_to_activate=0
-override_already_used=1 # false
 for d in "${path_of_applets_to_activate}"* ; do
     applet_UUID="$(basename ${d})"
     grep --quiet -- "${applet_UUID}" "${schema_override_file}"
-    if [ $? -eq 0 ]; then
-        override_already_used=1
-    else
+    if [ $? -ne 0 ]; then
         to_add_via_sed="${to_add_via_sed}"", 'panel1:right:"$qty_to_activate":""${applet_UUID}""'"
         ((qty_to_activate++))
     fi
@@ -48,7 +50,7 @@ if [ "${qty_to_activate}" -gt 0 ]; then
         echo "enabled-applets=${changed_panel}" | sudo tee --append "${schema_override_file}" > /dev/null
     else
         changed_panel=`grep 'panel1:right:' "${schema_override_file}" | perl -pe 's/(right:)([0-9]+)/$1.($2+'$qty_to_activate")/eg" | sed "${to_add_via_sed}"`
-        sudo sed --in-place "s//${changed_panel}/" "${schema_override_file}"
+        sudo sed --in-place "s/enabled-applets=.*/${changed_panel}/" "${schema_override_file}"
     fi
 
     sudo glib-compile-schemas "${glib_schemas_location}"
