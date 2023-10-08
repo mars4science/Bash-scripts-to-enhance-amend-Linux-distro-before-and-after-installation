@@ -3,7 +3,7 @@
 # to download all branches
 # https://stackoverflow.com/questions/67699/how-to-clone-all-remote-branches-in-git/7216269#7216269
 
-trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
 
 # for "install" and "update" arguments
 source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh

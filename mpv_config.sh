@@ -1,7 +1,7 @@
 #!/bin/bash
 # adds config items to customize mpv - e.g. subtitles look, runtime key bindings
 
-# trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
 
 mpv_conf_folder="/etc/mpv/"
 if [ ! -e "${mpv_conf_folder}" ] ; then

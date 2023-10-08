@@ -1,5 +1,5 @@
 #!/bin/bash
-# trap 'err=$?; echo >&2 "Exiting on error $err"; sleep 10; exit $err' ERR
+# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; sleep 10; exit $err' ERR
 
 # initialy was developed to apply changes after install of GNU/Linux, later used during alteration of liveUSB iso
 # TODO separate into system wide and user specific scripts (user specific be run for each user)

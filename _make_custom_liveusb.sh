@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# trap 'err=$?; echo >&2 "Exiting on error $err"; sleep 10; exit $err' ERR
+# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; sleep 10; exit $err' ERR
 
 # ---- auto script  ----- #
 # ---- manual way is after auto script (note: manual outdated, auto up-to-date)  ----- #

@@ -5,7 +5,7 @@
 
 # TODO add code to add restored tabs to new profile (interesting how to abnormally terminate not default profile - start firefox with it?)
 
-# trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
 
 # where from to get data
 backups_path=/media/$(id -un)/usb

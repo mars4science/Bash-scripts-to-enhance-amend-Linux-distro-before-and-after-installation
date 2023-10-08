@@ -1,6 +1,6 @@
 #!/bin/bash
 # thinkpad specific
-trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
 
 # https://askubuntu.com/questions/92794/how-to-change-critically-low-battery-value
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
 
 sudo -i --user=mint bash <<-EOF
     exec dbus-run-session -- bash liveiso_path_scripts_root/user_specific.sh

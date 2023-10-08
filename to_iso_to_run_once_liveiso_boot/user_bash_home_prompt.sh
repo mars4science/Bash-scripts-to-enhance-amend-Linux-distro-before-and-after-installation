@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
 
 # ----- BASH ----- #
 

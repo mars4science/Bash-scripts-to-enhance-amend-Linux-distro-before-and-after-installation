@@ -1,5 +1,7 @@
 #!/bin/bash
-trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
+
+fasfa
 
 # add ramdisk for work and make link to it from use home
 # make cache reside in RAM

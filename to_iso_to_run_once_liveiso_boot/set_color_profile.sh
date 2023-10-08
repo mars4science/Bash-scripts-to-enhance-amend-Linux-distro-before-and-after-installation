@@ -1,5 +1,5 @@
 #!/bin/bash
-# trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
 
 # TODO to check if color profile could be set for display not yet connected 
 # run manually only for T480s with specific panel to set downloaded profile (that was programmed to be copied to /usr/share/color/icc/colord

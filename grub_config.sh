@@ -2,7 +2,7 @@
 
 # to be run adter run_at_boot_config.sh
 
-trap 'err=$?; echo >&2 "Exiting on error $err"; exit $err' ERR
+trap 'err=$?; echo >&2 "Exiting $0 on error $err"; exit $err' ERR
 
 # man sed:
 #  -E, -r, --regexp-extended

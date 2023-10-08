@@ -1,5 +1,5 @@
 #!/bin/bash
-# trap 'err=$?; echo >&2 "Exiting on error $err"; sleep 10; exit $err' ERR
+# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; sleep 10; exit $err' ERR
 
 # dbus-run-session needs to be used to run the script (to write to dconf database) before user login, for liveUSB the script is run from systemd_to_run_as_user.sh [1]
 

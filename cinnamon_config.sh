@@ -1,5 +1,5 @@
 #!/bin/bash
-# trap 'err=$?; echo >&2 "Exiting on error $err"; sleep 10; exit $err' ERR
+# trap 'err=$?; echo >&2 "Exiting $0 on error $err"; sleep 10; exit $err' ERR
 
 # here change setting not particular to each user (as opposed to e.g. dconf settings, which AFAIK need to be run for each user - IIRC I have not found a way to change system-wide defaults).
 
