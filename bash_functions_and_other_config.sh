@@ -37,20 +37,67 @@ add_function(){
 # for awk '' are needed cause $1 is awk notation, if "" than would be expanded by the shell
 
 add_function 'e_ject' '
-    dev=$(mount | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')
-    echo $dev | grep " " # check if space is present, then two or more lines were selected
-    if [ $? -eq 0 ]; then echo "Two or more mounts matched, please pass more specific parameter"; return; fi
-    if [ -z $dev ]; then echo "No mounts contaning phrase [$1] found"; return; fi
-    2>/dev/null eject $dev;
-    i=1
-    for (( ; i < 10; i++ )); do
-        if [ -z $(mount | grep --ignore-case "$1" | awk '\''{ print $1 }'\'') ]; then
-            udisksctl power-off -b $dev;
-            return
+
+    attempts=5
+
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Code for powering off removable block device (e.g. USB stick), takes as parameter string to match for mount points and/or block devices"
+        return 0
+    fi
+
+    mounts="$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep --ignore-case "$1" | wc -l)"
+    if [ "${mounts}" -ge 2 ]; then echo "ERROR: Two or more block devices matched, please pass more specific parameter"; return 1; fi
+    if [ "${mounts}" -eq 0 ]; then echo "ERROR: No block devices contaning phrase [$1] found"; return 1; fi
+    dev_name="$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    dev_path="$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep --ignore-case "$1" | awk '\''{ print $2 }'\'')"
+    dev_mount="$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep --ignore-case "$1" | awk '\''{ print $3 }'\'')"
+
+    # unmounting
+    for (( i=1; i < ${attempts}; i++ )); do
+        if [ -n "$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep "${dev_path}" | awk '\''{print $3}'\'')"  ] ; then # dev_path seems unique, dev_mount can be empty already
+            umount "${dev_mount}" && echo "${dev_mount} unmounted" && break
+        else
+            echo "${dev_path} not mounted"; break
         fi
         sleep 1
     done
-    echo "Takes long to unmount, had not attempted to power off"
+    if [ $i -eq ${attempts} ]; then
+        >&2 echo "ERROR: Takes long to unmount, seems NOT unmounted, had not attempted to power off"
+        return 1
+    fi
+
+    # unlocking luks
+    for (( i=1; i < ${attempts}; i++ )); do
+        if [ "$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep "${dev_path}" | grep --quiet --ignore-case "luks"; echo $?)" -eq 0 ]; then
+            dev="${dev_name}" # as for luks PKNAME contains partition name whereas for non-luks PKNAME contains whole device, PATH contains partition
+            udisksctl lock --block-device "${dev_name}" && break # no need for sudo, instead of: sudo cryptsetup close "${dev_path}"
+        else
+            dev="${dev_path}"
+            echo "${dev_path} not locked"
+            break
+        fi
+        sleep 1
+    done
+    if [ $i -eq ${attempts} ]; then
+        >&2 echo "ERROR: Takes long to lock luks device ${dev_name}, seems unmounted but still locked, had not attempted to power off"
+        return 1
+    fi
+
+    # powering off
+    eject $"${dev}" 2>/dev/null ; # does not seem to work lately but left just in case
+
+    for (( i=1; i < ${attempts}; i++ )); do
+        if [ -n "$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep "${dev}")" ]; then
+            msg=$(udisksctl power-off --block-device "${dev}" 2>&1) && echo "${dev} powered off" && return 0
+            if [ -n "$(echo "${msg}" | grep "No usb device")" ]; then
+                >&2 echo "ERROR: ${msg}, seems unmounted but powering off failed"
+                return 1
+            fi
+        fi
+        sleep 1
+    done
+    >&2 echo "ERROR: Takes long to power off, seems unmounted but powering off failed"
+    return 1
 '
 
 # command to remount ro
