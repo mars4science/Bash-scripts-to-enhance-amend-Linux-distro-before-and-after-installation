@@ -109,6 +109,7 @@ echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{p
 echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate inverted' | sudo tee $(get_install_path.sh)/display_rotate_inverted.sh
 sudo chmod a+rx $(get_install_path.sh)/display_rotate_normal.sh $(get_install_path.sh)/display_rotate_left.sh $(get_install_path.sh)/display_rotate_right.sh $(get_install_path.sh)/display_rotate_inverted.sh
 
+#
 ##### beginning of keyboard bindings #####
 
 # after custom binding is changed, noted that `gsettings get org.cinnamon.desktop.keybindings custom-list` output reverses from cusmomMAX to dummy and back, so in the script added that after each key assignments. It worked with only one reverse after all assignments in LM 20.2, but resluted in some keys not working in LM 21. With reverse after each key seems working in LM 21.
@@ -135,6 +136,18 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/binding
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'display_rotate_inverted.sh'"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3']"
 
+# set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/name "'Volume Up'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/binding "['<Alt>AudioRaiseVolume']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/command "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'"
+gsettings set org.cinnamon.desktop.keybindings custom-list "['custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
+
+# set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/name "'Volume Down'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/binding "['<Alt>AudioLowerVolume']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/command "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'"
+gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5']"
+
 # fix TrackPoint issue om carbon X1 gen 6
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/name "'TrackPoint X1G6 fix'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/binding "['<Super><Alt>t']"
@@ -152,18 +165,6 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/name "'
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/binding "['<Super><Alt>z']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/command "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
-
-# set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/name "'Volume Up'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/binding "['<Alt>AudioRaiseVolume']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/command "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
-
-# set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/name "'Volume Down'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/binding "['<Alt>AudioLowerVolume']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/command "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5']"
 
 # set custom monitor brightness adjustments
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/name "'Brightness up'"
@@ -184,12 +185,12 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/comman
 gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11']"
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/name "'Air fan(s) off'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/binding "['<Super><Alt>z']" # "['MonBrightnessDown']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/binding "['<Super><Alt>x']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/command "'stopfan'"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom12', 'custom11', 'custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
 ##### end of keyboard bindings #####
-
+#
 
 # additional shortcuts for working with windows
 # <Primary> was Ctrl on some thinkpad
