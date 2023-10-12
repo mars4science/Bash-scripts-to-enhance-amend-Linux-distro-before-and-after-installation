@@ -2,41 +2,57 @@
 
 # change label, original ISO file, keyboard layout languages, add bash fuctions and prepare for reduced set of debs to install (note: symbolic linking does not work on exFAT)
 
-# place in parent location of folder with scripts, edit, check path to debs and run
+# edit, check path to debs and run from repo's folder
 
 # comment out NOT to change those
-software_path_root="/media/ramdisk/LM"
-distro_label="GNU-Linux_1.70_b21"
-original_iso='${software_path_root}/GNU-Linux_1.68_b21.iso' # ' here as contains $
+software_path_root="/media/data/LM"
+distro_label="GNU-Linux_1.1_b21"
+original_iso='${software_path_root}/linuxmint-21-cinnamon-64bit.iso' # ' here as contains $
+locales='("en_US" "fr_FR")' # note: string here whereas array in the file to edit
+
+# ----------------------------------------------------------- #
+
+script_path="$(dirname "$(realpath "$0")")" # need to read $0 before folder change via `cd` later as `realpath` just substitutes "." (if script started from where located via ./script_name) with current folder
 
 change_variable(){
     par="$1" # needed for using "an exclamation point (!)" to introduce "a level of indirection" (see man bash). '!$1' does not work because positional parameter is just number w/out '$' however indirection uses variable name and number is not valid variable name
     if [ "x${!par}" != "x" ] ; then sed -i 's|^'"${par}"'=.*#|'"${par}"'="'"${!par}"'" #|' "${file_to_change}";fi
 }
 
-file_to_change=./"Scripts_git-remote/_make_custom_liveusb.sh"
+file_to_change="_make_custom_liveusb.sh"
 change_variable software_path_root
 change_variable distro_label
 change_variable original_iso
 
-# not via function as an array variable, not enclosed in quotation marks
-sed -i 's/^locales=("fr_FR" "en_US" "de_DE")/locales=("en_US" "fr_FR")/' "${file_to_change}"
+# not via change_variable function as locales is an array variable and enclosing in quotation marks right part of assignment command chamges it to incorrect (for purposes of other parts of the scripts) array
+perl -i -pe 's/^locales=\(.+?\)/locales='"${locales}"'/' "${file_to_change}"
 
-#if [ "x${distro_label}" != "x" ] ; then sed -i 's/^distro_label=".*"/distro_label="'"${distro_label}"'"/' "${file_to_change}";fi
-#if [ "x${original_iso}" != "x" ] ; then sed -i 's|^original_iso=.* #|original_iso="${software_path_root}"/'"${original_iso}"' #|' "${file_to_change}";fi
-#if [ "x${software_path_root}" != "x" ] ; then sed -i 's|^software_path_root=.* #|software_path_root='"${software_path_root}"' #|' "${file_to_change}";fi
-#
+# add bash functions
+file_to_change="bash_functions_and_other_config.sh"
+# length of 1st line to be at least number of symbols to select in variable in a following grep (otherwise part of 2nd line is matched too - amd separately as grep works with single lines)
+text_to_add='# tests tests tests tests tests
+add_function '\''t_est'\'' '\''
+    echo test
+'\''
+'
+grep --quiet "${text_to_add:0:20}" "${file_to_change}"
+if [ $? -ne 0 ]; then
+    printf "${text_to_add}" | tee --append "${file_to_change}"
+fi
 
-# ----------------------------------------------------------- #
 # set up cgroup to redure CPU load if wanted
 set -x
-sudo cgcreate -g cpu:gr1
-sudo cgset -r cpu.max="1000000 1000000" gr1
+sudo cgcreate -g cpu,cpuset:gr1
+sudo cgset -r cpu.max="1000000 1000000" gr1 # limit for whole CPU, write quota and period (valid values in the range of 1000 to 1000000) in microseconds, for  performance reasons could be better to use larger periods). Total CPU time in the system equals period multiplied by number of cores/processors
+sudo cgset -r cpuset.cpus="0-3" gr1 # not to use hyperthreading in typical 4 core Intel (list of cores obtained via `lscpu --all --extended`)
 sudo cgexec -g cpu:gr1 sudo -u somebody -g somebody echo 'Example of running this line in gr1'
 set +x
 
-script_path="$(dirname "$(realpath "$0")")" # need to read $0 before folder change via `cd` later as `realpath` just substitutes "." (if script started from where located via ./script_name) with current folder
+# end of script
+exit
 
+
+# Not run as of 2023/10/12
 # make debs_virt folder in not there yet (if v pressed); make links to folder with all debs and rename to debs what's needed
 read -p "Choose set of debs: press v key to select reduced set of debs to install, otherwise any other key:" -n 1 -r
 echo  # (optional) move to a new line
@@ -62,20 +78,6 @@ else
     fi
 fi
 
-
-# add bash functions
-file_to_change=./"Scripts_git-remote/bash_functions_and_other_config.sh"
-text_to_add='# tests
-add_function '\''t_est'\'' '\''
-    echo test
-'\''
-'
-grep --quiet "${text_to_add:0:20}" "${file_to_change}"
-if [ $? -ne 0 ]; then
-    echo "${text_to_add}" | tee --append "${file_to_change}"
-fi
-
-exit
 
 # Notes
 # Useful to change something in all scripts
