@@ -73,8 +73,10 @@ change_squash() {
     for f in ${scripts_to_copy_to}/*.sh ; do
         sudo sed --in-place --regexp-extended -- "s|liveiso_path_scripts_root|$liveiso_path_scripts_in_chroot|" "$f"
         sudo sed --in-place --regexp-extended -- "s|liveiso_path_settings_root|$liveiso_path_settings_in_chroot|" "$f"
-        sudo sed --in-place --regexp-extended -- "s|user=mint|user=$user_name|" "$f" # systemd_to_run_as_user.sh
-        sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" "$f" # run_at_boot_liveusb.sh
+        if [ "${change_initramfs}"="true" ]; then
+            sudo sed --in-place --regexp-extended -- "s|user=mint|user=${user_name}|" "$f" # systemd_to_run_as_user.sh, run_at_boot_liveusb.sh
+            # sudo sed --in-place --regexp-extended -- "s/user_name=mint/user_name=$user_name/" "$f"
+        fi
     done
 
     # copy sources of scripts to ISO
@@ -365,7 +367,7 @@ fi
 # After done with modifications making new `squashfs` file, needs to be free space there  
 # putting in folder of previously created for new iso
 un_mount_in_squashfs # if not unmounted adds e.g. /proc, which I think it not how liveUSB is made to work and it would make it less properly working   
-sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 # -comp xz
+sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 # was? '-comp xz'; adding option '-processors 1' did NOT help much to solve issue of `mksquashfs` using resident menory in the size of ~3Gb (a lot, about size of file to be created by the command)
 
 # if larger than 4Gb, split system to two squashfs files (casper scripts of Linux Mint support that); usr/lib by experince is about half
 if [ $(stat --format='%s' fin/casper/filesystem.squashfs) -ge 4294967296 ]; then

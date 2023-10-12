@@ -1,13 +1,13 @@
 #!/bin/bash
 
-user_name=mint
+user=mint
 # change liveUSB user id to usual id after install to easier access to files (to make appear as same ownership)
-usermod --uid 1000 $user_name
-groupmod --gid 1000 $user_name
+usermod --uid 1000 "${user}"
+groupmod --gid 1000 "${user}"
 
 full_path=`realpath $0` # man realpath : Print the resolved absolute file name;
 dir_name=$(dirname $full_path)
-$dir_name/libvirt_access_rights.sh "$user_name"
+$dir_name/libvirt_access_rights.sh "${user}"
 
 # change default /tmp size if already present in fstab, otherwise add; moved here as /etc/fstab is overshowed during liveISO boot
 if [[ ! $(grep '/tmp' /etc/fstab) ]]; then
