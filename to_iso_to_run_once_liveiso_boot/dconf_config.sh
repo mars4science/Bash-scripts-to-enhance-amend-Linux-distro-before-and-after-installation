@@ -112,81 +112,85 @@ sudo chmod a+rx $(get_install_path.sh)/display_rotate_normal.sh $(get_install_pa
 #
 ##### beginning of keyboard bindings #####
 
-# after custom binding is changed, noted that `gsettings get org.cinnamon.desktop.keybindings custom-list` output reverses from cusmomMAX to dummy and back, so in the script added that after each key assignments. It worked with only one reverse after all assignments in LM 20.2, but resluted in some keys not working in LM 21. With reverse after each key seems working in LM 21.
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' ]"
+# after custom binding is changed, noted that `gsettings get org.cinnamon.desktop.keybindings custom-list` output reverses from cusmomMAX to dummy and back, so in the script added that after each key assignments. It worked with only one reverse after all assignments in LM 20.2, but resluted in some keys not working in LM 21. With reverse after each key seems working in LM 21. Later tried only setting custom-list at the end of assignments, but twice - direct and reverse order and keys seem to work
+
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' ]"
 # or dconf write /org/cinnamon/desktop/keybindings/custom-list "['__dummy__']"
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/name "'Display rotate normal'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/binding "['<Super><Alt>Up']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/command "'display_rotate_normal.sh'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', '__dummy__']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', '__dummy__']"
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/name "'Display rotate left'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/binding "['<Super><Alt>Left']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/command "'display_rotate_left.sh'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1']"
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "'Display rotate right'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Alt>Right']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'display_rotate_right.sh'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom2' ,'custom1', 'custom0', '__dummy__']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['custom2' ,'custom1', 'custom0', '__dummy__']"
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/name "'Display rotate upsidedown'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/binding "['<Super><Alt>Down']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'display_rotate_inverted.sh'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3']"
 
 # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/name "'Volume Up'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/binding "['<Alt>AudioRaiseVolume']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/command "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
 # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/name "'Volume Down'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/binding "['<Alt>AudioLowerVolume']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/command "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5']"
 
 # fix TrackPoint issue om carbon X1 gen 6
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/name "'TrackPoint X1G6 fix'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/binding "['<Super><Alt>t']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/command "'/lib/systemd/system-sleep/trackpoint_reset key'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
 # set custom screen scale
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/name "'Screen scale'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/binding "['<Super><Alt>s']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/command "'/lib/systemd/system-sleep/scaling_factor key'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7']"
 
 # screen lock binding, TODO check if xscreensaver deamon is started when ISO is booted with its debs installed
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/name "'Screen lock'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/binding "['<Super><Alt>z']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/command "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
 # set custom monitor brightness adjustments
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/name "'Brightness up'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/binding "['<Alt>MonBrightnessUp']" # "['MonBrightnessUp']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/command "'night +1'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9']"
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/name "'Brightness down'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/binding "['<Alt>MonBrightnessDown']" # "['MonBrightnessDown']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/command "'night -1'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
 # to replace opening Linux Mint web page on F1 press
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/name "'Help'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/binding "['F1']"
 # dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/command "'notify-send \'NoNo help in GUI available, some info via man pages\''"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/command "'yelp'" # GUI help app (not included in the distro: to be istalled)
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11']"
+# gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11']"
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/name "'Air fan(s) off'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/binding "['<Super><Alt>x']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/command "'stopfan'"
+
+gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11', 'custom12']"
+
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom12', 'custom11', 'custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
 ##### end of keyboard bindings #####
