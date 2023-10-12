@@ -95,6 +95,7 @@ gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/k
 
 gsettings set org.cinnamon.desktop.screensaver lock-delay 600 # seconds, ??? start delay not found via dconf Editor
 gsettings set org.cinnamon.settings-daemon.plugins.power lock-on-suspend false # in GUI it is in screensaver settings window, diaable as reported workaround for reported bug of scale reset after suspend on Linux Mint 21 (bundled screensaver does not lock screen when booted as liveUSB, xscreensaver does and has many programs/themes)
+# gsettings set org.cinnamon.settings-daemon.plugins.power lid-close-suspend-with-external-monitor true # added but as commented out because not sure if better to suspend than not
 gsettings set org.cinnamon.desktop.screensaver show-album-art false # to remote sometimes displyed youtube video picture from the screen
 gsettings set org.cinnamon.settings-daemon.plugins.power sleep-display-battery 900 # in seconds
 gsettings set org.cinnamon.settings-daemon.plugins.power sleep-inactive-battery-timeout 1800 # in seconds
