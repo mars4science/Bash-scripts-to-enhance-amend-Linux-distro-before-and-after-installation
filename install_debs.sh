@@ -6,7 +6,8 @@ trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
 if [ "x${work_path}" = "x" ] ; then work_path=/tmp ; fi
 packages_to_install="${software_path_root}/packages_to_install.list"
-amend_log="${work_path}/amend_errors.log"
+amend_errors_log="${work_path}/amend_errors.log"
+install_debs_log="${work_path}/install_debs.log"
 debian_archives="${software_path_root}/debian_archives"
 separate_debian_packages="${software_path_root}/debs"
 distribution="$(awk --field-separator '=' -- '/UBUNTU_CODENAME/{print $2}' /etc/os-release)"
@@ -51,13 +52,13 @@ if [ -d "${debian_archives}" ]; then
     while read line; do
         if [ -n "${line}" ];then # allow for empty lines
             echo -e "    ${line}  to be installed next\n"
-            sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends "${line}"
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends "${line}" | tee --append "${install_debs_log}"
             Eval=$?
             if [ $Eval -eq 0 ];then
                 echo -e "\n    $line  package installed (at least seems like it)\n"
             else
                 echo
-                echo "    ERROR:  $line  package NOT installed (at least seems like it)" | 1>&2 sudo tee --append "${amend_log}"
+                echo "    ERROR:  $line  package NOT installed (at least seems like it)" | 1>&2 sudo tee --append "${amend_errors_log}"
                 echo
             fi
 
@@ -89,6 +90,10 @@ if [ -d "${separate_debian_packages}" ]; then
 #    ls -1tr "${separate_debian_packages}" | ./apt_get.sh -i # (list files by modification time reversed)
     # TODO: understand why there are errors during installation if list of folders with debs is ordered alphabetically (want to switch because consider it more convenient to ensure desired ordering). Part of the cause (hypothesis): Errors are due to diffeent ordering from order in which packages were added.
 fi
+
+echo "    Potentially unwanted removals happened:" | 1>&2 sudo tee --append "${amend_errors_log}"
+grep -i -A 1 'removed' "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
+echo -e "    See  ${install_debs_log}  for details\n" | 1>&2 sudo tee --append "${amend_errors_log}"
 
 exit
 
