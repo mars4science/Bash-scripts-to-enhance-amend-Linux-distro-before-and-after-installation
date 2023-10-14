@@ -23,13 +23,13 @@ ff_installed_folder=$(dirname $(realpath $ff_installed_link))
 
 # check if found folder is dedicated for firefox or as found in LM 21 it is /usr/bin, firefox application there calls somewhere (still there is similar [to ISO where firefox in /usr/bin is a link] folder /usr/lib/firefox)
 if [ $(echo $ff_installed_folder | grep --ignore-case firefox) ] ; then
-    echo "Firefox found on the system in $ff_installed_folder, next replacing"
+    echo "  Firefox has been found in the system in $ff_installed_folder, replacing is programmed in the code that follows"
     ff_toinstall_folder=$ff_installed_folder
     cd $ff_toinstall_folder
     sudo rm --recursive ./* # to replace contents of previous firefox folder
 else
     ff_toinstall_folder=$liveiso_path_scripts_root/firefox
-    echo "Firefox folder not found on the system, next adding firefox to $liveiso_path_scripts_root"
+    echo "  Firefox folder has not been found in the system, adding firefox to ${liveiso_path_scripts_root} is programmed in the code that follows"
     sudo mkdir $ff_toinstall_folder # previous firefox folder not found, make somewhere safe from collision
     cd $_
 fi
@@ -38,10 +38,11 @@ fi
 if [ $(echo "$ff_archive" | grep ".tar") ] ; then
     sudo tar --extract --warning=no-timestamp --file="$ff_archive" --atime-preserve --one-top-level="$ff_toinstall_folder"
 elif [ $(echo "$ff_archive" | grep ".zip") ] ; then
-    unzip "$ff_archive" -d "$ff_toinstall_folder"
+    sudo unzip "$ff_archive" -d "$ff_toinstall_folder"
 else
-    echo "Neither tar nor zip archive format for browser, exiting"; exit 1
+    echo "  ERROR: Neither tar nor zip archive format for browser, exiting"; exit 1
 fi
+echo "  ..found ${ff_archive} to add contents to ${liveiso_path_scripts_root}, at least that line of code is after exiting the script if archive is not found"
 
 # in case archive have single top folder where all is
 if [ $(ls "$ff_toinstall_folder" | wc | awk '{print $1}') -eq 1 ] ; then

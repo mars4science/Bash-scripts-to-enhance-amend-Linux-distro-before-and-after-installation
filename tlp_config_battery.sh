@@ -43,6 +43,7 @@ low_path=/home/$(id -un)/.cache/battery_level_low
 #       to split a single command line onto multiple lines, like the shell's trailing "\".
 
 # checking whether entries are already there
+echo "  Next adding crontab entries is programmed, works for ordinary user only, not in chroot"
 crontab -l 2>/dev/null | grep 'upower --dump' 1>/dev/null
 if [ $? -ne 0 ]; then
 
@@ -52,6 +53,7 @@ if [ $? -ne 0 ]; then
 
 fi
 
+# There is "no crontab for root" so above results in error and trap when run in chroot
 # set charge threshholds now
 sudo tlp setcharge 65 70 BAT0
 

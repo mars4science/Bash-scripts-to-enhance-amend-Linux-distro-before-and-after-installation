@@ -23,10 +23,10 @@ if [ ! -f "$link_path" ]; then
     if [ ! -d $(dirname "$link_path") ]; then sudo mkdir --parents $(dirname "$link_path"); fi
     if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
     w_browser_archive_path=$software_path_root/$(ls --sort=time $software_path_root | grep browser | head --lines=1)
-    if [ ! -f "$w_browser_archive_path" ]; then echo >&2 "  ERROR/Error: file with browser to add at path : $w_browser_archive_path not found, exiting with error code 1"; exit 1; fi
+    if [ ! -f "${w_browser_archive_path}" ]; then echo >&2 "  ERROR: the script has not found a file with browser to add at path : $w_browser_archive_path, exiting with error code 1"; exit 1; else echo "  The script $0 has found archive with browser to add in: ${w_browser_archive_path}"; fi
     sudo cp "$w_browser_archive_path" $(dirname "$link_path")
     sudo ln -s $(dirname "$link_path")/$(basename "$w_browser_archive_path") "$link_path"
-    echo copied and linked browser to "$link_path", run script again to extract to "$run_path" and start from there
+    echo "  ..copied and linked browser to ${link_path}, run script again to extract to ${run_path} and start from there"
     exit 0
 fi
 
