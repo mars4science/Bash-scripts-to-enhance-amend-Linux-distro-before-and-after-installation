@@ -12,6 +12,16 @@ debian_archives="${software_path_root}/debian_archives"
 separate_debian_packages="${software_path_root}/debs"
 distribution="$(awk --field-separator '=' -- '/UBUNTU_CODENAME/{print $2}' /etc/os-release)"
 component=main
+strategy_for_sources=replace # or "add"
+# TODO: try to understand why during "add" strategy some packages fail to install (for one apt-get apparently tries to install version older than one in local archive from deb source, for another there is an error about dependency on package of version older than "is to be installed"). The same list of packages gets installed in full when using "replace".
+
+# a trap below had not helped fully, installing debs one after another is not easy to interrupt
+# call above in case of ctrl-c pressed
+exit_on_ctrl_c(){
+    echo -e "\nERROR: stopped manually"
+    exit 0
+}
+trap 'exit_on_ctrl_c' SIGINT
 
 #
 # installing packages downloaded via apt-get with dependencies and where all deb package files are stored in one Debian archive
@@ -31,46 +41,73 @@ if [ -d "${debian_archives}" ]; then
     fi
 
     # Note: seems apt/dpkg files location paths are stable: /var/lib/dpkg/status, /etc/apt/sources.list, single file /etc/apt/sources.list.d/official-package-repositories.list, but made hopefully more future proof
-    eval $(apt-config shell STATUS_FILE Dir::State::status) # full path
-    eval $(apt-config shell ETC_DIR Dir::Etc) # gave etc/apt
-    eval $(apt-config shell SOURCES_FILE Dir::Etc::sourcelist) # only last part of path
-    eval $(apt-config shell SOURCES_DIR Dir::Etc::sourceparts) # only last part of path
-    SOURCES_FILE="/${ETC_DIR}/${SOURCES_FILE}"
-    SOURCES_DIR="/${ETC_DIR}/${SOURCES_DIR}"
+    eval $(apt-config shell STATUS_FILE Dir::State::status) # full path, just in case, line from apt_get
+    eval $(apt-config shell ETC_DIR Dir::Etc) # assigned variable to "etc/apt"
+    eval $(apt-config shell SOURCES_FILE Dir::Etc::sourcelist) # only last part of path, assigned variable to "sources.list"
+    eval $(apt-config shell SOURCES_DIR Dir::Etc::sourceparts) # only last part of path, assigned variable to "sources.list.d"
 
-    # replace original apt sources files
-    sudo mv "${SOURCES_DIR}" "${SOURCES_DIR}".bak
-    sudo mv "${SOURCES_FILE}" "${SOURCES_FILE}".bak
-    sudo mkdir "${SOURCES_DIR}"
-    echo "deb [ allow-insecure=yes, trusted=yes ] file:${software_path_root}/debian_archives ${distribution} ${component}" | sudo tee "${SOURCES_FILE}"
-    echo -e "    Reading the package(s) index files from newly assigned sources next\n"
-    sudo apt-get update
+    # man apt.conf: The Dir::State section pertains to local state information
+    eval $(apt-config shell STATE_DIR Dir::State) # assigned variable to "var/lib/apt"
+    eval $(apt-config shell LISTS_DIR Dir::State::lists) # only past part of path, assigned variable to "lists/"; lists is the directory to place downloaded package lists in
+
+    SOURCES_FILE="/${ETC_DIR}/${SOURCES_FILE}"
+    SOURCES_DIR="/${ETC_DIR}/${SOURCES_DIR%/}" # just in case for the future
+    INDEX_FILES_DIR="/${STATE_DIR}/${LISTS_DIR%/}" # remove ending "/" (for mv to .bak)
+
+    # replace original apt sources files or add one line with local archive
+    if [ "${strategy_for_sources}" = "replace" ]; then
+        sudo mv "${INDEX_FILES_DIR}" "${INDEX_FILES_DIR}".bak
+        sudo mkdir "${INDEX_FILES_DIR}"
+
+        sudo mv "${SOURCES_DIR}" "${SOURCES_DIR}".bak
+        sudo mkdir "${SOURCES_DIR}"
+
+        source_original=""
+    else
+        source_original="$(cat ${SOURCES_FILE})"
+    fi
+    sudo cp "${SOURCES_FILE}" "${SOURCES_FILE}".bak
+    { echo "deb [ allow-insecure=yes, trusted=yes ] file:${software_path_root}/debian_archives ${distribution} ${component}"; printf "${source_original}";} | sudo tee "${SOURCES_FILE}"
+    echo -e "\n    Reading the package(s) index files from newly assigned sources is programmed in the code that follows this line\n"
+    sudo apt-get update # reads index files (aka Package files by man page of dpkg-scanpackages), by observation noted it removes previous files of sources that are no longer in sources lists, so for restoring if strategy is "replace" need to backup those (done via "${INDEX_FILES_DIR}")
     echo
 
     # read packages names and install
     cat "${packages_to_install}" | \
     while read line; do
+        line="${line%%#*}" # remove commands from the end up to last from end #, also seems to allow to comment out whole lime
+        line="${line%% *}" # remove a blank, how to match one or more blanks I have not found
+
         if [ -n "${line}" ];then # allow for empty lines
-            echo -e "    ${line}  to be installed next\n"
-            sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends "${line}" | tee --append "${install_debs_log}"
-            Eval=$?
-            if [ $Eval -eq 0 ];then
-                echo -e "\n    $line  package installed (at least seems like it)\n"
+            echo -e "    ${line}  to be installed next\n" | tee --append "${install_debs_log}"
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends "${line}" |& tee --append "${install_debs_log}"
+            # man bash: Each  command in a pipeline is executed as a separate process (i.e., in a subshell)
+            # pipeline works similarly in e.g. sh, however PIPESTATUS array is Bash-specific, solution is different for sh
+            if [ ${PIPESTATUS[0]} -eq 0 ];then
+                echo -e "\n    $line  package installed (at least seems like it)\n" | tee --append "${install_debs_log}"
             else
-                echo
-                echo "    ERROR:  $line  package NOT installed (at least seems like it)" | 1>&2 sudo tee --append "${amend_errors_log}"
-                echo
+                echo | tee --append "${install_debs_log}"
+                echo "    ERROR:  $line  package NOT installed (at least seems like it)"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
+                echo | tee --append "${install_debs_log}"
             fi
 
         fi # empty line
     done # reading lines of names of packages
 
     # restore original apt sources files
-    sudo rm "${SOURCES_FILE}"
-    sudo rmdir "${SOURCES_DIR}"
-    sudo mv "${SOURCES_DIR}".bak "${SOURCES_DIR}"
-    sudo mv "${SOURCES_FILE}".bak "${SOURCES_FILE}"
-    sudo apt-get update
+    if [ "${strategy_for_sources}" = "replace" ]; then
+        sudo rm --force --recursive "${INDEX_FILES_DIR}" # that one is expected to be non-empty, but filled via `apt-get update`
+        sudo mv "${INDEX_FILES_DIR}".bak "${INDEX_FILES_DIR}"
+
+        sudo rmdir "${SOURCES_DIR}"
+        sudo mv "${SOURCES_DIR}".bak "${SOURCES_DIR}"
+    fi
+    sudo mv --force "${SOURCES_FILE}".bak "${SOURCES_FILE}"
+    if [ "${strategy_for_sources}" = "add" ]; then
+        echo -e "  A command on next line (apt-get update) is to remove apt state index files for temporary added local Debian archive. Errors in output are expected if there is no internet connection and in practice had not resulted in failed restoring of initial apt state (in particular of index files).\n"
+        sudo apt-get update
+        echo
+    fi
 
 fi
 
@@ -91,9 +128,12 @@ if [ -d "${separate_debian_packages}" ]; then
     # TODO: understand why there are errors during installation if list of folders with debs is ordered alphabetically (want to switch because consider it more convenient to ensure desired ordering). Part of the cause (hypothesis): Errors are due to diffeent ordering from order in which packages were added.
 fi
 
-echo "    Potentially unwanted removals happened:" | 1>&2 sudo tee --append "${amend_errors_log}"
-grep -i -A 1 'removed' "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
-echo -e "    See  ${install_debs_log}  for details\n" | 1>&2 sudo tee --append "${amend_errors_log}"
+if [ $(grep --quiet -i 'removed' "${install_debs_log}";echo $?) -eq 0 ]; then
+    echo -e "\n===== Unwanted removals potentially happened      =====" | 1>&2 sudo tee --append "${amend_errors_log}"
+    echo -e "  === List below by grep, entries separated by --   ===\n" | 1>&2 sudo tee --append "${amend_errors_log}"
+    grep -i -A 1 'removed' "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
+    echo -e "\n===== See  ${install_debs_log}  for details       =====\n" | 1>&2 sudo tee --append "${amend_errors_log}"
+fi
 
 exit
 
