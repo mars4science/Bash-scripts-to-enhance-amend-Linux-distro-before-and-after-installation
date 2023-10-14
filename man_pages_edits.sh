@@ -12,7 +12,8 @@
 # many empty lines between sections in source file seems to be displayed by man as one empty line
 
 #man_section=man1
-man_section="man" # changed due to: now section number included in input file like grep.1
+man_section="man" # changed to that line due to: now section number included in input file like "grep.1"
+man_section="man/man" # changed to that line due to: some pakages have man pages for different languages, noted one for English is located in man/man, other languages differently, e.g. man/de/man1/dpkg.1.gz
 
 if [ "x${liveiso_path_sources_root}" = "x" ] ; then liveiso_path_sources_root=/media/$(id -un)/usb/LM/to_root/usr/src/amendedliveiso ; fi
 
