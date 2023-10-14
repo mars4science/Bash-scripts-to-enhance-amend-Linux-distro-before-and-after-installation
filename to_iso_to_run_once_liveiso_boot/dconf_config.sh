@@ -93,7 +93,17 @@ gsettings set org.gnome.gnome-system-monitor.proctree sort-order 0 # highest at 
 # does not work, maybe "legacy" was a hint for that, developer wants to find another way to change zoom-in for terminal
 gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/zoom-in/ zoom-in "<Ctrl>equal"
 
-gsettings set org.cinnamon.desktop.screensaver lock-delay 600 # seconds, ??? start delay not found via dconf Editor
+#
+# screensaver settings
+#
+# gsettings set org.cinnamon.desktop.screensaver idle-activation-enabled false # setting had not turned off activation, setting idle-delay to 0 turned off
+gsettings set org.cinnamon.desktop.session idle-delay 0 # 0 displayed as "Never" by GUI in Screensaver->Settings; setting in seconds
+gsettings set org.cinnamon.desktop.screensaver lock-delay 600 # seconds
+# gsettings set org.cinnamon.desktop.screensaver custom-screensaver-command "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''" # interestingly when xscreensaver is activated by cinnamon.desktop based on idle-delay, lockTimeout in .xscreensaver seems to have no effect (TODO: try to find out why and how to fix), lock happened ealier (immediately?) (and org.cinnamon.desktop.screensaver lock-delay was 10 minutes), therefore not using for now; also allow-keyboard-shortcuts does not seem to enable custom keyboard bindings to work when xscreensaver locked the screen
+# gsettings set org.cinnamon.desktop.screensaver allow-media-control true
+# gsettings set org.cinnamon.desktop.screensaver allow-keyboard-shortcuts true
+
+
 gsettings set org.cinnamon.settings-daemon.plugins.power lock-on-suspend false # in GUI it is in screensaver settings window, diaable as reported workaround for reported bug of scale reset after suspend on Linux Mint 21 (bundled screensaver does not lock screen when booted as liveUSB, xscreensaver does and has many programs/themes)
 # gsettings set org.cinnamon.settings-daemon.plugins.power lid-close-suspend-with-external-monitor true # added but as commented out because not sure if better to suspend than not
 gsettings set org.cinnamon.desktop.screensaver show-album-art false # to remote sometimes displyed youtube video picture from the screen
