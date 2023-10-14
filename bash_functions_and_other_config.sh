@@ -10,6 +10,9 @@ if [ $? -ne 0 ]; then
     echo 'PS1='\''\[\033[01;34m\]\w\[\033[00m\]\$ '\''' | sudo tee --append $bashrc
 fi
 
+echo $'\n'"alias hi=history" | sudo tee --append "${bashrc}"
+
+
 add_function(){
     # remove previous version if in the file; $'\n' is line break in bash (using $'\' notation)
     sudo perl -0777 -pi -e "s/"$'\n'"$1().*?export -f $1"$'\n'$'\n'"//sg" "${bashrc}" # sg modifiers for perl regex: g - global, replace more than once; s - makes "." cross line boundaries. "?" needed to make regex lazy, otherwise greedy: selects up to past occurence of "export -f", not first
