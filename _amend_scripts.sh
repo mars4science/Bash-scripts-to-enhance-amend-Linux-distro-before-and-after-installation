@@ -8,7 +8,9 @@
 software_path_root="/media/data/LM"
 distro_label="GNU-Linux_1.1_b21"
 original_iso='${software_path_root}/linuxmint-21-cinnamon-64bit.iso' # ' here as contains $
+work_path="/media/disk1/work1"
 locales='("en_US" "fr_FR")' # note: string here whereas array in the file to edit
+cgroup="gr1"
 
 # ----------------------------------------------------------- #
 
@@ -23,6 +25,7 @@ file_to_change="_make_custom_liveusb.sh"
 change_variable software_path_root
 change_variable distro_label
 change_variable original_iso
+change_variable work_path
 
 # not via change_variable function as locales is an array variable and enclosing in quotation marks right part of assignment command chamges it to incorrect (for purposes of other parts of the scripts) array
 perl -i -pe 's/^locales=\(.+?\)/locales='"${locales}"'/' "${file_to_change}"
@@ -42,10 +45,11 @@ fi
 
 # set up cgroup to redure CPU load if wanted
 set -x
-sudo cgcreate -g cpu,cpuset:gr1
-sudo cgset -r cpu.max="1000000 1000000" gr1 # limit for whole CPU, write quota and period (valid values in the range of 1000 to 1000000) in microseconds, for  performance reasons could be better to use larger periods). Total CPU time in the system equals period multiplied by number of cores/processors
-sudo cgset -r cpuset.cpus="0-3" gr1 # not to use hyperthreading in typical 4 core Intel (list of cores obtained via `lscpu --all --extended`)
-sudo cgexec -g cpu:gr1 sudo -u somebody -g somebody echo 'Example of running this line in gr1'
+sudo cgcreate -g cpu,cpuset:"${cgroup}"
+sudo cgset -r cpu.max="1000000 1000000" "${cgroup}" # limit for whole CPU, write quota and period (valid values in the range of 1000 to 1000000) in microseconds, for  performance reasons could be better to use larger periods). Total CPU time in the system equals period multiplied by number of cores/processors
+# sudo cgset -r cpuset.cpus="0-3" gr1 # not to use hyperthreading in typical 4 core Intel (list of cores obtained via `lscpu --all --extended`)
+sudo cgset -r cpuset.cpus="0-1" "${cgroup}"
+sudo cgexec -g cpu:"${cgroup}" sudo -u somebody -g somebody echo 'Example of running this line in gr1'
 set +x
 
 # end of script
