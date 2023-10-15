@@ -90,7 +90,7 @@ if [ -d "${debian_archives}" ]; then
 
         if [ -n "${line}" ];then # allow for empty lines
             echo -e "    ${line}  to be installed next\n" | tee --append "${install_debs_log}"
-            sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends "${line}" |& tee --append "${install_debs_log}"
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes "${line}" |& tee --append "${install_debs_log}" # --no-install-recommends deleted from the line as in apt_get recommended dependencies were added as were in the folders of deb files to install all files from
             # man bash: Each  command in a pipeline is executed as a separate process (i.e., in a subshell)
             # pipeline works similarly in e.g. sh, however PIPESTATUS array is Bash-specific, solution is different for sh
             if [ ${PIPESTATUS[0]} -eq 0 ];then
