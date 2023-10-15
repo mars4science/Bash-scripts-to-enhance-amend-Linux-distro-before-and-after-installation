@@ -11,9 +11,8 @@ install_debs_log="${work_path}/install_debs.log"
 debian_archives="${software_path_root}/debian_archives"
 separate_debian_packages="${software_path_root}/debs"
 distribution="$(awk --field-separator '=' -- '/UBUNTU_CODENAME/{print $2}' /etc/os-release)"
-component=main
-strategy_for_sources=replace # or "add"
-# TODO: try to understand why during "add" strategy some packages fail to install (for one apt-get apparently tries to install version older than one in local archive from deb source, for another there is an error about dependency on package of version older than "is to be installed"). The same list of packages gets installed in full when using "replace".
+component=amend
+strategy_for_sources=add # "replace" or "add"
 
 # a trap below had not helped fully, installing debs one after another is not easy to interrupt
 # call above in case of ctrl-c pressed
@@ -28,9 +27,9 @@ trap 'exit_on_ctrl_c' SIGINT
 
 if [ -d "${debian_archives}" ]; then
 
-    # does NOT work during liveISO amendment as source files is mounted read-only because of thoughts about safety
+    # does NOT work during liveISO amendment as source files are mounted read-only because of thoughts about safety
     # can still serve as guide to run manually
-    # Creates package index files used by `apt-get update` (in the code below)
+    # creates package index files used by `apt-get update` (in the code below)
     if [ ! -d "${debian_archives}/dists/${distribution}/${component}/binary-amd64" ]; then
         cd "${debian_archives}"
         mkdir --parents "./dists/${distribution}/${component}/binary-amd64"
@@ -48,11 +47,13 @@ if [ -d "${debian_archives}" ]; then
 
     # man apt.conf: The Dir::State section pertains to local state information
     eval $(apt-config shell STATE_DIR Dir::State) # assigned variable to "var/lib/apt"
-    eval $(apt-config shell LISTS_DIR Dir::State::lists) # only past part of path, assigned variable to "lists/"; lists is the directory to place downloaded package lists in
+    eval $(apt-config shell LISTS_DIR Dir::State::Lists) # only past part of path, assigned variable to "lists/"; lists is the directory to place downloaded package lists in
+    eval $(apt-config shell PREFS_DIR Dir::Etc::PreferencesParts) # only past part of path
 
     SOURCES_FILE="/${ETC_DIR}/${SOURCES_FILE}"
     SOURCES_DIR="/${ETC_DIR}/${SOURCES_DIR%/}" # just in case for the future
     INDEX_FILES_DIR="/${STATE_DIR}/${LISTS_DIR%/}" # remove ending "/" (for mv to .bak)
+    PREFS_FILE_ADD="/${ETC_DIR}/${PREFS_DIR}/amended_iso.pref"
 
     # replace original apt sources files or add one line with local archive
     if [ "${strategy_for_sources}" = "replace" ]; then
@@ -63,9 +64,18 @@ if [ -d "${debian_archives}" ]; then
         sudo mkdir "${SOURCES_DIR}"
 
         source_original=""
-    else
+    elif [ "${strategy_for_sources}" = "add" ]; then
         source_original="$(cat ${SOURCES_FILE})"
+
+        # set priority for local archive (via expectedly unique "component") as higher than linuxmint's official repositories (Pin-Priority: 700)
+        # TODO: check if possible to allow downgrades for individual packages and how
+        # TODO: understand effect of "release" on next line
+        echo -e "Package: *\nPin: release c=${component}\nPin-Priority: 900" | sudo tee "${PREFS_FILE_ADD}"
+    else
+        echo "    ERROR:  '${strategy_for_sources}' value for strategy_for_sources w/out code to process it (at least seems like it), next line is programmed to abort $0 script"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
+        return 1
     fi
+
     sudo cp "${SOURCES_FILE}" "${SOURCES_FILE}".bak
     { echo "deb [ allow-insecure=yes, trusted=yes ] file:${software_path_root}/debian_archives ${distribution} ${component}"; printf "${source_original}";} | sudo tee "${SOURCES_FILE}"
     echo -e "\n    Reading the package(s) index files from newly assigned sources is programmed in the code that follows this line\n"
@@ -98,11 +108,12 @@ if [ -d "${debian_archives}" ]; then
     if [ "${strategy_for_sources}" = "replace" ]; then
         sudo rm --force --recursive "${INDEX_FILES_DIR}" # that one is expected to be non-empty, but filled via `apt-get update`
         sudo mv "${INDEX_FILES_DIR}".bak "${INDEX_FILES_DIR}"
-
         sudo rmdir "${SOURCES_DIR}"
         sudo mv "${SOURCES_DIR}".bak "${SOURCES_DIR}"
+        sudo rm "${PREFS_FILE_ADD}"
     fi
     sudo mv --force "${SOURCES_FILE}".bak "${SOURCES_FILE}"
+
     if [ "${strategy_for_sources}" = "add" ]; then
         echo -e "  A command on next line (apt-get update) is to remove apt state index files for temporary added local Debian archive. Errors in output are expected if there is no internet connection and in practice had not resulted in failed restoring of initial apt state (in particular of index files).\n"
         sudo apt-get update
