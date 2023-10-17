@@ -62,7 +62,7 @@ fi
 path_to_edit=/usr/share/applications/libreoffice-calc.desktop
 if [[ -e "$path_to_edit" ]]; then
     if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=.*/Tables;Accounting;Stats;OpenDocument Spreadsheet;Chart;Microsoft Excel;Microsoft Works;OpenOffice/' "$path_to_edit"
+        sudo sed --in-place 's/Keywords=.*/Keywords=Tables;Accounting;Stats;OpenDocument Spreadsheet;Chart;Microsoft Excel;Microsoft Works;OpenOffice/' "$path_to_edit"
     else
         echo -e '\nKeywords=Tables;Accounting;Stats;OpenDocument Spreadsheet;Chart;Microsoft Excel;Microsoft Works;OpenOffice' | sudo tee --append "$path_to_edit"
     fi
