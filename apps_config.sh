@@ -40,7 +40,7 @@ else
     Shift+DOWN no-osd seek 60 exact
 
     / quit # set / key to quit player
-    a cycle audio-pitch-correction for sound # set "a" key to enable/disable scaletempo/scaletempo2 pitch correction
+    a cycle audio-pitch-correction # set "a" key to enable/disable scaletempo/scaletempo2 pitch correction for sound
 
     # various combinations with "add sub-color" to gradually change part of RGB/transparency failed to produce desired result
     ALT+3 set sub-color 1.0/0.0/0.0/0.7
