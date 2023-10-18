@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# to be run adter run_at_boot_config.sh
+# to be run after run_at_boot_config.sh
 
 trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
