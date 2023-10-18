@@ -56,64 +56,39 @@ if [ "${qty_to_activate}" -gt 0 ]; then
     sudo glib-compile-schemas "${glib_schemas_location}"
 fi
 
+#
 ## edit applications in menu for better discoverability
+#
 
-# add search keyword for LibreOffice Calc
-path_to_edit=/usr/share/applications/libreoffice-calc.desktop
-if [[ -e "$path_to_edit" ]]; then
-    if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=.*/Keywords=Tables;Accounting;Stats;OpenDocument Spreadsheet;Chart;Microsoft Excel;Microsoft Works;OpenOffice/' "$path_to_edit"
-    else
-        echo -e '\nKeywords=Tables;Accounting;Stats;OpenDocument Spreadsheet;Chart;Microsoft Excel;Microsoft Works;OpenOffice' | sudo tee --append "$path_to_edit"
+# parameters: path, key, text
+edit_line(){
+    if [ -n "${3}" ]; then
+        if [[ $(grep "^${2}=" "${1}") ]]; then # true if grep finds
+            sudo sed --in-place "s/${2}=.*/${2}=${3}/" "${1}"
+        else
+            echo -e "\n${2}=${3}" | sudo tee --append "${1}"
+        fi
     fi
-fi
+}
 
-# add search keywords for Virtual Machines Manager
-path_to_edit=/usr/share/applications/virt-manager.desktop
-if [[ -e "$path_to_edit" ]]; then
-    if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=.*/Keywords=Emulators;Virtualization;KVM;QEMU;vmm/' "$path_to_edit"
-    else
-        echo -e '\nKeywords=Emulators;Virtualization;KVM;QEMU;vmm' | sudo tee --append "$path_to_edit"
+# parameters: desktop name short, keywords, [comments]
+edit_desktop_file(){
+    path_to_edit="/usr/share/applications/${1}.desktop"
+    if [ -e "${path_to_edit}" ]; then
+        edit_line "${path_to_edit}" "Keywords" "${2}"
+        edit_line "${path_to_edit}" "Comment" "${3}"
     fi
-fi
+}
 
-# add search keywords for Kazam (screen capture)
-path_to_edit=/usr/share/applications/kazam.desktop
-if [[ -e "$path_to_edit" ]]; then
-    if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=.*/Keywords=capture;screenshot;screencast;videorecord;desktop recording/' "$path_to_edit"
-    else
-        echo -e '\nKeywords=capture;screenshot;screencast;videorecord;desktop recording' | sudo tee --append "$path_to_edit"
-    fi
-fi
+edit_desktop_file "libreoffice-calc" "Tables;Accounting;Stats;OpenDocument Spreadsheet;Chart;Calculator;Microsoft Excel;Microsoft Works;OpenOffice" # LibreOffice Calc
+edit_desktop_file "virt-manager" "Emulators;Virtualization;KVM;QEMU;vmm" # Virtual Machines Manager
+edit_desktop_file "kazam" "capture;screenshot;screencast;videorecord;desktop recording" # Kazam (screen capture)
+edit_desktop_file "com.github.maoschanz.drawing" "image;picture;photo;paint;draw;Paint;Sketch;Pencil" # Drawing
+edit_desktop_file "dwww" "documentation;information;manual;help" "Browse, search documentation files in /usr/share/doc, man pages" # Debian Documentation Browser
 
-# add search keywords for Drawing
-path_to_edit=/usr/share/applications/com.github.maoschanz.drawing.desktop
-if [[ -e "$path_to_edit" ]]; then
-    if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=.*/Keywords=image;picture;photo;paint;draw;Paint;Sketch;Pencil/' "$path_to_edit"
-    else
-        echo -e '\nKeywords=image;picture;photo;paint;draw;Paint;Sketch;Pencil' | sudo tee --append "$path_to_edit"
-    fi
-fi
-
-## change how dwww is executed (add check for apache status) - after addding search keywords
-
-# add search keywords, comment and browser for Debian Documentation Browser
+## change how dwww is executed (add check for apache status)
 path_to_edit=/usr/share/applications/dwww.desktop
 if [[ -e "$path_to_edit" ]]; then
-    if [[ $(grep "Keywords=" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's/Keywords=.*/Keywords=help;documentation;information;manual/' "$path_to_edit"
-    else
-        echo -e '\nKeywords=documentation;information;manual;help' | sudo tee --append "$path_to_edit"
-    fi
-
-    if [[ $(grep "^Comment" "$path_to_edit") ]]; then # true if grep finds
-        sudo sed --in-place 's|Comment=.*|Comment=Browse, search documentation files in /usr/share/doc, man pages;|' "$path_to_edit"
-    else
-        echo -e '\nComment=Browse, search documentation files in /usr/share/doc, man pages' | sudo tee --append "$path_to_edit"
-    fi
 
     # TODO: try to understand how to use _BROWSER variables in /etc/dwww/dwww.conf
     # for now to use dwww in text mode run `dwww` in bash, to run in GUI (firefox) use Cinnamon menu
@@ -125,6 +100,7 @@ if [[ -e "$path_to_edit" ]]; then
     # TODO learn format of text for Zenity, using "sudo a2enmod cgi \\\&\\\& sudo service apache2 restart" results in
     # Gtk-WARNING **: ... :Failed to set text ... from markup due to error parsing markup: Error on line 1: Entity name “& sudo service apache2 restart - suggestion: successful executition of that beforehand is needed for documentation browser to work.    TL” is not known
     # TODO add format description to man page of zenity
+
     sudo sed --in-place -- 's~^Exec=.*~Exec=bash -c '\''a2enmod cgi ; if [ $? -eq 127 ] ; then zenity --info --width=500 --text="Seems apache is not running; this code is written not to try to start documentation browser in that case"; elif [ -e "/etc/apache2/mods-enabled/cgid.conf" ] || [ -e "/etc/apache2/mods-enabled/cgid.conf" ] ; then firefox localhost/dwww ; else zenity --info --width=500 --text="sudo a2enmod cgi ; sudo service apache2 restart - suggestion: successful executition of that beforehand is needed for documentation browser to work.    TL;DR Seems cgi module of apache is disabled. Suggestion is to copy and run commands displayed at the end of this message (after :) in terminal to enable functionality, then use same Cinnamon menu entry again (note: proper functioning of text-based browser run from terminal by command dwww also required cgi module to be enabled): sudo a2enmod cgi ; sudo service apache2 restart" ; fi'\''~' "$path_to_edit"
 
 fi
