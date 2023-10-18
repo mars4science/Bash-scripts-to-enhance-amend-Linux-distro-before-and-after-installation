@@ -98,7 +98,7 @@ Other minor tweaks, including:
 
 - sets systemd task at boot target for transmission settings
 - replaces Firefox (`firefox-replace.sh`) with downloaded (and w/out google search engine selection disabled in Mint) version; the script's code is written to process tar or zip archives with `firefox` executable to start Firefox located in root of archive or in single top folder of the archive (usually named "firefox")
-- makes mpv default for video/audio file types, configures some mpv keys (`mpv_config.sh`)
+- makes mpv default for video/audio file types, configures some mpv keys (`apps_config.sh`)
 - workaround of problem of specific old color printer (`printer_color_as_gray.sh`)
 - installs python scripts, i.e. `files.py` (program from my other repo), placed in software_path_root by `utils_misc_install.sh`
 - disables swap (`disable_swap.sh`)
