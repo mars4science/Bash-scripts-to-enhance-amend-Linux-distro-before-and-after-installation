@@ -1,12 +1,14 @@
 #!/bin/bash
 # thinkpad specific
-trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
-# !!! works if device has one battery
+# Commented out as `crontab -l` raises error 1 when there is no (yet) crontab entry (in /var/spool/cron/crontabs/) for a user
+# trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
-# tlp - thinkpad ? power
+# !!! parts related to battery work if device has one battery; TODO: modify the for more than one battery
+
+# tlp - thinkpad laptop power ?
 # man sed: -E, -r, --regexp-extended
-# ( )	Defines a marked subexpression. The string matched within the parentheses can be recalled later (see the next entry, \n). 
+# ( )	Defines a marked subexpression. The string matched within the parentheses can be recalled later (see the next entry, \n).
 sudo sed -E --in-place=".bak" 's/#{0,1}START_CHARGE_THRESH_BAT([0-1])=[0-9]{1,3}/START_CHARGE_THRESH_BAT\1=65/' /etc/tlp.conf
 sudo sed -E --in-place=".bak" 's/#{0,1}STOP_CHARGE_THRESH_BAT([0-1])=[0-9]{1,3}/STOP_CHARGE_THRESH_BAT\1=70/' /etc/tlp.conf
 
@@ -21,7 +23,10 @@ echo -e "[main]\nNetworkingEnabled=true\nWirelessEnabled=false\nWWANEnabled=fals
 echo "  done."
 # P.S. adding "rfkill.default_state=0" to kernel parameters during boot w/out having NetworkManager.state file as above did not disable wifi (but decided to add anyway maybe it will prevent wifi from turning on initially as kernel docs IIRC states kernel turns wireless devices on by default; TODO: check what actually happens)
 
+# added after noticing "Error: tlp.service is not enabled, power saving will not apply on boot" in `tlp-stat` output
+systemctl enable tlp.service
 
+#
 # --- notifies of low level of BAT0 once per crossing threshold ---
 
 # Note: seems crontab works for already logged in user (not during amending of liveISO)
@@ -42,20 +47,20 @@ low_path=/home/$(id -un)/.cache/battery_level_low
 #       backslash (\), will be changed into newline characters, and all data after the first % will be sent to the command as standard input.  There is no  way
 #       to split a single command line onto multiple lines, like the shell's trailing "\".
 
-# checking whether entries are already there
-echo "  Next adding crontab entries is programmed, works for ordinary user only, not in chroot"
-crontab -l 2>/dev/null | grep 'upower --dump' 1>/dev/null
-if [ $? -ne 0 ]; then
+# Notify ordinary user, not root account used during liveISO amendment
+if [ `whoami` != 'root' ]; then
+    # checking whether entries are already there
+    crontab -l 2>/dev/null | grep 'upower --dump' 1>/dev/null
+    if [ $? -ne 0 ]; then
+        echo "  Next adding crontab entries is programmed"
+        (crontab -l 2>/dev/null; echo '* * * * * if [ ! -f '$low_path' -a  $(upower --dump | sed -n '\''0,/percentage/p'\''| awk '\''/percentage:/ { print $2 }'\'' | sed '\''s/\%//'\'') -le 30 ]; then touch '$low_path' ; XDG_RUNTIME_DIR=/run/user/$(id -u) notify-send -u normal '\''Battery level low: 30\%'\''; fi') | crontab -
 
-    (crontab -l 2>/dev/null; echo '* * * * * if [ ! -f '$low_path' -a  $(upower --dump | sed -n '\''0,/percentage/p'\''| awk '\''/percentage:/ { print $2 }'\'' | sed '\''s/\%//'\'') -le 30 ]; then touch '$low_path' ; XDG_RUNTIME_DIR=/run/user/$(id -u) notify-send -u normal '\''Battery level low: 30\%'\''; fi') | crontab -
-
-    (crontab -l 2>/dev/null; echo '* * * * * if [ -f '$low_path' -a  $(upower --dump | sed -n '\''0,/percentage/p'\''| awk '\''/percentage:/ { print $2 }'\'' | sed '\''s/\%//'\'') -ge 31 ]; then rm '$low_path'; fi') | crontab -
-
+        (crontab -l 2>/dev/null; echo '* * * * * if [ -f '$low_path' -a  $(upower --dump | sed -n '\''0,/percentage/p'\''| awk '\''/percentage:/ { print $2 }'\'' | sed '\''s/\%//'\'') -ge 31 ]; then rm '$low_path'; fi') | crontab -
+    fi
 fi
 
-# There is "no crontab for root" so above results in error and trap when run in chroot
 # set charge threshholds now
+set -x
 sudo tlp setcharge 65 70 BAT0
-
-
+set +x
 
