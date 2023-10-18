@@ -12,7 +12,7 @@ debian_archives="${software_path_root}/debian_archives"
 separate_debian_packages="${software_path_root}/debs"
 distribution="$(awk --field-separator '=' -- '/UBUNTU_CODENAME/{print $2}' /etc/os-release)"
 component=amend
-strategy_for_sources=add # "replace" or "add"
+strategy_for_sources=replace # "replace" or "add" (replace previous/official sources with local Debian archive or all the archive to already listed sources)
 
 # a trap below had not helped fully, installing debs one after another is not easy to interrupt
 # call above in case of ctrl-c pressed
@@ -67,7 +67,7 @@ if [ -d "${debian_archives}" ]; then
     elif [ "${strategy_for_sources}" = "add" ]; then
         source_original="$(cat ${SOURCES_FILE})"
 
-        # set priority for local archive (via expectedly unique "component") as higher than linuxmint's official repositories (Pin-Priority: 700)
+        # set priority for local archive (via expectedly unique "component") as higher than linuxmint's official repositories (Pin-Priority: 700). Usage details: `man apt_preferences(5)`
         # TODO: check if possible to allow downgrades for individual packages and how
         # TODO: understand effect of "release" on next line
         echo -e "Package: *\nPin: release c=${component}\nPin-Priority: 900" | sudo tee "${PREFS_FILE_ADD}"
@@ -100,7 +100,6 @@ if [ -d "${debian_archives}" ]; then
                 echo "    ERROR:  $line  package NOT installed (at least seems like it)"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
                 echo | tee --append "${install_debs_log}"
             fi
-
         fi # empty line
     done # reading lines of names of packages
 
@@ -110,11 +109,11 @@ if [ -d "${debian_archives}" ]; then
         sudo mv "${INDEX_FILES_DIR}".bak "${INDEX_FILES_DIR}"
         sudo rmdir "${SOURCES_DIR}"
         sudo mv "${SOURCES_DIR}".bak "${SOURCES_DIR}"
-        sudo rm "${PREFS_FILE_ADD}"
     fi
     sudo mv --force "${SOURCES_FILE}".bak "${SOURCES_FILE}"
 
     if [ "${strategy_for_sources}" = "add" ]; then
+        sudo rm "${PREFS_FILE_ADD}"
         echo -e "  A command on next line (apt-get update) is to remove apt state index files for temporary added local Debian archive. Errors in output are expected if there is no internet connection and in practice had not resulted in failed restoring of initial apt state (in particular of index files).\n"
         sudo apt-get update
         echo
