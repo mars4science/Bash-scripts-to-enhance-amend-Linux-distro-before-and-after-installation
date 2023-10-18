@@ -242,24 +242,25 @@ change_initrd(){
 u_mount(){
     # proc path exists before script, mount_path is relative, so grep, not just `findmnt "$mount_path"` and current folder is "expected" to be $work_path
     # no need to escape " inside command substitution as double quotes preserve literal meaning of qouble quotes (man bash: search for "QUOTING")
-    if [ -n "$(findmnt | grep "$1" | head -n 1)" ]; then sudo umount "$1"; fi
+    mount_point="${1//\/\//\/}" # remove extra '/' just in case work_path ends with '/' for grep to find a match
+    if [ -n "$(findmnt | grep "${mount_point}" | head -n 1)" ]; then sudo umount "${mount_point}"; fi # `head -n` as a "just in case" safeguard against using several lines for '-n' of `if`, works w/out it
 }
 
 un_mount_in_squashfs(){
-    u_mount fin_sq/dev/pts
-    u_mount fin_sq/dev
-    u_mount fin_sq/proc
-    u_mount fin_sq/sys
-    u_mount fin_sq/media/ramdisk
-    u_mount fin_sq"${path_to_software_in_chroot}"
-    u_mount fin_sq/media/root/Scripts
+    u_mount "${work_path}"/fin_sq/dev/pts
+    u_mount "${work_path}"/fin_sq/dev
+    u_mount "${work_path}"/fin_sq/proc
+    u_mount "${work_path}"/fin_sq/sys
+    u_mount "${work_path}"/fin_sq/media/ramdisk
+    u_mount "${work_path}"/fin_sq/"${path_to_software_in_chroot}"
+    u_mount "${work_path}"/fin_sq/media/root/Scripts
 }
 
 un_mount_in_work_path(){
-    u_mount fin_sq
-    u_mount fin
-    u_mount iso_sq
-    u_mount iso
+    u_mount "${work_path}"/fin_sq
+    u_mount "${work_path}"/fin
+    u_mount "${work_path}"/iso_sq
+    u_mount "${work_path}"/iso
 }
 
 un_mount(){
