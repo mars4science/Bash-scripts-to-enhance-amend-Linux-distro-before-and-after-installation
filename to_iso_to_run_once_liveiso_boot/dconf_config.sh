@@ -211,6 +211,21 @@ dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/bindin
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/command "'stopfan'"
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom12', 'custom11', 'custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom13/name "'Up text scaling 1.1 times'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom13/binding "['<Primary><Shift><Alt>x']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom13/command "'sh -c \'f=\$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=\$(printf print\(\${f}*1.1\) | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor \${fnew}\''"
+
+gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11', 'custom12', 'custom13']"
+
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom14/name "'Up text scaling 0.9 times'"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom14/binding "['<Primary><Shift><Alt>z']"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom14/command "'sh -c \'f=\$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=\$(printf print\(\${f}*0.9\) | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor \${fnew}\''"
+
+gsettings set org.cinnamon.desktop.keybindings custom-list "['custom14', 'custom13', 'custom12', 'custom11', 'custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
+
+# reversed order one more time in attempt to correct for <Alt>Audio LowerVolume and higher not working on one laptop on LM 21.2 TODO: test if the issue is solved
+gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11', 'custom12', 'custom13', 'custom14']"
+
 ##### end of keyboard bindings #####
 #
 
