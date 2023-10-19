@@ -245,7 +245,7 @@ gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for
 
 # change theme for Cinnamon
 gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark'
-gsettings set org.cinnamon.desktop.interface icon-theme 'Mint-Y'
+gsettings set org.cinnamon.desktop.interface icon-theme 'Mint-Y-Dark-Teal' # noted Mint-Y appearance changed from LM 21 to 21.2 from yellowish to greenish, so now attemping to use more "specifc" themes
 gsettings set org.cinnamon.theme name 'Mint-Y-Dark'
 
 # change theme for xed to Cobalt (for dark Cinnamon theme)
