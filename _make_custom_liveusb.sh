@@ -291,9 +291,10 @@ else
     mkdir --parents $work_path && cd $_
 fi
 
-read -p "Choose interactive mode (press i key) to pause at some points, otherwise run unattended (any other key):" -n 1 -r
+read -p "Choose interactive mode (press i key) to pause at some points, otherwise run unattended (any other key), n key to also delete work files leaving only amended iso file without pausing for user input:" -n 1 -r
 echo  # (optional) move to a new line
 if [[ $REPLY =~ ^[Ii]$ ]]; then interactive_mode="true"; else interactive_mode="false"; fi
+if [[ $REPLY =~ ^[Nn]$ ]]; then delete_work_files_without_user_interaction="true"; else delete_work_files_without_user_interaction="false"; fi
 
 mkdir iso to temp fin initrd
 
@@ -464,8 +465,10 @@ set +x
 echo -e "\nNewly created distro hybrid iso file:"
 file $"$work_path/$distro_label.iso"
 
-echo "Next line is coded to invoke new bash instance; on exit all work files are coded to be removed, only iso file left"
-bash -i
+if [ "${delete_work_files_without_user_interaction}" = 'false' ];  then
+    echo "Next line is coded to invoke new bash instance; on exit all work files are coded to be removed, only iso file left"
+    bash -i
+fi
 
 # now delete intermediary data
 un_mount # was un_mount_in_work_path, I still do not understand why the result after next rm -R is same - all deleted
