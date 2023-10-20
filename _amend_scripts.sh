@@ -12,6 +12,7 @@ new_legacy_menu_title="GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)
 work_path="/media/disk1/work1"
 locales='("en_US" "fr_FR")' # note: string here whereas array in the file to edit
 cgroup="gr1" # see [1] for example of usage (in addition of moving process into a group)
+cpu_max_mksquashfs="1200000 1000000"
 
 # ----------------------------------------------------------- #
 
@@ -33,6 +34,7 @@ change_variable original_iso
 change_variable work_path
 change_variable new_legacy_menu_title
 change_variable cgroup
+change_variable cpu_max_mksquashfs
 
 # not via change_variable function as locales is an array variable and enclosing in quotation marks right part of assignment command chamges it to incorrect (for purposes of other parts of the scripts) array
 perl -i -pe 's/^locales=\(.+?\)/locales='"${locales}"'/' "${file_to_change}"
