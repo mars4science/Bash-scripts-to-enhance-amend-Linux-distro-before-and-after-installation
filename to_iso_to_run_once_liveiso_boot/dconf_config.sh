@@ -91,8 +91,11 @@ gsettings set org.cinnamon.desktop.media-handling autorun-never true # If set to
 # gnome-system-monitor
 gsettings set org.gnome.gnome-system-monitor show-whose-processes 'all' # Determines which processes to show
 gsettings set org.gnome.gnome-system-monitor cpu-smooth-graph 'false' # Show CPU chart as smooth graph using Bezier curves
-gsettings set org.gnome.gnome-system-monitor update-interval 1000 # Time in milliseconds between updates of the process view
-gsettings set org.gnome.gnome-system-monitor graph-update-interval 1000
+gsettings set org.gnome.gnome-system-monitor update-interval 5000 # Time in milliseconds between updates of the process view (if 1 second than often processes reorder so frequently it is difficult to select needed one)
+gsettings set org.gnome.gnome-system-monitor process-memory-in-iec true # Show memory in IEC (that is in e.g. MiB, not MB)
+gsettings set org.gnome.gnome-system-monitor graph-update-interval 2000 # Time in milliseconds between updates of the graphs
+gsettings set org.gnome.gnome-system-monitor graph-data-points 250 # Time amount of data points in the resource graphs (no scrolling, affects scale)
+gsettings set org.gnome.gnome-system-monitor kill-dialog true # Show warning dialog when killing processes
 gsettings set org.gnome.gnome-system-monitor.proctree col-14-visible 'true' # Show process “Command Line” column on startup
 gsettings set org.gnome.gnome-system-monitor.proctree col-14-width 120 # Width of process “Command Line” column
 gsettings set org.gnome.gnome-system-monitor.proctree col-4-visible 'true' # Show process “Resident Memory” column on startup
