@@ -31,12 +31,24 @@ liveiso_path_scripts_in_chroot=/usr/share/amendedliveiso-scripts
 liveiso_path_settings_in_chroot=/usr/share/amendedliveiso-settings
 liveiso_sources_in_chroot=/usr/src/amendedliveiso # to copy all scripts to have sources on resulting ISO
 work_path_in_chroot=/tmp # used by apt_get.sh
+use_cgroup='true' # to limit CPU usage during CPU intensive tasks of long duration (chroot, mksquashfs)
+cgroup="gr1"
+cpu_max_chroot="500000 1000000" # limit for whole CPU, write quota and period (valid values in the range of 1000 to 1000000) in microseconds, for  performance reasons could be better to use larger periods). Total CPU time in the system equals period multiplied by number of cores/processors
+cpu_max_mksquashfs="1500000 1000000"
 
 # ---- parameters end ---- #
 
 if [ ! -e "$original_iso" ]; then delay=5; echo original iso file not found at $original_iso, ending script in $delay seconds; sleep $delay; exit 1; fi
 
 script_path="$(dirname "$(realpath "$0")")"
+
+if [ "${use_cgroup}" = 'true' ]; then
+    sudo cgcreate -g cpu,cpuset:"${cgroup}" # no error noted if this cgroup already exists
+    sudo cgset -r cpu.max="${cpu_max_chroot}" "${cgroup}"
+    sudo cgset -r cpuset.cpus="0-1" "${cgroup}"
+    printf "Next line moves to cgroup ${cgroup} this process, id of the process: "
+    echo $$ | sudo tee /sys/fs/cgroup/"${cgroup}"/cgroup.procs
+fi
 
 # commands that make amendments that result in changed booted live system
 change_squash() {
@@ -364,6 +376,11 @@ if [ "${change_initramfs}" = "true" ] ; then
     find . -print0 | cpio --null --create --reproducible --format=newc | xz --format=lzma | 1>/dev/null sudo tee --append $initrd_path
     echo "  ... repacking initrd code was before this line."
     cd $work_path
+fi
+
+if [ "${use_cgroup}" = 'true' ]; then
+    sudo cgset -r cpu.max="${cpu_max_mksquashfs}" "${cgroup}"
+    sudo cgset -r cpuset.cpus="all" "${cgroup}"
 fi
 
 # After done with modifications making new `squashfs` file, needs to be free space there  
