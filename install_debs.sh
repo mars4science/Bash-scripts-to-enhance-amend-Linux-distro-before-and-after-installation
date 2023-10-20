@@ -3,9 +3,10 @@ trap 'err=$?; echo >&2 "  ERROR: Exiting $0 on error $err"; exit $err' ERR
 
 # TODO: add usage of debconf-set-selections to allow automatic installation of packages that ask questions
 
+if [ "x${liveiso_path_sources_root}" = "x" ] ; then liveiso_path_sources_root="/usr/src/amendedliveiso" ; fi
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
 if [ "x${work_path}" = "x" ] ; then work_path=/tmp ; fi
-packages_to_install="${software_path_root}/packages_to_install.list"
+packages_to_install="${liveiso_path_sources_root}/packages_to_install.list"
 amend_errors_log="${work_path}/amend_errors.log"
 install_debs_log="${work_path}/install_debs.log"
 debian_archives="${software_path_root}/debian_archives"
