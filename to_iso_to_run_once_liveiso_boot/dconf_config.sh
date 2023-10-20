@@ -246,7 +246,10 @@ dconf write /org/cinnamon/sounds/switch-enabled false
 dconf write /org/cinnamon/sounds/tile-enabled false
 dconf write /org/cinnamon/sounds/plug-enabled false
 dconf write /org/cinnamon/sounds/unplug-enabled false
-# TODO find how to disable notification's sound (is on by default in LM 21.2)
+# DONE: find how to disable notification's sound (is on by default in LM 21.2)
+# interestingly if value in dconf GUI is set to 'default', `dconf read /org/cinnamon/sounds/notification-enabled` outputs nothing, but gsetting get outputs correct default value; however in such setting `dconf write` works.
+# TODO: find out how to change 'default' flag via terminal, also how to read 'Summary', 'Description' fields of dconf entry
+dconf write /org/cinnamon/sounds/notification-enabled false
 
 gsettings set ca.desrt.dconf-editor.Settings show-warning false # If “true”, Dconf Editor opens a popup when launched reminding the user to be careful.
 gsettings set org.gnome.nm-applet disable-disconnected-notifications true # Set this to true to disable notifications when disconnecting from a network.
