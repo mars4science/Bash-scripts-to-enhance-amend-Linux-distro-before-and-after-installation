@@ -31,10 +31,6 @@ liveiso_path_scripts_in_chroot=/usr/share/amendedliveiso-scripts
 liveiso_path_settings_in_chroot=/usr/share/amendedliveiso-settings
 liveiso_sources_in_chroot=/usr/src/amendedliveiso # to copy all scripts to have sources on resulting ISO
 work_path_in_chroot=/tmp # used by apt_get.sh
-use_cgroup='true' # to limit CPU usage during CPU intensive tasks of long duration (chroot, mksquashfs)
-cgroup="gr1"
-cpu_max_chroot="500000 1000000"
-cpu_max_mksquashfs="1500000 1000000"
 
 # ---- parameters end ---- #
 
@@ -117,24 +113,13 @@ change_squash() {
     # note which looks as made before `mount /proc` was added: # mount  ----- output: mount: failed to read mtab: No such file or directory
 
     locales=$(echo "${locales[@]@A}" | sed "s/"\""/'/g") # A operator of bash generate declare line with double quotes, need to replace for bash -c below
-
-    _command='sudo chroot $work_path/fin_sq /bin/bash -c "\
+    sudo chroot $work_path/fin_sq /bin/bash -c "\
         export software_path_root=${path_to_software_in_chroot}; \
         export liveiso_path_scripts_root=${liveiso_path_scripts_in_chroot}; \
         export locales="\""${locales}"\"";\
         export liveiso_path_sources_root="${liveiso_sources_in_chroot}"; \
         export work_path=${work_path_in_chroot}; \
-        /media/root/Scripts/after_original_distro_install.sh"'
-    if [ "${use_cgroup}" = 'true' ]; then
-        # create cgroup, change limits and run _command
-        sudo cgcreate -g cpu,cpuset:"${cgroup}"
-        sudo cgset -r cpu.max="${cpu_max_chroot}" "${cgroup}"
-        sudo cgset -r cpuset.cpus="0-1" "${cgroup}"
-        sudo cgexec -g cpu,cpuset:"${cgroup}" sudo -u `id -un` -g `id -gn` "${_command}"
-    else
-        "${_command}"
-    fi
-
+        /media/root/Scripts/after_original_distro_install.sh"
     if [ $? -ne 0 ]; then echo "=== That code has been written to display in case of non zero exit code of chroot of after_original_distro_install.sh ==="; fi
 }
 
@@ -384,16 +369,7 @@ fi
 # After done with modifications making new `squashfs` file, needs to be free space there  
 # putting in folder of previously created for new iso
 un_mount_in_squashfs # if not unmounted adds e.g. /proc, which I think it not how liveUSB is made to work and it would make it less properly working   
-
-_command='sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22'  # was? '-comp xz'; adding option '-processors 1' did NOT help much to solve issue of `mksquashfs` using resident menory in the size of ~3Gb (a lot, about size of file to be created by the command)
-if [ "${use_cgroup}" = 'true' ]; then
-    # change limits and run _command
-    sudo cgset -r cpu.max="${cpu_max_mksquashfs}" "${cgroup}"
-    sudo cgset -r cpuset.cpus="all" "${cgroup}"
-    sudo cgexec -g cpu,cpuset:"${cgroup}" sudo -u `id -un` -g `id -gn` "${_command}"
-else
-    "${_command}"
-fi
+sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 # was? '-comp xz'; adding option '-processors 1' did NOT help much to solve issue of `mksquashfs` using resident menory in the size of ~3Gb (a lot, about size of file to be created by the command)
 
 # if larger than 4Gb, split system to two squashfs files (casper scripts of Linux Mint support that); usr/lib by experince is about half
 if [ $(stat --format='%s' fin/casper/filesystem.squashfs) -ge 4294967296 ]; then
@@ -401,19 +377,9 @@ if [ $(stat --format='%s' fin/casper/filesystem.squashfs) -ge 4294967296 ]; then
     sudo rm fin/casper/filesystem.squashfs
 
     # Below split to two files was initially implemented as moves of folders, however moves in overlay seems to take memory, also learned there is -no-strip option added in 2021 and of -e option usage from README (both are absent from man page)
-    _command='sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -e "usr/lib"'
-    if [ "${use_cgroup}" = 'true' ]; then
-        sudo cgexec -g cpu,cpuset:"${cgroup}" sudo -u `id -un` -g `id -gn` "${_command}"
-    else
-        "${_command}"
-    fi
+    sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -e "usr/lib"
     cd fin_sq
-    _command='sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip'
-    if [ "${use_cgroup}" = 'true' ]; then
-        sudo cgexec -g cpu,cpuset:"${cgroup}" sudo -u `id -un` -g `id -gn` "${_command}"
-    else
-        "${_command}"
-    fi
+    sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
     cd ..
 
 #    sudo mkdir fin_sq/part1
