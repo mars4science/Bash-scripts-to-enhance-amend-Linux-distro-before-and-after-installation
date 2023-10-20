@@ -1,6 +1,6 @@
 # support script to avoid saving and commiting regular but temporarily changes to scripts
 
-# change label, original ISO file, keyboard layout languages, add bash fuctions and prepare for reduced set of debs to install (note: symbolic linking does not work on exFAT)
+# change label, original ISO file, keyboard layout languages, etc., add bash fuctions and prepare for reduced set of debs to install (note: symbolic linking does not work on exFAT)
 
 # edit, check path to debs and run from repo's folder
 
@@ -8,12 +8,16 @@
 software_path_root="/media/data/LM"
 distro_label="GNU-Linux_1.1_b21"
 original_iso='${software_path_root}/linuxmint-21-cinnamon-64bit.iso' # ' here as contains $
+new_legacy_menu_title="GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)"
 work_path="/media/disk1/work1"
 locales='("en_US" "fr_FR")' # note: string here whereas array in the file to edit
-cgroup="gr1"
+cgroup="gr1" # see [1] for example of usage (in addition of moving process into a group)
 
 # ----------------------------------------------------------- #
 
+#
+# change variables
+#
 script_path="$(dirname "$(realpath "$0")")" # need to read $0 before folder change via `cd` later as `realpath` just substitutes "." (if script started from where located via ./script_name) with current folder
 
 change_variable(){
@@ -26,11 +30,15 @@ change_variable software_path_root
 change_variable distro_label
 change_variable original_iso
 change_variable work_path
+change_variable new_legacy_menu_title
+change_variable cgroup
 
 # not via change_variable function as locales is an array variable and enclosing in quotation marks right part of assignment command chamges it to incorrect (for purposes of other parts of the scripts) array
 perl -i -pe 's/^locales=\(.+?\)/locales='"${locales}"'/' "${file_to_change}"
 
+#
 # add bash functions
+#
 file_to_change="bash_functions_and_other_config.sh"
 # length of 1st line to be at least number of symbols to select in variable in a following grep (otherwise part of 2nd line is matched too - amd separately as grep works with single lines)
 text_to_add='# tests tests tests tests tests
@@ -43,17 +51,23 @@ if [ $? -ne 0 ]; then
     printf "${text_to_add}" | tee --append "${file_to_change}"
 fi
 
+# end of script
+exit
+
+
+###########################################
+
+# [1]
 # set up cgroup to redure CPU load if wanted
 set -x
 sudo cgcreate -g cpu,cpuset:"${cgroup}"
-sudo cgset -r cpu.max="1000000 1000000" "${cgroup}" # limit for whole CPU, write quota and period (valid values in the range of 1000 to 1000000) in microseconds, for  performance reasons could be better to use larger periods). Total CPU time in the system equals period multiplied by number of cores/processors
+sudo cgset -r cpu.max="500000 1000000" "${cgroup}" # limit for whole CPU, write quota and period (valid values in the range of 1000 to 1000000) in microseconds, for  performance reasons could be better to use larger periods). Total CPU time in the system equals period multiplied by number of cores/processors
 # sudo cgset -r cpuset.cpus="0-3" gr1 # not to use hyperthreading in typical 4 core Intel (list of cores obtained via `lscpu --all --extended`)
-sudo cgset -r cpuset.cpus="0-1" "${cgroup}"
-sudo cgexec -g cpu:"${cgroup}" sudo -u somebody -g somebody echo 'Example of running this line in gr1'
+sudo cgset -r cpuset.cpus="all" "${cgroup}"
+sudo cgexec -g cpu:"${cgroup}" sudo -u `id -un` -g `id -gn` echo "Example of running this line as ordinary user in ${cgroup}"
+sudo cgexec -g cpu:"${cgroup}" echo "Example of running this line as root in ${cgroup}"
 set +x
 
-# end of script
-exit
 
 
 # Not run as of 2023/10/12
