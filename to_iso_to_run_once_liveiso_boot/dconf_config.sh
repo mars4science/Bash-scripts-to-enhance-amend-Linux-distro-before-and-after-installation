@@ -10,6 +10,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# NOTE: dconf: VALUE arguments must be in proper GVariant format (e.g. a string must include explicit quotes - either single or double - around the string: e.g. foo as "'foo'", f'o"o as '"f'\''o\"o"').
+
 # ========= cinnamon / desktop / GUI settings ============
 # LM 21 ?
 gsettings set org.cinnamon.control-center.display show-fractional-scaling-controls true
@@ -213,13 +215,13 @@ gsettings set org.cinnamon.desktop.keybindings custom-list "['custom12', 'custom
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom13/name "'Up text scaling 1.1 times'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom13/binding "['<Primary><Shift><Alt>x']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom13/command "'sh -c \'f=\$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=\$(printf print\(\${f}*1.1\) | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor \${fnew}\''"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom13/command '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*1.1)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
 
 gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11', 'custom12', 'custom13']"
 
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom14/name "'Up text scaling 0.9 times'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom14/binding "['<Primary><Shift><Alt>z']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom14/command "'sh -c \'f=\$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=\$(printf print\(\${f}*0.9\) | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor \${fnew}\''"
+dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom14/command '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*0.9)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
 
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom14', 'custom13', 'custom12', 'custom11', 'custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
 
@@ -263,7 +265,7 @@ gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for
 
 # change theme for Cinnamon
 gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark'
-gsettings set org.cinnamon.desktop.interface icon-theme 'Mint-Y-Dark-Teal' # noted Mint-Y appearance changed from LM 21 to 21.2 from yellowish to greenish, so now attemping to use more "specifc" themes
+gsettings set org.cinnamon.desktop.interface icon-theme 'Mint-Y-Dark-Teal' # noted Mint-Y appearance changed from LM 21 to 21.2 from yellowish to greenish, so now attemping to use more "specifc" themes, on 21.2 result of 'Mint-Y-Dark-Teal' is interesting even as there seems to be no such theme available for choosing in GUI
 gsettings set org.cinnamon.theme name 'Mint-Y-Dark'
 
 # change theme for xed to Cobalt (for dark Cinnamon theme)
