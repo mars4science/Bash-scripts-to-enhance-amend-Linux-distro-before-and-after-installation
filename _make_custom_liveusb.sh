@@ -120,14 +120,9 @@ change_squash() {
     # moved here from after_original_distro_install.sh as I understood is customary to set chroot environment before calling chroot
     sudo mount -t proc proc $work_path/fin_sq/proc
     sudo mount -t sysfs sys $work_path/fin_sq/sys
-    sudo mount -t devtmpfs devtmpfs $work_path/fin_sq/dev
+    sudo mount -t devtmpfs devtmpfs $work_path/fin_sq/dev # when contents of /dev had been partly deleted, [3] helped
     sudo mount -t devpts devpts $work_path/fin_sq/dev/pts
     # note which looks as made before `mount /proc` was added: # mount  ----- output: mount: failed to read mtab: No such file or directory
-
-    # when something messed up in /dev, below helped
-    # From https://tldp.org/LDP/lfs/LFS-BOOK-6.1.1-HTML/chapter06/devices.html "Linux From Scratch - Version 6.1.1, 6.8. Populating /dev"
-    # mknod -m 666 /dev/null c 1 3
-    # mknod -m 666 /dev/ptmx c 5 2
 
     locales=$(echo "${locales[@]@A}" | sed "s/"\""/'/g") # A operator of bash generate declare line with double quotes, need to replace for bash -c below
     sudo chroot $work_path/fin_sq /bin/bash -c "\
@@ -511,18 +506,29 @@ if [ $? -eq 0 ]; then bash -i; fi
 
 exit
 
+-----"<Footnotes>"-----
 
 [1]
-# testing gerenating CD (not USB) image:
-# sudo genisoimage -lJr -o new_custom.iso -V LinuxMint_CD -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 --boot-info-table fin
+# testing generating CD (not USB) image:
+sudo genisoimage -lJr -o new_custom.iso -V LinuxMint_CD -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 --boot-info-table fin
 
 [2]
 # https://stackoverflow.com/questions/148451/how-to-use-sed-to-replace-only-the-first-occurrence-in-a-file
 
-
-
-
-
+[3]
+# From https://tldp.org/LDP/lfs/LFS-BOOK-6.1.1-HTML/chapter06/devices.html "Linux From Scratch - Version 6.1.1, 6.8. Populating /dev"
+mknod -m 666 /dev/null c 1 3 # to restore ability to start GUI applications
+mknod -m 666 /dev/ptmx c 5 2 # additionally needed to restore ability to open new terminal windows
+mknod -m 660 /dev/loop-control c 10 237 # ?
+for((i=0;i<=7;i++)); do sudo mknod -m 660 /dev/loop$i b 7 $i; done # to how ability to mount e.g. ISO files. TODO: How many are needed to be made? even with loop-control no devices at all resulted in error
+ln -sv /proc/self/fd /dev/fd # to restore ability to use e.g. redirection of output from subshells (e.g. some packages failed to be installed w/out /dev/fd)
+# apt-get install tp-smapi-dkms
+# /usr/sbin/dkms: line 2106: /dev/fd/63: No such file or directory
+# to test:
+echo <(echo a)
+/dev/fd/63
+cat <(echo a) # without /dev/fd that line IIRC produced an error, not 'a'
+a
 
 
 
