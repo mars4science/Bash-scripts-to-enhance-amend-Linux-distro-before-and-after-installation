@@ -3,18 +3,19 @@
 # change label, original ISO file, keyboard layout languages, etc., add bash fuctions and prepare for reduced set of debs to install (note: symbolic linking does not work on exFAT)
 
 # edit, check path to debs and run from repo's folder
-
 # P.S. at the end some useful code [2]
 
-# comment out NOT to change those
-software_path_root="/media/data/LM"
-distro_label="GNU-Linux_1.1_b21"
-original_iso='${software_path_root}/linuxmint-21-cinnamon-64bit.iso' # ' here as contains $
-new_legacy_menu_title="GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)"
-work_path="/media/disk1/work1"
-locales='("en_US" "fr_FR")' # note: string here whereas array in the file to edit
-cgroup="gr1" # see [1] for example of usage (in addition of moving process into a group)
-cpu_max_mksquashfs="1200000 1000000"
+# for skipping changing a variable one is adviced to try commenting out the line
+software_path_root="/media/data/LM1"
+base_version="21"
+distro_label="GNU-Linux_1.2_b${base_version}"
+original_iso='${software_path_root}'"/linuxmint-${base_version}-cinnamon-64bit.iso" # ' here as contains $
+new_legacy_menu_title="GNU/Linux Cinnamon OS based on LM ${base_version} 64-bit (legacy boot)"
+work_path="/media/disk1/work2"
+user_name="user2"
+locales='("en_US" "de_DE")' # note: string here whereas array in the file to edit
+cgroup="gr2" # see [1] for example of usage (in addition of moving process into a group)
+cpu_max_mksquashfs="1100000 1000000"
 
 # ----------------------------------------------------------- #
 
@@ -37,6 +38,7 @@ change_variable work_path
 change_variable new_legacy_menu_title
 change_variable cgroup
 change_variable cpu_max_mksquashfs
+change_variable user_name
 
 # not via change_variable function as locales is an array variable and enclosing in quotation marks right part of assignment command chamges it to incorrect (for purposes of other parts of the scripts) array
 perl -i -pe 's/^locales=\(.+?\)/locales='"${locales}"'/' "${file_to_change}"

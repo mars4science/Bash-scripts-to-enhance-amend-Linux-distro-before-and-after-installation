@@ -20,7 +20,7 @@ change_boot_menu="true" # set to "true" to edit boot menu (which adds options e.
 new_legacy_menu_title="GNU/Linux Cinnamon OS based on LM 21 64-bit (legacy boot)"
 
 change_initramfs="true" # set to true to change early boot envinonment, now changing of user name is programmed
-user_name=somebody # in case of change_initramfs=true put arbitrary name to set for user, in case of "false" put user name as set in the distro (used in run_at_boot_liveusb.sh - custom init script and systemd_to_run_as_user.sh - run as user during boot)
+user_name="user1" # in case of change_initramfs=true put arbitrary name to set for user, in case of "false" put user name as set in the distro (used in run_at_boot_liveusb.sh - custom init script and systemd_to_run_as_user.sh - run as user during boot)
 
 # array, list separated by space; correct syntax of each entry can be found in /etc/locale.gen (languagecode_COUNTRYCODE); used to generate locales, set keyboard layouts available for switching
 locales=("fr_FR" "en_US" "de_DE") # first in array also used to set system interface language; set to empty () for not doing locales changes (so for liveISO layouts will be default - Eng only, as layouts are set via amended to that setting script during boot time)
