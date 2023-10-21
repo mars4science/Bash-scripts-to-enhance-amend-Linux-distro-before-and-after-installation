@@ -4,6 +4,8 @@
 
 # edit, check path to debs and run from repo's folder
 
+# P.S. at the end some useful code [2]
+
 # comment out NOT to change those
 software_path_root="/media/data/LM"
 distro_label="GNU-Linux_1.1_b21"
@@ -100,7 +102,14 @@ else
 fi
 
 
-# Notes
+# [2] Notes, useful code
+
 # Useful to change something in all scripts
 find . -name '*.sh' -execdir bash -c 'sed -i '\''s|Exiting $0 on error $err|  ERROR: Exiting $0 on error $err|'\'' "$0"' "{}" \;
 
+# get information of size taken if a package is installed (for set of packages, estimation by APT for each separately)
+
+# Run install_debs.sh with changed `apt-get install` line  to `sudo apt-get install --assume-no ${line}`
+# Copy install_debs.log from /tmp somewhere
+perl -lne 's/^.*?(?=    )//s; for (split /    /) { print qq($1 $2\n) if /(.*?)  to be installed next.*?After this operation, (.*?) of additional disk space will be used./s }' -0777 <install_debs.log | grep ' ' > perl.txt
+# copy perl.txt to Calc
