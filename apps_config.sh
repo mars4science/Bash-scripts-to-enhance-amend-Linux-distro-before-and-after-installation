@@ -65,7 +65,7 @@ fi
 # GIMP2_SYSCONFDIR was not set (man gimp), so hardcode config folder
 app_conf_folder="/etc/gimp/2.0/"
 if [ ! -e "${app_conf_folder}" ] ; then
-  echo "  ERROR: ${app_conf_folder} not found; probably mpv is not installed or mpv config files location changed"
+  echo "  ERROR: ${app_conf_folder} not found; probably GIMP is not installed or GIMP config files location changed"
 else
   file_fully_qualified_name="${app_conf_folder}/gimprc"
   sudo sed --in-place 's/.*(icon-theme "Symbolic")/(icon-theme "Color")/' "${file_fully_qualified_name}" # file had got edited but GIMP started with b&w icons; when changed in GUI back and forth next time GIMP started with color icons, but in ~/.config/gimp/2.0/gimprc there was no entry for color icons added (was added when such change was made when there was no entry in system wide gimprc). TODO: understand the reason; P.S. Also GIMP initially started w/out maximazie window icon in its window. TODO: understand the reason
