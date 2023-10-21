@@ -20,5 +20,7 @@ if [ $dpm -ge 6 ] && ([ ${horizontal_resolution} -le 2000 ] || [ ${horizontal_re
     # 3. Text scaling results in half effect, e.g. scaling increase from 1.0 to 1.5 resulted in ~ 1.25 font size increase in list view in Nemo
     # 4. Decreasing scaling below 1 had not resulted in icons decrease in Nemo's list view, increasing above 1 had increased icons size
     gsettings set org.cinnamon.desktop.interface text-scaling-factor 1.7
+else
+    gsettings set org.cinnamon.desktop.interface text-scaling-factor 1.3
 fi
 
