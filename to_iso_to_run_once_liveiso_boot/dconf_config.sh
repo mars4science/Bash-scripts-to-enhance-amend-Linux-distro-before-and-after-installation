@@ -18,7 +18,7 @@ gsettings set org.cinnamon.control-center.display show-fractional-scaling-contro
 # LM 21.2
 gsettings set org.cinnamon.muffin experimental-features "['x11-randr-fractional-scaling']"
 
-# moved to fonts_scaling.sh
+# moved to gui_configure.sh
 #dpm=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4/$(NF-1)}') # dots per millimeter, rounded as bash test works with integers only at least gave "integer expression expected" for [ 3.4 -eq 45 ]
 #dpi=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4/$(NF-1)*25.4}') # dots per inch, rounded
 #horizontal_resolution=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4}')

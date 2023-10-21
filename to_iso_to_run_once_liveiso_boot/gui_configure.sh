@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# set scaling of fonts in Cinnamon based on display's resolution and pixels density (and guesswork about overall monitor scaling factor as still have not found a way to read it by shell code)
+# set scaling of fonts in Cinnamon
+#
+# based on display's resolution and pixels density (and guesswork about overall monitor scaling factor as still have not found a way to read it by shell code)
 # to be run separately from the rest of dconf settings as it seems `xrandr` does not output data when X had not started yet
 
 dpm=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4/$(NF-1)}') # dots per millimeter, rounded as bash test works with integers only

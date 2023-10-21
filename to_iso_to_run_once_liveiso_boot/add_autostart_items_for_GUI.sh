@@ -38,13 +38,13 @@ Hidden=false
 X-GNOME-Autostart-Delay=0
 EOF
 
-# set scaling of fonts in Cinnamon based on display's resolution and pixels density (and guesswork about overall monitor scaling factor as still have not found a way to read it by shell code)
-tee $autostart_dir/fonts.scaling.set.desktop << EOF
+# includes setting scaling of fonts in Cinnamon based on display's resolution and pixels density (and guesswork about overall monitor scaling factor as still have not found a way to read it by shell code)
+tee $autostart_dir/gui.configure.desktop << EOF
 [Desktop Entry]
 Name=fonts.scaling.set
 Comment=No description
 Type=Application
-Exec=liveiso_path_scripts_root/fonts_scaling.sh
+Exec=liveiso_path_scripts_root/gui_configure.sh
 X-GNOME-Autostart-enabled=true
 NoDisplay=false
 Hidden=false
