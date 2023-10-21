@@ -124,6 +124,11 @@ change_squash() {
     sudo mount -t devpts devpts $work_path/fin_sq/dev/pts
     # note which looks as made before `mount /proc` was added: # mount  ----- output: mount: failed to read mtab: No such file or directory
 
+    # when something messed up in /dev, below helped
+    # From https://tldp.org/LDP/lfs/LFS-BOOK-6.1.1-HTML/chapter06/devices.html "Linux From Scratch - Version 6.1.1, 6.8. Populating /dev"
+    # mknod -m 666 /dev/null c 1 3
+    # mknod -m 666 /dev/ptmx c 5 2
+
     locales=$(echo "${locales[@]@A}" | sed "s/"\""/'/g") # A operator of bash generate declare line with double quotes, need to replace for bash -c below
     sudo chroot $work_path/fin_sq /bin/bash -c "\
         export software_path_root=${path_to_software_in_chroot}; \
@@ -255,7 +260,12 @@ u_mount(){
     # proc path exists before script, mount_path is relative, so grep, not just `findmnt "$mount_path"` and current folder is "expected" to be $work_path
     # no need to escape " inside command substitution as double quotes preserve literal meaning of qouble quotes (man bash: search for "QUOTING")
     mount_point="${1//\/\//\/}" # remove extra '/' just in case work_path ends with '/' for grep to find a match
-    if [ -n "$(findmnt | grep "${mount_point}" | head -n 1)" ]; then sudo umount "${mount_point}"; fi # `head -n` as a "just in case" safeguard against using several lines for '-n' of `if`, works w/out it
+    if [ -n "$(findmnt | grep "${mount_point}" | head -n 1)" ]; then
+        sudo umount "${mount_point}" # `head -n` as a "just in case" safeguard against using several lines for '-n' of `if`, works w/out it
+        if [ $? -ne 0 ]; then
+            delay=10; echo "  ERROR: Unmounting ${mount_point} unsuccessful (per return code); this script is written to end in $delay seconds"; sleep $delay; exit 1;
+        fi
+    fi
 }
 
 un_mount_in_squashfs(){
@@ -295,9 +305,9 @@ if [ -e "$work_path" ] && [ "$(ls $work_path)" != "" ]; then
         sudo rm -R $work_path/*
         Eval=$?
         if [ $Eval -ne 0 ]; then
-            delay=10; echo "Deleting contents unsuccessful (per return code);this script is written to end in $delay seconds"; sleep $delay; exit 1;
+            delay=10; echo "  ERROR: Deleting contents of ${work_path} unsuccessful (per return code); this script is written to end in $delay seconds"; sleep $delay; exit 1;
         fi
-            delay=1; echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
+            delay=1; echo "Deleting contents of ${work_path} successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
     fi    
 else
     mkdir --parents $work_path && cd $_
