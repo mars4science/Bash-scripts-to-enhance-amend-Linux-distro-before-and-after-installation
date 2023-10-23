@@ -139,10 +139,131 @@ sudo chmod a+rx $(get_install_path.sh)/display_rotate_normal.sh $(get_install_pa
 #
 ##### beginning of keyboard bindings #####
 
+# previous notes and code see in [3]
+
+# programmed based on output of `dconf watch /` when adding key via GUI:
+# upon new entry added in GUI addional entry to custom-list is added to the right and after binding added in GUI the list's order is reversed
+# 1st entry is exception: custom0 is added to the left
+
+# no gsettings schema for '/org/cinnamon/desktop/keybindings/custom-keybindings/custom', hence AFAIK need for such long lines TODO understand why
+
+id_key=-1
+dconf_customb_path='/org/cinnamon/desktop/keybindings/custom-keybindings/custom'
+gsettings_customb_path='org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom'
+custom_list="['__dummy__']"
+
+add_key(){
+
+    id_key=$((id_key+1))
+    if [ ${id_key} -eq 0 ]; then # initialization of the list ? as reason for exception TODO understand if and why needed
+        custom_list="$(python -c "a=${custom_list};a.insert(0,'custom${id_key}');print(a)")" # added to the left
+    else
+        custom_list="$(python -c "a=${custom_list};a.append('custom${id_key}');print(a)")" # added to the right
+    fi
+
+    # using dconf
+    dconf write /org/cinnamon/desktop/keybindings/custom-list "${custom_list}"
+    dconf write "${dconf_customb_path}${id_key}/binding" "@as []" # '@as' specify string type ('s' - developer's guess) for empty array ('a')
+    dconf write "${dconf_customb_path}${id_key}/binding" "${2}"
+    dconf write "${dconf_customb_path}${id_key}/command" "${3}"
+    dconf write "${dconf_customb_path}${id_key}/name" "${1}"
+
+    custom_list="$(python -c "a=${custom_list};a.reverse();print(a)")" # (echo "" | python) works too, but why make extra subshells?
+    dconf write /org/cinnamon/desktop/keybindings/custom-list "${custom_list}"
+
+    # using gsettings TODO (maybe if dconf won't work always and fully to set keys)
+}
+
+add_key "'Display rotate normal'" "['<Super><Alt>Up']" "'display_rotate_normal.sh'"
+add_key "'Display rotate left'" "['<Super><Alt>Left']" "'display_rotate_left.sh'"
+add_key "'Display rotate right'" "['<Super><Alt>Right']" "'display_rotate_right.sh'"
+add_key "'Display rotate upsidedown'" "['<Super><Alt>Down']" "'display_rotate_inverted.sh'"
+add_key "'Volume Down'" "['<Alt>AudioLowerVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'" # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
+add_key "'Volume Up'" "['<Alt>AudioRaiseVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'" # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
+add_key "'TrackPoint X1G6 fix'" "['<Super><Alt>t']" "'/lib/systemd/system-sleep/trackpoint_reset key'" # fix TrackPoint issue om carbon X1 gen 6
+add_key "'Screen lock'" "['<Super><Alt>x']" "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''" # screen lock binding, xscreensaver to be set to be started via other script
+add_key "'Brightness up'" "['<Alt>MonBrightnessUp']" "'night +1'" # set custom monitor brightness adjustments
+add_key "'Brightness down'" "['<Alt>MonBrightnessDown']" "'night -1'"
+add_key "'Help'" "['F1']" "'notify-send \'NoNo help in GUI available, some info via man pages\''" "'yelp'" # GUI help app (not included in the distro: to be istalled) replaces opening Linux Mint web page on F1 press
+add_key "'Air fan(s) off'" "['<Super><Alt>z']" "'stopfan'"
+add_key "'Up text scaling 1.1 times'" "['<Primary><Shift><Alt>x']" '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*1.1)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
+add_key "'Up text scaling 0.9 times'" "['<Primary><Shift><Alt>z']" '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*0.9)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
+
+# did not work on LM 21 so commented out, moved to use font scaling mostly
+# add_key "'Screen scale'" "['<Super><Alt>s']" "'/lib/systemd/system-sleep/scaling_factor key'" # set custom screen scale
+
+##### end of keyboard bindings #####
+#
+
+# additional shortcuts for working with windows
+# <Primary> was Ctrl on some thinkpad
+gsettings set org.cinnamon.desktop.keybindings.wm close "['<Alt>F4', '<Primary><Shift>w']" # same as in terminal
+gsettings set org.cinnamon.desktop.keybindings.wm maximize "['<Alt><Shift>Up']"
+gsettings set org.cinnamon.desktop.keybindings.wm minimize "['<Alt><Shift>Down']"
+
+# sounds
+dconf write /org/cinnamon/sounds/login-enabled false
+dconf write /org/cinnamon/sounds/close-enabled false
+dconf write /org/cinnamon/sounds/logout-enabled false
+dconf write /org/cinnamon/sounds/maximize-enabled false
+dconf write /org/cinnamon/sounds/unmaximize-enabled false
+dconf write /org/cinnamon/sounds/minimize-enabled false
+dconf write /org/cinnamon/sounds/switch-enabled false
+dconf write /org/cinnamon/sounds/tile-enabled false
+dconf write /org/cinnamon/sounds/plug-enabled false
+dconf write /org/cinnamon/sounds/unplug-enabled false
+# DONE: find how to disable notification's sound (is on by default in LM 21.2)
+# interestingly if value in dconf GUI is set to 'default', `dconf read /org/cinnamon/sounds/notification-enabled` outputs nothing, but gsetting get outputs correct default value; however in such setting `dconf write` works.
+# TODO: find out how to change 'default' flag via terminal, also how to read 'Summary', 'Description' fields of dconf entry
+dconf write /org/cinnamon/sounds/notification-enabled false
+
+gsettings set ca.desrt.dconf-editor.Settings show-warning false # If “true”, Dconf Editor opens a popup when launched reminding the user to be careful.
+gsettings set org.gnome.nm-applet disable-disconnected-notifications true # Set this to true to disable notifications when disconnecting from a network.
+
+desktop_background=liveiso_path_settings_root/background.jpg
+if [ ! -e "$desktop_background" ] ; then desktop_background=/usr/share/backgrounds/linuxmint-ulyssa/echerkasski_countryside.jpg ; fi
+gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_background"
+
+# UPDATE: setting not helping for some reason
+gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run)
+
+# change theme for Cinnamon
+gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark'
+gsettings set org.cinnamon.desktop.interface icon-theme 'Mint-Y-Dark-Teal' # noted Mint-Y appearance changed from LM 21 to 21.2 from yellowish to greenish, so now attemping to use more "specifc" themes, on 21.2 result of 'Mint-Y-Dark-Teal' is interesting even as there seems to be no such theme available for choosing in GUI
+gsettings set org.cinnamon.theme name 'Mint-Y-Dark'
+
+# change theme for xed to Cobalt (for dark Cinnamon theme)
+gsettings set org.x.editor.preferences.editor scheme 'cobalt'
+gsettings set org.x.editor.preferences.editor display-line-numbers false # AFAIK false by default, however added as could be useful to set to true for somebody
+
+exit
+
+
+
+[1]
+# Issue solved by running the script via:
+sudo -i --user=mint bash <<-EOF
+    exec dbus-run-session -- bash liveiso_path_scripts_root/user_specific.sh
+EOF
+
+# dconf write /org/cinnamon/desktop/interface/scaling-factor 1
+error: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
+root@alex:/# echo $?
+1
+root@alex:/# gsettings set org.cinnamon.desktop.interface scaling-factor 1
+
+(process:242481): dconf-WARNING **: 08:34:30.432: failed to commit changes to dconf: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
+root@alex:/# echo $?
+0
+
+
+[3]
+
 # after custom binding is changed, noted that `gsettings get org.cinnamon.desktop.keybindings custom-list` output reverses from cusmomMAX to dummy and back, so in the script added that after each key assignments. It worked with only one reverse after all assignments in LM 20.2, but resluted in some keys not working in LM 21. With reverse after each key seems working in LM 21.
 gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' ]"
 # or dconf write /org/cinnamon/desktop/keybindings/custom-list "['__dummy__']"
 
+# ----- previous code for custom-keybindings START ----- #
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/name "'Display rotate normal'"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/binding "['<Super><Alt>Up']"
 dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/command "'display_rotate_normal.sh'"
@@ -230,70 +351,4 @@ gsettings set org.cinnamon.desktop.keybindings custom-list "['custom14', 'custom
 
 # reversed order one more time in attempt to correct for <Alt>Audio LowerVolume and higher not working on one laptop on LM 21.2 TODO: test if the issue is solved
 gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11', 'custom12', 'custom13', 'custom14']"
-
-##### end of keyboard bindings #####
-#
-
-# additional shortcuts for working with windows
-# <Primary> was Ctrl on some thinkpad
-gsettings set org.cinnamon.desktop.keybindings.wm close "['<Alt>F4', '<Primary><Shift>w']" # same as in terminal
-gsettings set org.cinnamon.desktop.keybindings.wm maximize "['<Alt><Shift>Up']"
-gsettings set org.cinnamon.desktop.keybindings.wm minimize "['<Alt><Shift>Down']"
-
-# sounds
-dconf write /org/cinnamon/sounds/login-enabled false
-dconf write /org/cinnamon/sounds/close-enabled false
-dconf write /org/cinnamon/sounds/logout-enabled false
-dconf write /org/cinnamon/sounds/maximize-enabled false
-dconf write /org/cinnamon/sounds/unmaximize-enabled false
-dconf write /org/cinnamon/sounds/minimize-enabled false
-dconf write /org/cinnamon/sounds/switch-enabled false
-dconf write /org/cinnamon/sounds/tile-enabled false
-dconf write /org/cinnamon/sounds/plug-enabled false
-dconf write /org/cinnamon/sounds/unplug-enabled false
-# DONE: find how to disable notification's sound (is on by default in LM 21.2)
-# interestingly if value in dconf GUI is set to 'default', `dconf read /org/cinnamon/sounds/notification-enabled` outputs nothing, but gsetting get outputs correct default value; however in such setting `dconf write` works.
-# TODO: find out how to change 'default' flag via terminal, also how to read 'Summary', 'Description' fields of dconf entry
-dconf write /org/cinnamon/sounds/notification-enabled false
-
-gsettings set ca.desrt.dconf-editor.Settings show-warning false # If “true”, Dconf Editor opens a popup when launched reminding the user to be careful.
-gsettings set org.gnome.nm-applet disable-disconnected-notifications true # Set this to true to disable notifications when disconnecting from a network.
-
-desktop_background=liveiso_path_settings_root/background.jpg
-if [ ! -e "$desktop_background" ] ; then desktop_background=/usr/share/backgrounds/linuxmint-ulyssa/echerkasski_countryside.jpg ; fi
-gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_background"
-
-# UPDATE: setting not helping for some reason
-gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run)
-
-# change theme for Cinnamon
-gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark'
-gsettings set org.cinnamon.desktop.interface icon-theme 'Mint-Y-Dark-Teal' # noted Mint-Y appearance changed from LM 21 to 21.2 from yellowish to greenish, so now attemping to use more "specifc" themes, on 21.2 result of 'Mint-Y-Dark-Teal' is interesting even as there seems to be no such theme available for choosing in GUI
-gsettings set org.cinnamon.theme name 'Mint-Y-Dark'
-
-# change theme for xed to Cobalt (for dark Cinnamon theme)
-gsettings set org.x.editor.preferences.editor scheme 'cobalt'
-gsettings set org.x.editor.preferences.editor display-line-numbers false # AFAIK false by default, however added as could be useful to set to true for somebody
-
-exit
-
-
-
-[1]
-# Issue solved by running the script via:
-sudo -i --user=mint bash <<-EOF
-    exec dbus-run-session -- bash liveiso_path_scripts_root/user_specific.sh
-EOF
-
-# dconf write /org/cinnamon/desktop/interface/scaling-factor 1
-error: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
-root@alex:/# echo $?
-1
-root@alex:/# gsettings set org.cinnamon.desktop.interface scaling-factor 1
-
-(process:242481): dconf-WARNING **: 08:34:30.432: failed to commit changes to dconf: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
-root@alex:/# echo $?
-0
-
-
-
+# ----- previous code END ----- #
