@@ -142,14 +142,16 @@ sudo chmod a+rx $(get_install_path.sh)/display_rotate_normal.sh $(get_install_pa
 # previous notes and code see in [3]
 
 # programmed based on output of `dconf watch /` when adding key via GUI:
-# upon new entry added in GUI addional entry to custom-list is added to the right and after binding added in GUI the list's order is reversed
+# upon new entry added in GUI addional entry to custom-list is added to the right (1st part, setting mane and command) and after binding added in GUI the list's order is reversed (2nd part)
 # 1st entry is exception: custom0 is added to the left
 
+# Alternatively using gsettings, need key variable, aslo
 # no gsettings schema for '/org/cinnamon/desktop/keybindings/custom-keybindings/custom', hence AFAIK need for such long lines TODO understand why
+# gsettings_customb_path='org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom'
+# gsettings set "${gsettings_customb_path}${id_key}/" command "${3}"
 
 id_key=-1
 dconf_customb_path='/org/cinnamon/desktop/keybindings/custom-keybindings/custom'
-gsettings_customb_path='org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom'
 custom_list="['__dummy__']"
 
 add_key(){
@@ -163,23 +165,24 @@ add_key(){
 
     # using dconf
     dconf write /org/cinnamon/desktop/keybindings/custom-list "${custom_list}"
-    dconf write "${dconf_customb_path}${id_key}/binding" "@as []" # '@as' specify string type ('s' - developer's guess) for empty array ('a')
-    dconf write "${dconf_customb_path}${id_key}/binding" "${2}"
+    dconf write "${dconf_customb_path}${id_key}/binding" "@as []" # per GVariant Format Strings syntax need to specify type for empty array; '@as' means (developer's guess) 's' for string and 'a' for array
     dconf write "${dconf_customb_path}${id_key}/command" "${3}"
     dconf write "${dconf_customb_path}${id_key}/name" "${1}"
 
+    dconf write "${dconf_customb_path}${id_key}/binding" "${2}"
     custom_list="$(python -c "a=${custom_list};a.reverse();print(a)")" # (echo "" | python) works too, but why make extra subshells?
     dconf write /org/cinnamon/desktop/keybindings/custom-list "${custom_list}"
-
-    # using gsettings TODO (maybe if dconf won't work always and fully to set keys)
 }
+
+# TODO understand AudioRaiseVolume/AudioLowerVolume mystery:
+# Done dozens of tests creating new user, running dconf (including having only two add_key function calls and close to nothing else) for it and starting Cinnamon; keys ['<Alt>AudioRaiseVolume'] and ['<Alt>AudioLowerVolume'] worked appearently randomly: 1st in add_key list, 2nd, both, none. Even adding delay of 5 seconds between add_key calls later some seconds after each of two parts of binding calls in add_key function itself had not helped, using 'gsettings set' instead of 'dconf write' had not helped.
 
 add_key "'Display rotate normal'" "['<Super><Alt>Up']" "'display_rotate_normal.sh'"
 add_key "'Display rotate left'" "['<Super><Alt>Left']" "'display_rotate_left.sh'"
 add_key "'Display rotate right'" "['<Super><Alt>Right']" "'display_rotate_right.sh'"
 add_key "'Display rotate upsidedown'" "['<Super><Alt>Down']" "'display_rotate_inverted.sh'"
-add_key "'Volume Down'" "['<Alt>AudioLowerVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'" # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
 add_key "'Volume Up'" "['<Alt>AudioRaiseVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'" # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
+add_key "'Volume Down'" "['<Alt>AudioLowerVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'" # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
 add_key "'TrackPoint X1G6 fix'" "['<Super><Alt>t']" "'/lib/systemd/system-sleep/trackpoint_reset key'" # fix TrackPoint issue om carbon X1 gen 6
 add_key "'Screen lock'" "['<Super><Alt>x']" "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''" # screen lock binding, xscreensaver to be set to be started via other script
 add_key "'Brightness up'" "['<Alt>MonBrightnessUp']" "'night +1'" # set custom monitor brightness adjustments
