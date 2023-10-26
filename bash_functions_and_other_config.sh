@@ -156,3 +156,24 @@ add_function 'git_merge' '
     echo "- checking out to branch where function was called from"
     git checkout $current_branch
 '
+
+# mount via terminal
+add_function 'm_ount' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Code for mounting block device (e.g. USB stick), takes as parameter string to match for block devices by type, label, path"
+        return 0
+    fi
+
+    mounts="$(lsblk --paths --output PKNAME,FSTYPE,PATH,LABEL | grep --ignore-case "$1" | wc -l)"
+    if [ "${mounts}" -ge 2 ]; then echo "ERROR: Two or more block devices matched, please pass more specific parameter"; return 1; fi
+    if [ "${mounts}" -eq 0 ]; then echo "ERROR: No block devices contaning phrase [$1] found"; return 1; fi
+
+    dev_type="$(lsblk --paths --output PKNAME,FSTYPE,PATH,LABEL | grep --ignore-case "$1" | awk '\''{ print $2 }'\'')"
+    dev_path="$(lsblk --paths --output PKNAME,FSTYPE,PATH,LABEL | grep --ignore-case "$1" | awk '\''{ print $3 }'\'')"
+
+    if [ "${dev_type}" != "${dev_type/crypto/cryptofound}" ]; then # type contains word crypto
+        dev_path="$(udisksctl unlock --block-device "${dev_path}" | awk '\''{ print $4 }'\'')" # e.g. unlocked /dev/sdc1  as /dev/dm-1.
+    fi
+
+    udisksctl mount --block-device "${dev_path%.}" # removal of . at the end if it is there
+'
