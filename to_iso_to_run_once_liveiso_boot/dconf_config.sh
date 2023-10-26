@@ -128,14 +128,6 @@ gsettings set org.cinnamon.settings-daemon.plugins.power sleep-inactive-battery-
 gsettings set org.cinnamon.settings-daemon.plugins.power idle-dim-time 300 # in seconds, dim screen after becoming idle; timeout
 gsettings set org.cinnamon.settings-daemon.plugins.power idle-brightness 10 # in %
 
-# See [1] of _readme.md ([1] no longer there, what was it?), also for some reason command (for binding) that have $(xrandr do not work, only specific with e.g. eDP-1,
-# therefore changed script code to make shell files and bind to them - it resulted in being able to use keys to rotate system's display
-echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate normal' | sudo tee $(get_install_path.sh)/display_rotate_normal.sh
-echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate left' | sudo tee $(get_install_path.sh)/display_rotate_left.sh
-echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate right' | sudo tee $(get_install_path.sh)/display_rotate_right.sh
-echo 'xrandr --output $(xrandr -q|grep -v disconnected|grep connected|awk '\''{print $1}'\'') --rotate inverted' | sudo tee $(get_install_path.sh)/display_rotate_inverted.sh
-sudo chmod a+rx $(get_install_path.sh)/display_rotate_normal.sh $(get_install_path.sh)/display_rotate_left.sh $(get_install_path.sh)/display_rotate_right.sh $(get_install_path.sh)/display_rotate_inverted.sh
-
 #
 ##### beginning of keyboard bindings #####
 
@@ -177,18 +169,25 @@ add_key(){
 # TODO understand AudioRaiseVolume/AudioLowerVolume mystery:
 # Done dozens of tests creating new user, running dconf (including having only two add_key function calls and close to nothing else) for it and starting Cinnamon; keys ['<Alt>AudioRaiseVolume'] and ['<Alt>AudioLowerVolume'] worked appearently randomly: 1st in add_key list, 2nd, both, none. Even adding delay of 5 seconds between add_key calls later some seconds after each of two parts of binding calls in add_key function itself had not helped, using 'gsettings set' instead of 'dconf write' had not helped.
 
-add_key "'Display rotate normal'" "['<Super><Alt>Up']" "'display_rotate_normal.sh'"
-add_key "'Display rotate left'" "['<Super><Alt>Left']" "'display_rotate_left.sh'"
-add_key "'Display rotate right'" "['<Super><Alt>Right']" "'display_rotate_right.sh'"
-add_key "'Display rotate upsidedown'" "['<Super><Alt>Down']" "'display_rotate_inverted.sh'"
+# around {print $1} single quotes need NOT be quoted for bash as within double quotes, but to be 1) outside of single quotes for sh (' -> '\''), 2) backslash used for (1) be escaped for GVariant, using unicode \u005c works for GVariant, alternatively \\\\, 3) all resultant single quotes to be quoted for GVariant (' -> \')
+# $ to be quoted (e.g. via backslash) as within double quotes for bash
+add_key "'Display rotate normal'" "['<Super><Alt>Up']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\') --rotate normal\''"
+add_key "'Display rotate left'" "['<Super><Alt>Left']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\') --rotate left\''"
+add_key "'Display rotate right'" "['<Super><Alt>Right']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\') --rotate right\''"
+add_key "'Display rotate upsidedown'" "['<Super><Alt>Down']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\') --rotate inverted\''"
+
 add_key "'Volume Up'" "['<Alt>AudioRaiseVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'" # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
 add_key "'Volume Down'" "['<Alt>AudioLowerVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'" # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
+
 add_key "'TrackPoint X1G6 fix'" "['<Super><Alt>t']" "'/lib/systemd/system-sleep/trackpoint_reset key'" # fix TrackPoint issue om carbon X1 gen 6
 add_key "'Screen lock'" "['<Super><Alt>x']" "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''" # screen lock binding, xscreensaver to be set to be started via other script
+
 add_key "'Brightness up'" "['<Alt>MonBrightnessUp']" "'night +1'" # set custom monitor brightness adjustments
 add_key "'Brightness down'" "['<Alt>MonBrightnessDown']" "'night -1'"
+
 add_key "'Help'" "['F1']" "'notify-send \'NoNo help in GUI available, some info via man pages\''" "'yelp'" # GUI help app (not included in the distro: to be istalled) replaces opening Linux Mint web page on F1 press
 add_key "'Air fan(s) off'" "['<Super><Alt>z']" "'stopfan'"
+
 add_key "'Up text scaling 1.1 times'" "['<Primary><Shift><Alt>x']" '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*1.1)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
 add_key "'Up text scaling 0.9 times'" "['<Primary><Shift><Alt>z']" '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*0.9)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
 
