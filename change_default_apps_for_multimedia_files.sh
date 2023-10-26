@@ -40,7 +40,7 @@ if [ $? -ne 0 ]; then
     sudo sed --in-place --regexp-extended -- '0,/^$/s/^$/MimeType=application\/x-shellscript;\n/' "$path_to_edit"
 fi
 # edit to run script from Nemo when choose "open with", edit one line (others are with parameters, so not selected)
-sudo sed --in-place --regexp-extended -- 's/^Exec=gnome-terminal$/Exec=gnome-terminal -- bash -c '\''script="$1"; if [[ -e "$script" ]] ; then "$script" ; else exec bash ; fi '\'' bash %u/' "$path_to_edit"
+sudo sed --in-place --regexp-extended -- 's/^Exec=gnome-terminal$/Exec=gnome-terminal -- bash -c '\''script="$1"; if [[ -e "$script" ]] ; then "$script" ; else exec bash ; fi '\'' bash %u/' "$path_to_edit" # TODO add explanation about %u, difference from %U
 
 path_to_edit=/usr/share/applications/xed.desktop
 sudo sed --in-place --regexp-extended -- 's|MimeType=.*|MimeType=application/x-shellscript;text/plain;|' "$path_to_edit"
