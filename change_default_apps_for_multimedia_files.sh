@@ -21,17 +21,11 @@ add_line (){
   fi
 }
 
-# to open srt (subtitles) in xed, not subtitle editor by default
-add_line 'application/x-subrip=xed.desktop'
-
-# open epub /ebooks with Foliate, not first app by ASCII sorted name from those in "open with" list
-add_line 'application/epub+zip=com.github.johnfactotum.Foliate.desktop;'
-
-# webp is not supported by Mint's default xviewer; pix.desktop does not list image/webp as supported MIME, but opens it
-add_line 'image/webp=pix.desktop;'
-
-# open desktop files with xed editor - noted NO effect in Nemo, still only via "Open With" context menu
-add_line 'application/x-desktop=xed.desktop;'
+add_line 'application/octet-stream=kiwix.desktop' # to open zim files; was added this way when associated manually, using /zim did not work
+add_line 'application/x-subrip=xed.desktop' # to open srt (subtitles) in xed, not subtitle editor by default
+add_line 'application/epub+zip=com.github.johnfactotum.Foliate.desktop' # open epub /ebooks with Foliate, not first app by ASCII sorted name from those in "open with" list
+add_line 'image/webp=pix.desktop' # webp is not supported by Mint's default xviewer; pix.desktop does not list image/webp as supported MIME, but opens it
+add_line 'application/x-desktop=xed.desktop' # open desktop files with xed editor - noted NO effect in Nemo, still starts the application (xed editing only via "Open With" context menu) even as in Open-With default application shown is Text Editor
 
 # add xed and terminal to scripts's "open with" list in Nemo
 
