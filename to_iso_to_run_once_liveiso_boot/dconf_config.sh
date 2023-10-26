@@ -18,33 +18,14 @@ gsettings set org.cinnamon.control-center.display show-fractional-scaling-contro
 # LM 21.2
 gsettings set org.cinnamon.muffin experimental-features "['x11-randr-fractional-scaling']"
 
-# moved to gui_configure.sh
-#dpm=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4/$(NF-1)}') # dots per millimeter, rounded as bash test works with integers only at least gave "integer expression expected" for [ 3.4 -eq 45 ]
-#dpi=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4/$(NF-1)*25.4}') # dots per inch, rounded
-#horizontal_resolution=$(xrandr | sed 's/x/ /g' | awk '/ connected/ {printf "%.0f",$4}')
-#
-# "gsettings set org.cinnamon.desktop.interface scaling-factor 2" does not seem to work in LM 21 (had been working in LM 20); GUI scaling controls worked in both
-#if [ $dpm -ge 6 ] && ([ ${horizontal_resolution} -le 2000 ] || [ ${horizontal_resolution} -ge 3500 ]); then
-#    # increase text scaling for primary fullhd and 4k displays; TL;DR:
-#    # 14 inch is 309mm width, hd is 1920, dpm=6.21
-#    # text scaling setting below is based on observation, but source code and/or documentation:
-#    # 1. if resolution is larger than 1920 seems whole dislay scaling is set to 2 by LM somewhere in code. TODO find where and how
-#    # 2. if resolution is less than 1920 seems whole dislay scaling is set to 1
-#    # 3. Text scaling results in half effect, e.g. scaling increase from 1.0 to 1.5 resulted in ~ 1.25 font size increase in list view in Nemo
-#    # 4. Decreasing scaling below 1 had not resulted in icons decrease in Nemo's list view, increasing above 1 had increased icons size
-#    gsettings set org.cinnamon.desktop.interface text-scaling-factor 1.5
-#fi
 
 gsettings set org.cinnamon.desktop.a11y.applications screen-magnifier-enabled true
 gsettings set org.cinnamon.desktop.a11y.magnifier mouse-tracking push
 
-# gsettings set org.gnome.libgnomekbd.keyboard layouts "['us', 'fr', 'de']" # now set in locales_change.sh and tha t script edits this line for liveISO
-# gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'terminate\tterminate:ctrl_alt_bksp', 'grp\tgrp:lalt_lshift_toggle']"
-gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'grp\tgrp:ctrls_toggle', 'terminate\tterminate:ctrl_alt_bksp']"
+gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'grp\tgrp:ctrls_toggle', 'terminate\tterminate:ctrl_alt_bksp']" # set key combinations for changing keyboard layout and terminating GUI session (going to login screen)
 
-# change keyboard layout icon in cinnamon panel to upper font text
 gsettings set org.cinnamon.desktop.interface keyboard-layout-show-flags false
-gsettings set org.cinnamon.desktop.interface keyboard-layout-use-upper true
+gsettings set org.cinnamon.desktop.interface keyboard-layout-use-upper true # change keyboard layout icon in cinnamon panel to upper font text
 
 # Nemo
 gsettings set org.nemo.preferences show-hidden-files true
@@ -57,12 +38,12 @@ gsettings set org.nemo.list-view default-column-order "['name', 'size', 'date_mo
 gsettings set org.nemo.search search-visible-columns "['name', 'where', 'date_modified', 'size', 'type', 'owner', 'permissions']"
 
 gsettings set org.nemo.preferences default-folder-viewer 'list-view'
-# standard 100%, large 150%, larger 200%, largest 400%; small 66%, smaller 50%, smallest 33%
-gsettings set org.nemo.list-view default-zoom-level 'standard'
+gsettings set org.nemo.list-view default-zoom-level 'standard' # standard 100%, large 150%, larger 200%, largest 400%; small 66%, smaller 50%, smallest 33%
 gsettings set org.nemo.icon-view default-zoom-level 'largest'
 
 gsettings set org.nemo.preferences executable-text-activation 'display' # What to do with executable text files when they are activated (single or double clicked). Possible values are "launch" to launch them as programs, "ask" to ask what to do via a dialog, and "display" to display them as text files.
 # seems to not have effect if "open with" and/or default desktop application is set for x-shellscript files (see change_default_apps_for_multimedia_files.sh)
+
 gsettings set org.nemo.preferences click-double-parent-folder true # If true, double click left on blank area will go to parent folder
 gsettings set org.nemo.preferences quick-renames-with-pause-in-between true # Enables renaming of icons by two times clicking with pause between clicks
 gsettings set org.nemo.preferences date-format 'iso' # to set time to 24 hours; e.g. 2023-01-17 15:00:00
@@ -84,9 +65,9 @@ if [ $? -ne 0 ] ; then # noted above schema depricated for Linux Mint 21
     gsettings set org.cinnamon.desktop.peripherals.touchpad tap-to-click true
 fi
 
-gsettings set org.cinnamon.desktop.media-handling automount false # If set to true, then Nautilus will automatically mount media such as user-visible hard disks and removable media on start-up and media insertion.
+gsettings set org.cinnamon.desktop.media-handling automount false # If set to true, then Nautilus will automatically mount media such as user-visible hard disks and removable media on start-up and media insertion
 gsettings set org.cinnamon.desktop.media-handling automount-open false # Whether to automatically open a folder for automounted media (happens in Nemo)
-gsettings set org.cinnamon.desktop.media-handling autorun-never true # If set to true, then Nautilus will never prompt nor autorun/autostart programs when a medium is inserted.
+gsettings set org.cinnamon.desktop.media-handling autorun-never true # If set to true, then Nautilus will never prompt nor autorun/autostart programs when a medium is inserted
 
 # gnome-system-monitor
 gsettings set org.gnome.gnome-system-monitor show-whose-processes 'all' # Determines which processes to show
@@ -131,8 +112,6 @@ gsettings set org.cinnamon.settings-daemon.plugins.power idle-brightness 10 # in
 #
 ##### beginning of keyboard bindings #####
 
-# previous notes and code see in [3]
-
 # programmed based on output of `dconf watch /` when adding key via GUI:
 # upon new entry added in GUI addional entry to custom-list is added to the right (1st part, setting mane and command) and after binding added in GUI the list's order is reversed (2nd part)
 # 1st entry is exception: custom0 is added to the left
@@ -143,7 +122,7 @@ gsettings set org.cinnamon.settings-daemon.plugins.power idle-brightness 10 # in
 # AudioRaiseVolume/AudioLowerVolume mystery:
 #   Done dozens of tests creating new user, running dconf (including having only two add_key function calls and close to nothing else) for it and starting Cinnamon; keys ['<Alt>AudioRaiseVolume'] and ['<Alt>AudioLowerVolume'] worked appearently randomly: 1st in add_key list, 2nd, both, none. Even adding delay of 5 seconds between add_key calls later some seconds after each of two parts of binding calls in add_key function itself had not helped, using 'gsettings set' instead of 'dconf write' had not helped.
 
-# FIX: if such issue occured, working of custom keys was successfully completed after Cinnamon start by running "keybindings_to_reverse_custom_list.sh" (assigned to keys below)
+# FIX: if issue as above occured, working of custom keys was successfully completed after Cinnamon start by running "keybindings_to_reverse_custom_list.sh" (assigned to keys below)
 
 # Note: if as dconf watch outputted /org/cinnamon/desktop/keybindings/media-keys/volume-up-quiet; dconf read of the key may result in empty output, whereas `gsettings get org.cinnamon.desktop.keybindings.media-keys volume-up-quiet` resulted in expected output
 
@@ -200,23 +179,22 @@ add_key "'Display rotate upsidedown'" "['<Super><Alt>Down']" "'sh -c \'xrandr --
 add_key "'Volume Up'" "['<Primary>AudioRaiseVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'" # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
 add_key "'Volume Down'" "['<Primary>AudioLowerVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'" # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
 
-add_key "'TrackPoint X1G6 fix'" "['<Super><Alt>t']" "'/lib/systemd/system-sleep/trackpoint_reset key'" # fix TrackPoint issue om carbon X1 gen 6
-add_key "'Screen lock'" "['<Super><Alt>x']" "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''" # screen lock binding, xscreensaver to be set to be started via other script
-
 add_key "'Brightness up'" "['<Alt>MonBrightnessUp']" "'night +1'" # set custom monitor brightness adjustments
 add_key "'Brightness down'" "['<Alt>MonBrightnessDown']" "'night -1'"
-
-add_key "'Help'" "['F1']" "'notify-send \'NoNo help in GUI available, some info via man pages\''" "'yelp'" # GUI help app (not included in the distro: to be istalled) replaces opening Linux Mint web page on F1 press
-add_key "'Air fan(s) off'" "['<Super><Alt>z']" "'stopfan'"
 
 add_key "'Up text scaling 1.1 times'" "['<Primary><Shift><Alt>x']" '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*1.1)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
 add_key "'Up text scaling 0.9 times'" "['<Primary><Shift><Alt>z']" '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*0.9)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
 
-# did not work on LM 21 so commented out, moved to use font scaling mostly
-# add_key "'Screen scale'" "['<Super><Alt>s']" "'/lib/systemd/system-sleep/scaling_factor key'" # set custom screen scale
+add_key "'TrackPoint X1G6 fix'" "['<Super><Alt>t']" "'/lib/systemd/system-sleep/trackpoint_reset key'" # fix TrackPoint issue om carbon X1 gen 6
+add_key "'Screen lock'" "['<Super><Alt>x']" "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''" # screen lock binding, xscreensaver to be set to be started via other script
+add_key "'Help'" "['F1']" "'notify-send \'NoNo help in GUI available, some info via man pages\''" "'yelp'" # GUI help app (not included in the distro: to be istalled) replaces opening Linux Mint web page on F1 press
+add_key "'Air fan(s) off'" "['<Super><Alt>z']" "'stopfan'"
 
 ##### end of keyboard bindings #####
 #
+
+# did not work on LM 21 so commented out, started to use font scaling mostly
+# add_key "'Screen scale'" "['<Super><Alt>s']" "'/lib/systemd/system-sleep/scaling_factor key'" # set custom screen scale
 
 # additional shortcuts for working with windows
 # <Primary> was Ctrl on some thinkpad
@@ -235,19 +213,18 @@ dconf write /org/cinnamon/sounds/switch-enabled false
 dconf write /org/cinnamon/sounds/tile-enabled false
 dconf write /org/cinnamon/sounds/plug-enabled false
 dconf write /org/cinnamon/sounds/unplug-enabled false
-# DONE: find how to disable notification's sound (is on by default in LM 21.2)
-# interestingly if value in dconf GUI is set to 'default', `dconf read /org/cinnamon/sounds/notification-enabled` outputs nothing, but gsetting get outputs correct default value; however in such setting `dconf write` works.
+# interestingly if value in dconf GUI is set to 'default' (can be for notification-enabled), `dconf read /org/cinnamon/sounds/notification-enabled` outputs nothing, but gsetting get outputs correct default value; however in such setting `dconf write` works.
 # TODO: find out how to change 'default' flag via terminal, also how to read 'Summary', 'Description' fields of dconf entry
 dconf write /org/cinnamon/sounds/notification-enabled false
 
-gsettings set ca.desrt.dconf-editor.Settings show-warning false # If “true”, Dconf Editor opens a popup when launched reminding the user to be careful.
-gsettings set org.gnome.nm-applet disable-disconnected-notifications true # Set this to true to disable notifications when disconnecting from a network.
+gsettings set ca.desrt.dconf-editor.Settings show-warning false # If “true”, Dconf Editor opens a popup when launched reminding the user to be careful
+gsettings set org.gnome.nm-applet disable-disconnected-notifications true # Set this to true to disable notifications when disconnecting from a network
 
 desktop_background=liveiso_path_settings_root/background.jpg
 if [ ! -e "$desktop_background" ] ; then desktop_background=/usr/share/backgrounds/linuxmint-ulyssa/echerkasski_countryside.jpg ; fi
 gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_background"
 
-# UPDATE: setting not helping for some reason
+# UPDATE: setting not helping for some reason TODO: understand why
 gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run)
 
 # change theme for Cinnamon
@@ -259,8 +236,7 @@ gsettings set org.cinnamon.theme name 'Mint-Y-Dark'
 gsettings set org.x.editor.preferences.editor scheme 'cobalt'
 gsettings set org.x.editor.preferences.editor display-line-numbers false # AFAIK false by default, however added as could be useful to set to true for somebody
 
-exit
-
+exit # ------------- THE END, footnotes follow ------------------ #
 
 
 [1]
@@ -278,100 +254,3 @@ root@alex:/# gsettings set org.cinnamon.desktop.interface scaling-factor 1
 (process:242481): dconf-WARNING **: 08:34:30.432: failed to commit changes to dconf: Error spawning command line “dbus-launch --autolaunch=dafd9a61376b4676aa8b190bc1ed4b43 --binary-syntax --close-stderr”: Child process exited with code 1
 root@alex:/# echo $?
 0
-
-
-[3]
-
-# after custom binding is changed, noted that `gsettings get org.cinnamon.desktop.keybindings custom-list` output reverses from cusmomMAX to dummy and back, so in the script added that after each key assignments. It worked with only one reverse after all assignments in LM 20.2, but resluted in some keys not working in LM 21. With reverse after each key seems working in LM 21.
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' ]"
-# or dconf write /org/cinnamon/desktop/keybindings/custom-list "['__dummy__']"
-
-# ----- previous code for custom-keybindings START ----- #
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/name "'Display rotate normal'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/binding "['<Super><Alt>Up']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom0/command "'display_rotate_normal.sh'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', '__dummy__']"
-
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/name "'Display rotate left'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/binding "['<Super><Alt>Left']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom1/command "'display_rotate_left.sh'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1']"
-
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "'Display rotate right'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Alt>Right']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'display_rotate_right.sh'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom2' ,'custom1', 'custom0', '__dummy__']"
-
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/name "'Display rotate upsidedown'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/binding "['<Super><Alt>Down']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom3/command "'display_rotate_inverted.sh'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3']"
-
-# set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/name "'Volume Up'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/binding "['<Alt>AudioRaiseVolume']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom4/command "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
-
-# set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/name "'Volume Down'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/binding "['<Alt>AudioLowerVolume']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom5/command "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5']"
-
-# fix TrackPoint issue om carbon X1 gen 6
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/name "'TrackPoint X1G6 fix'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/binding "['<Super><Alt>t']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom6/command "'/lib/systemd/system-sleep/trackpoint_reset key'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
-
-# set custom screen scale
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/name "'Screen scale'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/binding "['<Super><Alt>s']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom7/command "'/lib/systemd/system-sleep/scaling_factor key'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7']"
-
-# screen lock binding, TODO check if xscreensaver deamon is started when ISO is booted with its debs installed
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/name "'Screen lock'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/binding "['<Super><Alt>x']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom8/command "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
-
-# set custom monitor brightness adjustments
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/name "'Brightness up'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/binding "['<Alt>MonBrightnessUp']" # "['MonBrightnessUp']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom9/command "'night +1'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9']"
-
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/name "'Brightness down'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/binding "['<Alt>MonBrightnessDown']" # "['MonBrightnessDown']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom10/command "'night -1'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
-
-# to replace opening Linux Mint web page on F1 press
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/name "'Help'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/binding "['F1']"
-# dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/command "'notify-send \'NoNo help in GUI available, some info via man pages\''"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom11/command "'yelp'" # GUI help app (not included in the distro: to be istalled)
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11']"
-
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/name "'Air fan(s) off'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/binding "['<Super><Alt>z']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom12/command "'stopfan'"
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom12', 'custom11', 'custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
-
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom13/name "'Up text scaling 1.1 times'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom13/binding "['<Primary><Shift><Alt>x']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom13/command '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*1.1)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
-
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11', 'custom12', 'custom13']"
-
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom14/name "'Up text scaling 0.9 times'"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom14/binding "['<Primary><Shift><Alt>z']"
-dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom14/command '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*0.9)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
-
-gsettings set org.cinnamon.desktop.keybindings custom-list "['custom14', 'custom13', 'custom12', 'custom11', 'custom10', 'custom9', 'custom8', 'custom7', 'custom6', 'custom5', 'custom4', 'custom3', 'custom2' ,'custom1', 'custom0', '__dummy__']"
-
-# reversed order one more time in attempt to correct for <Alt>Audio LowerVolume and higher not working on one laptop on LM 21.2 TODO: test if the issue is solved
-gsettings set org.cinnamon.desktop.keybindings custom-list "['__dummy__' , 'custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8' ,'custom9', 'custom10' ,'custom11', 'custom12', 'custom13', 'custom14']"
-# ----- previous code END ----- #
