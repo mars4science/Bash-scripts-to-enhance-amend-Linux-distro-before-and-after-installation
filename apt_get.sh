@@ -18,6 +18,10 @@ status_file_path_tmp="$apt_dpkg_folder_tmp/dpkg_status"
 sources_file_path_tmp="$apt_dpkg_folder_tmp/sources.list"
 sources_dir_path_tmp="$apt_dpkg_folder_tmp/sources.list.d"
 
+eval $(apt-config shell CACHE Dir::Cache)
+eval $(apt-config shell ARCHIVES Dir::Cache::archives)
+debs_cache_folder=/${CACHE}/${ARCHIVES} # man bash: brace { after $ "serve to protect the variable to be expanded from characters immediately following it which could be interpreted as part of the name."
+
 # for install, update arguments, help message output
 # check for availability of common_arguments_to_scripts.sh added for Example 1 of using scripts
 commons_path="$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
@@ -34,6 +38,7 @@ if [ -e "${commons_path}" ] ; then
       or echo -e 'package_unqualified_name"'[\\n'"package_unqualified_name] etc' | $script_name [-i | -d] [location_to_store] [folder with dpkg status file and apt sources location]
       -i means install right after downloaded.
       -d means download only to default path with default location of dpkg status file and apt sources.
+      -0 means download only to ${debs_cache_folder} with empty dpkg status file (with all dependencies) amd no substitution of apt sources
       If dpkg status and/or apt sources not found at supplied location, substitution not done.\n"
     display_help "$help_message$common_help"
 else
@@ -82,6 +87,11 @@ if [ $1 = "-i" ]
     install_now=yes
     # shift arguments left by 1 (default)
     shift
+elif [ $1 = "-0" ]
+  then
+    all_dependencies=yes
+    # shift arguments left by 1 (default)
+    shift
 fi
 
 
@@ -98,14 +108,6 @@ exit_on_ctrl_c(){
     exit 0
 }
 trap 'exit_on_ctrl_c' SIGINT
-
-
-eval $(apt-config shell CACHE Dir::Cache)
-eval $(apt-config shell ARCHIVES Dir::Cache::archives)
-
-# from man bash:
-# brace { after $ "serve to protect the variable to be expanded from characters immediately following it which could be interpreted as part of the name."
-debs_cache_folder=/${CACHE}/${ARCHIVES}
 
 
 # TODO: make named pipe to collect errors for packets and output all errors at the end
@@ -152,7 +154,16 @@ substitute_apt_status(){
 
 
 substitute_status(){
-    if [ -d "$apt_dpkg_folder" ]
+    if [ -n "${all_dependencies}" ]; then
+        mkdir --parent "${apt_dpkg_folder_tmp}"
+        touch "${status_file_path_tmp}" # make empty file for dpkg status
+        copy_status_file_exit_status=$?
+        if [ ${copy_status_file_exit_status} -ne 0 ]; then # error
+            echo >&2 "Exiting on ERROR, empty dpkg status was NOT created with success"
+            exit 1
+        fi
+        substitute_dpkg_status
+    elif [ -d "$apt_dpkg_folder" ]
       then
         mkdir --parent $apt_dpkg_folder_tmp
         cp $status_file_path $status_file_path_tmp
@@ -167,8 +178,8 @@ substitute_status(){
             echo >&2 "Exiting on error, neither dpkg status file not both apt sources file and folder were copied with success"
             if [ -v no_parameters_supplied ]; then 
                 echo >&2 "$0 was called without any parameters, calling with '-i' parameter means same except for no dpkg status file / apt sources substitution"
-            fi   
-            exit $err
+            fi
+            exit 1
         fi
 
         # noted there are /var/lib/dpkg/status, /etc/apt/sources.list, single file /etc/apt/sources.list.d/official-package-repositories.list, but made hopefully more future proof
@@ -212,8 +223,9 @@ restore_apt_status(){
 }
 
 restore_status(){
-    if [ -d "$apt_dpkg_folder_tmp" ]
-      then
+    if [ -n "${all_dependencies}" ]; then
+        restore_dpkg_status
+    elif [ -d "$apt_dpkg_folder_tmp" ]; then
         restore_dpkg_status
         restore_apt_status
         rm --recursive "$apt_dpkg_folder_tmp"
@@ -294,7 +306,9 @@ substitute_status
 # from man apt-get:
 # clears out the local repository of retrieved package files. It removes everything but the lock file from
 # /var/cache/apt/archives/ and /var/cache/apt/archives/partial/
-sudo apt-get clean
+if [ ! -n "${all_dependencies}" ]; then # so many of the same to download again and again otherwise
+    sudo apt-get clean
+fi
 
 # from man bash
 # read [-ers] [-a aname] [-d delim] [-i text] [-n nchars] [-N nchars] [-p prompt] [-t timeout] [-u fd] [name ...]
@@ -323,17 +337,21 @@ while read line; do
             if [ $Eval -eq 0 ];then
 
                 # interestingly folder can be named like /dev////sda same as /dev/sda
-                # ! that is for that case : on command line in parameters one can terminate with / or not - user friendly        
-                mkdir --parents $debs_storage_folder # -p --parents no error if existing, make parent directories as needed
-                cp $debs_cache_folder/*.deb $debs_storage_folder
-                # chmod --recursive a+rw $debs_storage_folder
-                # chmod a+rw $debs_storage_folder
-                1>&2 echo "    Package(s)  $line  downloaded (at least seems like it)"
-                sudo apt-get clean
-                install_local
+                # that is for that case : on command line in parameters one can terminate with / or not - user friendly
+                if [ -n "${all_dependencies}" ]; then
+                    1>&2 echo "    Package(s)  ${line}  downloaded to ${debs_cache_folder} (at least seems like it)"
+                else
+                    mkdir --parents $debs_storage_folder # -p --parents no error if existing, make parent directories as needed
+                    cp $debs_cache_folder/*.deb $debs_storage_folder
+                    # chmod --recursive a+rw $debs_storage_folder
+                    # chmod a+rw $debs_storage_folder
+                    1>&2 echo "    Package(s)  $line  downloaded to ${debs_storage_folder} (at least seems like it)"
+                    sudo apt-get clean
+                    install_local
+                fi
             else
                 echo "Package  $line  is NOT downloaded, downloaded deb files were not copied from cache to specified location (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
-                sudo apt-get clean
+                sudo apt-get clean # cleaning even if all_dependencies (-0 parameter on command line)
             fi # download success
         fi # existense of folder
     fi # empty line
