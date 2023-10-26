@@ -104,6 +104,8 @@ change_squash() {
 
     sudo rsync -rlptD --omit-dir-times "${software_path_root}"/to_root/ "$work_path/fin_sq" # copy what needs to be copied additionally to appropriate places along with paths
 
+   sudo rsync -rlptD --omit-dir-times "${software_path_root}"/to_iso_root/ "$work_path/fin" # copy to location to be available in /cdrom after boot
+
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp "${software_path_root}"/bin/stopfan $work_path/fin_sq/usr/local/bin
     sudo chmod +xs $work_path/fin_sq/usr/local/bin/stopfan
