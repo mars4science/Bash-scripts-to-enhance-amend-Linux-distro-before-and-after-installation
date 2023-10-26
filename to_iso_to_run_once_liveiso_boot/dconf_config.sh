@@ -137,10 +137,26 @@ gsettings set org.cinnamon.settings-daemon.plugins.power idle-brightness 10 # in
 # upon new entry added in GUI addional entry to custom-list is added to the right (1st part, setting mane and command) and after binding added in GUI the list's order is reversed (2nd part)
 # 1st entry is exception: custom0 is added to the left
 
-# Alternatively using gsettings, need key variable, aslo
-# no gsettings schema for '/org/cinnamon/desktop/keybindings/custom-keybindings/custom', hence AFAIK need for such long lines TODO understand why
+# WARNING: when binding overwrites some "standard" binding in GUI, additional is caught by dconf watch: setting standard to empty, e.g. /org/cinnamon/desktop/keybindings/media-keys/volume-up-quiet when reassigning Alt+AudioRaiseVolume
+#   assigning same combination to custom as used by another custom resulted in both custom entries having that keys
+#   When this code tried to assign binding used by "standard" to custom (Alt+AudioRaiseVolume / Alt+AudioLowerVolume) w/out setting standard to empty, there were appearently random results:
+# AudioRaiseVolume/AudioLowerVolume mystery:
+#   Done dozens of tests creating new user, running dconf (including having only two add_key function calls and close to nothing else) for it and starting Cinnamon; keys ['<Alt>AudioRaiseVolume'] and ['<Alt>AudioLowerVolume'] worked appearently randomly: 1st in add_key list, 2nd, both, none. Even adding delay of 5 seconds between add_key calls later some seconds after each of two parts of binding calls in add_key function itself had not helped, using 'gsettings set' instead of 'dconf write' had not helped.
+
+# FIX: if such issue occured, working of custom keys was successfully completed after Cinnamon start by running "keybindings_to_reverse_custom_list.sh" (assigned to keys below)
+
+# Note: if as dconf watch outputted /org/cinnamon/desktop/keybindings/media-keys/volume-up-quiet; dconf read of the key may result in empty output, whereas `gsettings get org.cinnamon.desktop.keybindings.media-keys volume-up-quiet` resulted in expected output
+
+# Note: dconf watch output when assigning custom in GUI was ['<Alt>AudioRaiseVolume'], where as `gsettings get org.cinnamon.desktop.keybindings.media-keys volume-up-quiet` output was ['<Alt>XF86AudioRaiseVolume']; assigning via `dconf write` to custom w/out XF86 works
+
+# Note: Alternatively maybe done using gsettings like below, need schema+key not just key as dconf, also no gsettings schema for '/org/cinnamon/desktop/keybindings/custom-keybindings/custom', hence AFAIK need for such long lines TODO understand why
 # gsettings_customb_path='org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom'
 # gsettings set "${gsettings_customb_path}${id_key}/" command "${3}"
+
+# Note: when keyboard dialog gets opened in GUI, below key-value pairs are in output of dconf watch, just in case here
+# dconf write /org/cinnamon/desktop/peripherals/keyboard/delay 'uint32 500'
+# dconf write /org/cinnamon/desktop/interface/cursor-blink-time 1200
+# dconf write /org/cinnamon/desktop/peripherals/keyboard/repeat-interval 'uint32 30'
 
 id_key=-1
 dconf_customb_path='/org/cinnamon/desktop/keybindings/custom-keybindings/custom'
@@ -166,8 +182,13 @@ add_key(){
     dconf write /org/cinnamon/desktop/keybindings/custom-list "${custom_list}"
 }
 
-# TODO understand AudioRaiseVolume/AudioLowerVolume mystery:
-# Done dozens of tests creating new user, running dconf (including having only two add_key function calls and close to nothing else) for it and starting Cinnamon; keys ['<Alt>AudioRaiseVolume'] and ['<Alt>AudioLowerVolume'] worked appearently randomly: 1st in add_key list, 2nd, both, none. Even adding delay of 5 seconds between add_key calls later some seconds after each of two parts of binding calls in add_key function itself had not helped, using 'gsettings set' instead of 'dconf write' had not helped.
+# hack to fix bindings to be assigned to already used key combinations; TODO maybe add autostart item for Cimmanon, but for now no automatic as it may be useful to know if the code tries to replace keys
+key_script_name="keybindings_to_reverse_custom_list.sh"
+if [ ! -e "$(get_install_path.sh)/${key_script_name}" ]; then
+    echo 'dconf write /org/cinnamon/desktop/keybindings/custom-list "$(python -c "a=$(dconf read /org/cinnamon/desktop/keybindings/custom-list);a.reverse();print(a)")"' | sudo tee $(get_install_path.sh)/${key_script_name}
+    sudo chmod a+rx $(get_install_path.sh)/${key_script_name}
+fi
+add_key "'To reverse keybindings custom list'" "['<Super><Alt>r']" "'${key_script_name}'"
 
 # around {print $1} single quotes need NOT be quoted for bash as within double quotes, but to be 1) outside of single quotes for sh (' -> '\''), 2) backslash used for (1) be escaped for GVariant, using unicode \u005c works for GVariant, alternatively \\\\, 3) all resultant single quotes to be quoted for GVariant (' -> \')
 # $ to be quoted (e.g. via backslash) as within double quotes for bash
@@ -176,8 +197,8 @@ add_key "'Display rotate left'" "['<Super><Alt>Left']" "'sh -c \'xrandr --output
 add_key "'Display rotate right'" "['<Super><Alt>Right']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\') --rotate right\''"
 add_key "'Display rotate upsidedown'" "['<Super><Alt>Down']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\') --rotate inverted\''"
 
-add_key "'Volume Up'" "['<Alt>AudioRaiseVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'" # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
-add_key "'Volume Down'" "['<Alt>AudioLowerVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'" # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
+add_key "'Volume Up'" "['<Primary>AudioRaiseVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'" # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
+add_key "'Volume Down'" "['<Primary>AudioLowerVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'" # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
 
 add_key "'TrackPoint X1G6 fix'" "['<Super><Alt>t']" "'/lib/systemd/system-sleep/trackpoint_reset key'" # fix TrackPoint issue om carbon X1 gen 6
 add_key "'Screen lock'" "['<Super><Alt>x']" "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''" # screen lock binding, xscreensaver to be set to be started via other script
