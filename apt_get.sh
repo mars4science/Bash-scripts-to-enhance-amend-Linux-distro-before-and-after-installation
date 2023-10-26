@@ -18,6 +18,13 @@ status_file_path_tmp="$apt_dpkg_folder_tmp/dpkg_status"
 sources_file_path_tmp="$apt_dpkg_folder_tmp/sources.list"
 sources_dir_path_tmp="$apt_dpkg_folder_tmp/sources.list.d"
 
+# noted there are /var/lib/dpkg/status, /etc/apt/sources.list, single file /etc/apt/sources.list.d/official-package-repositories.list, but made hopefully more future proof
+eval $(apt-config shell STATUS_FILE Dir::State::status) # full path
+eval $(apt-config shell ETC_DIR Dir::Etc) # gave etc/apt
+eval $(apt-config shell SOURCES_FILE Dir::Etc::sourcelist) # only last part of path
+eval $(apt-config shell SOURCES_DIR Dir::Etc::sourceparts) # only last part of path
+SOURCES_FILE=/$ETC_DIR/$SOURCES_FILE
+SOURCES_DIR=/$ETC_DIR/$SOURCES_DIR
 eval $(apt-config shell CACHE Dir::Cache)
 eval $(apt-config shell ARCHIVES Dir::Cache::archives)
 debs_cache_folder=/${CACHE}/${ARCHIVES} # man bash: brace { after $ "serve to protect the variable to be expanded from characters immediately following it which could be interpreted as part of the name."
@@ -135,7 +142,7 @@ substitute_dpkg_status(){
     fi
 }
 
-substitute_apt_status(){
+substitute_apt_sources(){
     if [ $copy_sources_file_exit_status -eq 0 ] ; then
         sudo mv $SOURCES_FILE $SOURCES_FILE.bak;
         sudo ln -s $sources_file_path_tmp $SOURCES_FILE;
@@ -182,17 +189,8 @@ substitute_status(){
             exit 1
         fi
 
-        # noted there are /var/lib/dpkg/status, /etc/apt/sources.list, single file /etc/apt/sources.list.d/official-package-repositories.list, but made hopefully more future proof
-        eval $(apt-config shell STATUS_FILE Dir::State::status) # full path
-        eval $(apt-config shell ETC_DIR Dir::Etc) # gave etc/apt
-        eval $(apt-config shell SOURCES_FILE Dir::Etc::sourcelist) # only last part of path
-        eval $(apt-config shell SOURCES_DIR Dir::Etc::sourceparts) # only last part of path
-
-        SOURCES_FILE=/$ETC_DIR/$SOURCES_FILE
-        SOURCES_DIR=/$ETC_DIR/$SOURCES_DIR
-
         substitute_dpkg_status
-        substitute_apt_status
+        substitute_apt_sources
     fi
 }
 
@@ -204,7 +202,7 @@ restore_dpkg_status(){
     fi
 }
 
-restore_apt_status(){
+restore_apt_sources(){
     if [ $copy_sources_file_exit_status -eq 0 ] ; then
         sudo mv --force $SOURCES_FILE.bak $SOURCES_FILE
         # rm $sources_file_path_tmp
@@ -223,11 +221,11 @@ restore_apt_status(){
 }
 
 restore_status(){
-    if [ -n "${all_dependencies}" ]; then
+    if [ -d "$apt_dpkg_folder_tmp" ]; then
         restore_dpkg_status
-    elif [ -d "$apt_dpkg_folder_tmp" ]; then
-        restore_dpkg_status
-        restore_apt_status
+        if [ ! -n "${all_dependencies}" ]; then
+            restore_apt_sources
+        fi
         rm --recursive "$apt_dpkg_folder_tmp"
     fi
 }
