@@ -110,7 +110,7 @@ exit_on_ctrl_c(){
     if [ -v connect_restore ]; then
       if [ $connect_restore -eq 1 ]; then nmcli networking on; fi
     fi
-    restore_status
+    restore_status_and_sources
     echo -e "\nstopped manually"
     exit 0
 }
@@ -160,7 +160,7 @@ substitute_apt_sources(){
 }
 
 
-substitute_status(){
+substitute_status_and_sources(){
     if [ -n "${all_dependencies}" ]; then
         mkdir --parent "${apt_dpkg_folder_tmp}"
         touch "${status_file_path_tmp}" # make empty file for dpkg status
@@ -220,7 +220,7 @@ restore_apt_sources(){
     fi
 }
 
-restore_status(){
+restore_status_and_sources(){
     if [ -d "$apt_dpkg_folder_tmp" ]; then
         restore_dpkg_status
         if [ ! -n "${all_dependencies}" ]; then
@@ -299,7 +299,7 @@ install_local(){
 
 # ----- start of main part of code where functions are called ----- #
 
-substitute_status
+substitute_status_and_sources
 
 # from man apt-get:
 # clears out the local repository of retrieved package files. It removes everything but the lock file from
@@ -337,7 +337,17 @@ while read line; do
                 # interestingly folder can be named like /dev////sda same as /dev/sda
                 # that is for that case : on command line in parameters one can terminate with / or not - user friendly
                 if [ -n "${all_dependencies}" ]; then
-                    1>&2 echo "    Package(s)  ${line}  downloaded to ${debs_cache_folder} (at least seems like it)"
+                    1>&2 echo "    Package(s)  ${line}  with all dependencies downloaded to ${debs_cache_folder} (at least seems like it)"
+                    1>&2 echo "    Next to attempt to download even more: some of packages that depend on downloaded packages and supposedly will need to be upgraded during installation of  ${line}  on the current system"
+                    restore_status_and_sources
+                    sudo apt-get install --download-only --assume-yes $line
+                    if [ $? -eq 0 ];then
+                        1>&2 echo "    Package(s) related to  ${line}  on the current system downloaded to ${debs_cache_folder} (at least seems like it)"
+                    else
+                        echo "Package(s) needed to upgrade ones related to  $line  on the current system are NOT downloaded (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
+                        sudo apt-get clean # cleaning even if all_dependencies (-0 parameter on command line)
+                    fi
+                    substitute_status_and_sources
                 else
                     mkdir --parents $debs_storage_folder # -p --parents no error if existing, make parent directories as needed
                     cp $debs_cache_folder/*.deb $debs_storage_folder
@@ -350,13 +360,13 @@ while read line; do
             else
                 echo "Package  $line  is NOT downloaded, downloaded deb files were not copied from cache to specified location (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
                 sudo apt-get clean # cleaning even if all_dependencies (-0 parameter on command line)
-            fi # download success
+            fi # download success check
         fi # existense of folder
     fi # empty line
 done # reading lines of names of packages
 
 
-restore_status
+restore_status_and_sources
 
 if [ -e $errors_apt_get ]; then 
     echo "=====    Errors during script:     =====" | tee --append "${amend_log}" # no sudo as location is assigned to be in /tmp
