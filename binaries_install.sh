@@ -11,5 +11,8 @@ sudo cp --no-clobber "$software_path_root"/bin/appimages/* "$(get_install_path.s
 sudo cp --no-clobber "$software_path_root"/bin/desktops/* /usr/share/applications
 sudo cp --no-clobber "$software_path_root"/bin/icons/* /usr/share/pixmaps
 
-sudo ln --relative --symbolic "$(get_install_path.sh)"/kiwix*.appimage "$(get_install_path.sh)"/kiwix.appimage # for desktop file to be independent of kiwix version
-
+# for desktop files to be independent of appimage files versions
+for f in "$software_path_root"/bin/appimages/* ; do
+    n="$(basename $f)" # all desktop file names as of now in the folder contain hythen (-) before version part, therefore:
+    sudo ln --relative --symbolic "$(get_install_path.sh)/${n}" "$(get_install_path.sh)/${n%%-*}.appimage"
+done
