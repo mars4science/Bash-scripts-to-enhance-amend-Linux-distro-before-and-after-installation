@@ -36,7 +36,7 @@ sudo mv /tmp/..X11-unix /tmp/.X11-unix
 
 # end Windows (wine) processes after deleting Windows disks (~./wine)
 # often there are none, so 2>/dev/null to prevent an error displayed
-ps -e -f | grep '\.exe' | grep ' [C|Z]:\\' | awk '{print $2}' | 2>/dev/null xargs kill
+ps -e -f | grep '\.exe$' | grep ' [C|Z]:\\' | awk '{print $2}' | 2>/dev/null xargs kill
 
 exit
 

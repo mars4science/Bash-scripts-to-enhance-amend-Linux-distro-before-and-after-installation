@@ -38,7 +38,7 @@ full_profile_path=/home/$(id -un)/.mozilla/firefox/$profile_path
 tabs_path_backup=$(ls -t $backups_path | grep firefox-browser-sessionstore-backups | head --lines=1)
 
 # end firefox process, $ at the end needed to skip firefox.real of TOR bundle
-pkill firefox$ || pkill GeckoMain 
+pkill 'firefox$' || pkill GeckoMain
 
 if [ $? -eq 1 ]; then # want to be sure firefox terminated abnormally
     echo "Firefox process not detected, if Firefox is running that means process name might be changed, script might need a fix," 
