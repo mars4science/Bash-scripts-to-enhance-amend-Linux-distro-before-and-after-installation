@@ -19,13 +19,12 @@ if [ ${#locales[@]} -ne 0 ] ; then
 
     # set keyboard layouts
     # was -gt 1 (if more than 1 locale) but realized in case default language changed need to change layout just in case
-    # make list with small letters of last parts separated by comma, quoted with single quotes and replace in dconf_config.sh line
-    # gsettings set org.gnome.libgnomekbd.keyboard layouts "['us', 'fr', 'de']"
-    layouts="gsettings set org.gnome.libgnomekbd.keyboard layouts "\""['"
+    # make list with small letters of last parts separated by comma, quoted with single quotes and replace in dconf_config.sh line containing: "gsettings set org.gnome.libgnomekbd.keyboard layouts"
+    layouts="gsettings set org.gnome.libgnomekbd.keyboard layouts "\""['" # need full command line in case need to be run below
     for key in "${locales[@]}"; do layouts=$layouts$(echo "$key" | awk 'BEGIN {FS = "_"}{print tolower($2)}')"', '"; done
-    layouts=${layouts::-3}']"' # remove extra , '
+    layouts=${layouts::-3}']"' # remove extra comma space and single quotation mark (, '), add closing bracket and double quotation mark
     if [ $running_system = "false" ]; then
-        sudo sed --in-place --regexp-extended -- "s/# gsettings set org.gnome.libgnomekbd.keyboard layouts.*/$layouts/" $liveiso_path_scripts_root/dconf_config.sh
+        perl -i -pe 's!^.*?gsettings set org.gnome.libgnomekbd.keyboard layouts.*?(#| #|\n)!'"${layouts/$/\\$}"'$1!' "${liveiso_path_scripts_root}/dconf_config.sh" # '?' for lazy matching, '/$/\\$' to escape possible '$' - make literal symbol
     else
         # as running "${layouts}" results in "command not found", using alias
         alias gsettings_layouts="${layouts}"

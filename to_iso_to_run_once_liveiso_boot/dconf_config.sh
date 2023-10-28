@@ -23,6 +23,7 @@ gsettings set org.cinnamon.desktop.a11y.applications screen-magnifier-enabled tr
 gsettings set org.cinnamon.desktop.a11y.magnifier mouse-tracking push
 
 gsettings set org.gnome.libgnomekbd.keyboard options "['grp\tgrp:win_space_toggle', 'grp\tgrp:ctrls_toggle', 'terminate\tterminate:ctrl_alt_bksp']" # set key combinations for changing keyboard layout and terminating GUI session (going to login screen)
+# DO NOT DELETE, NOT A COMMENT gsettings set org.gnome.libgnomekbd.keyboard layouts "['fr', 'us', 'de']" # locales_change.sh script edits this line for liveISO (based on 'locales' array variable set in _make_custom_liveusb.sh)
 
 gsettings set org.cinnamon.desktop.interface keyboard-layout-show-flags false
 gsettings set org.cinnamon.desktop.interface keyboard-layout-use-upper true # change keyboard layout icon in cinnamon panel to upper font text
