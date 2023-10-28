@@ -45,8 +45,8 @@ sudo sed --in-place --regexp-extended -- 's/^Exec=gnome-terminal$/Exec=gnome-ter
 path_to_edit=/usr/share/applications/xed.desktop
 sudo sed --in-place --regexp-extended -- 's|MimeType=.*|MimeType=application/x-shellscript;text/plain;|' "$path_to_edit"
 
-# at least in chrooted system after desktop files updates mimeinfo.list was not updated automatically (and in running system at least not immediately)
-sudo update-desktop-database
+sudo update-desktop-database /usr/share/applications # at least in chrooted system after desktop files updates mimeinfo.list was not updated automatically (and in running system at least not immediately)
+sudo update-mime-database /usr/share/mime
 
 exit
 
