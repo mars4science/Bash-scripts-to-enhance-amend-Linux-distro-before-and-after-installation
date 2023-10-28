@@ -390,10 +390,14 @@ if [ "${use_cgroup}" = 'true' ]; then
     sudo cgset -r cpuset.cpus="all" "${cgroup}"
 fi
 
+# --- START of squashfs ---
 un_mount_in_squashfs # if not unmounted adds e.g. /proc, which I think it not how liveUSB is made to work and it would make it less properly working
 echo "Time now is: $(date -Isec)"
-
-if [ $(du --summarize --block-size=1 "fin_sq/usr/lib") -le 6474670592 ]; then # size of maximum 6... of /usr/lib is "rule of thumb" (to be finetuned) to estimate whether to attempt to fit all fs into one squashfs file (mksquashfs is by far the longest part of the script, so attempting to save time)
+echo   Disk usage in MiB:
+du --block-size=1M --threshold=1 --total --summarize fin_sq/* 2>/dev/null
+echo
+sudo rm fin/casper/filesystem.squashfs # remove original for if [ ! -e ]
+if [ $(2>/dev/null du --summarize --block-size=1G "fin_sq" | tail --lines=1 | awk '{print $1}') -le 12 ]; then # maximum size is "rule of thumb" (to be finetuned, to get 4G max, based on past observations of ~34% in mksquashfs output) to estimate whether to attempt to fit all fs into one squashfs file (mksquashfs is by far the longest part of the script, so attempting to save time); `tail` added just in case
     time sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 # was? '-comp xz'; adding option '-processors 1' did NOT help much to solve issue of `mksquashfs` using resident menory in the size of ~3Gb (a lot, about size of file to be created by the command)
 
 # if larger than 4Gb, split system to two squashfs files (casper scripts of Linux Mint support that); usr/lib by experince is about half
@@ -408,18 +412,8 @@ if [ ! -e fin/casper/filesystem.squashfs ]; then
     cd fin_sq
     time sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
     cd ..
-
-#    sudo mkdir fin_sq/part1
-#    echo "  "error \"cannot move to a subdirectory of itself\" is expected
-#    sudo mv fin_sq/* fin_sq/part1
-#    sudo mkdir --parents fin_sq/part2/usr
-#    sudo mv fin_sq/part1/usr/lib fin_sq/part2/usr
-
-#    sudo mksquashfs fin_sq/part1 fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22
-#    sudo mksquashfs fin_sq/part2 fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22
-
 fi
-# --- end of squashfs ---
+# --- END of squashfs ---
 
 # --- generate new iso image ---
 
