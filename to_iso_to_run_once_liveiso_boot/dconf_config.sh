@@ -171,10 +171,16 @@ add_key "'To reverse keybindings custom list'" "['<Super><Alt>r']" "'${key_scrip
 
 # around {print $1} single quotes need NOT be quoted for bash as within double quotes, but to be 1) outside of single quotes for sh (' -> '\''), 2) backslash used for (1) be escaped for GVariant, using unicode \u005c works for GVariant, alternatively \\\\, 3) all resultant single quotes to be quoted for GVariant (' -> \')
 # $ to be quoted (e.g. via backslash) as within double quotes for bash
-add_key "'Display rotate normal'" "['<Super><Alt>Up']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\') --rotate normal\''"
-add_key "'Display rotate left'" "['<Super><Alt>Left']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\') --rotate left\''"
-add_key "'Display rotate right'" "['<Super><Alt>Right']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\') --rotate right\''"
-add_key "'Display rotate upsidedown'" "['<Super><Alt>Down']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\') --rotate inverted\''"
+add_key "'Display #1 rotate normal'" "['<Super><Alt>Up']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1) --rotate normal\''"
+add_key "'Display #1 rotate left'" "['<Super><Alt>Left']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1) --rotate left\''"
+add_key "'Display #1 rotate right'" "['<Super><Alt>Right']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1) --rotate right\''"
+add_key "'Display #1 rotate upsidedown'" "['<Super><Alt>Down']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1) --rotate inverted\''"
+
+add_key "'Display #2 rotate normal'" "['<Shift><Super><Alt>Up']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1) --rotate normal\''"
+add_key "'Display #2 rotate left'" "['<Shift><Super><Alt>Left']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1) --rotate left\''"
+add_key "'Display #2 rotate right'" "['<Shift><Super><Alt>Right']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1) --rotate right\''"
+add_key "'Display #2 rotate upsidedown'" "['<Shift><Super><Alt>Down']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1) --rotate inverted\''"
+
 
 add_key "'Volume Up'" "['<Primary>AudioRaiseVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'" # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
 add_key "'Volume Down'" "['<Primary>AudioLowerVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'" # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
