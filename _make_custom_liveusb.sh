@@ -390,17 +390,19 @@ if [ "${use_cgroup}" = 'true' ]; then
     sudo cgset -r cpuset.cpus="all" "${cgroup}"
 fi
 
-# After done with modifications making new `squashfs` file, needs to be free space there  
-# putting in folder of previously created for new iso
 un_mount_in_squashfs # if not unmounted adds e.g. /proc, which I think it not how liveUSB is made to work and it would make it less properly working
 echo "Time now is: $(date -Isec)"
-time sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 # was? '-comp xz'; adding option '-processors 1' did NOT help much to solve issue of `mksquashfs` using resident menory in the size of ~3Gb (a lot, about size of file to be created by the command)
+
+if [ $(du --summarize --block-size=1 "fin_sq/usr/lib") -le 6474670592 ]; then # size of maximum 6... of /usr/lib is "rule of thumb" (to be finetuned) to estimate whether to attempt to fit all fs into one squashfs file (mksquashfs is by far the longest part of the script, so attempting to save time)
+    time sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 # was? '-comp xz'; adding option '-processors 1' did NOT help much to solve issue of `mksquashfs` using resident menory in the size of ~3Gb (a lot, about size of file to be created by the command)
 
 # if larger than 4Gb, split system to two squashfs files (casper scripts of Linux Mint support that); usr/lib by experince is about half
-if [ $(stat --format='%s' fin/casper/filesystem.squashfs) -ge 4294967296 ]; then
+    if [ $(stat --format='%s' fin/casper/filesystem.squashfs) -ge 4294967296 ]; then # AFAIK exect limit for squashfs file to be functioning properly
+        sudo rm fin/casper/filesystem.squashfs
+    fi
+fi
 
-    sudo rm fin/casper/filesystem.squashfs
-
+if [ ! -e fin/casper/filesystem.squashfs ]; then
     # Below split to two files was initially implemented as moves of folders, however moves in overlay seems to take memory, also learned there is -no-strip option added in 2021 and of -e option usage from README (both are absent from man page)
     time sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -e "usr/lib"
     cd fin_sq
@@ -441,11 +443,13 @@ check_free_memory(){
 check_free_memory
 if [ $? -ne 0 ]; then
     echo "Available memory is less than [110% of size of squashfs file(s) + 200 MB], might need more memory to complete iso file creation"
-# TODO if [ "$interactive_mode" = "true" ]; then
-    echo "Press (y/Y) to delete working files in $work_path/fin_sq that made up filesystem.squashfs"
-    read -p "Any other key to open sub-shell to pause and maybe add more free memory manually"  -n 1 -r
-    echo  # (optional) move to a new line
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [ "${interactive_mode}" = "true" ]; then
+        echo "Press (y/Y) to delete working files in $work_path/fin_sq that made up squashfs filesystem file(s)"
+        read -p "Any other key to open sub-shell to pause and maybe add more free memory manually"  -n 1 -r
+        echo  # (optional) move to a new line
+    fi
+    if [[ "${REPLY}" =~ ^[Yy]$ ]] || [ ! "${interactive_mode}" = "true" ] || [ "${delete_work_files_without_user_interaction}" = "true" ]; then
+        echo "  Next deleting working files in $work_path/fin_sq that made up squashfs filesystem file(s)"
         un_mount_in_squashfs
         sudo rm -R fin_sq/*
     else
