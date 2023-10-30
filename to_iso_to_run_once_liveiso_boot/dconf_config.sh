@@ -182,7 +182,6 @@ add_key "'Display #2 rotate left'" "['<Shift><Super><Alt>Left']" "'sh -c \'xrand
 add_key "'Display #2 rotate right'" "['<Shift><Super><Alt>Right']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1) --rotate right\''"
 add_key "'Display #2 rotate upsidedown'" "['<Shift><Super><Alt>Down']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1) --rotate inverted\''"
 
-
 add_key "'Volume Up'" "['<Primary>AudioRaiseVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'" # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
 add_key "'Volume Down'" "['<Primary>AudioLowerVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'" # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
 
@@ -191,6 +190,12 @@ add_key "'Brightness down'" "['<Alt>MonBrightnessDown']" "'night -1'"
 
 add_key "'Up text scaling 1.1 times'" "['<Primary><Shift><Alt>x']" '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*1.1)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
 add_key "'Up text scaling 0.9 times'" "['<Primary><Shift><Alt>z']" '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*0.9)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
+
+add_key "'Increase mouse speed by 0.1 (range from -1 to 1)'" "['<Primary><Super><Alt>Up']" '"sh -c '\''p=\"org.cinnamon.desktop.peripherals.mouse\";f=$(gsettings get ${p} speed);fnew=$(printf \"print(${f}+0.1)\" | python); gsettings set ${p} speed ${fnew}'\'\"
+add_key "'Decrease mouse speed by 0.1 (range from -1 to 1)'" "['<Primary><Super><Alt>Down']" '"sh -c '\''p=\"org.cinnamon.desktop.peripherals.mouse\";f=$(gsettings get ${p} speed);fnew=$(printf \"print(${f}-0.1)\" | python); gsettings set ${p} speed ${fnew}'\'\"
+
+add_key "'Increase touchpad speed by 0.1 (range from -1 to 1)'" "['<Primary><Super><Alt>Right']" '"sh -c '\''p=\"org.cinnamon.desktop.peripherals.touchpad\";f=$(gsettings get ${p} speed); gsettings set ${p} speed $(python -c \"print(${f}+0.1)\")'\'\"
+add_key "'Decrease touchpad speed by 0.1 (range from -1 to 1)'" "['<Primary><Super><Alt>Left']" '"sh -c '\''p=\"org.cinnamon.desktop.peripherals.touchpad\";f=$(gsettings get ${p} speed); gsettings set ${p} speed $(python -c \"print(${f}-0.1)\")'\'\"
 
 add_key "'TrackPoint X1G6 fix'" "['<Super><Alt>t']" "'/lib/systemd/system-sleep/trackpoint_reset key'" # fix TrackPoint issue om carbon X1 gen 6
 add_key "'Screen lock'" "['<Super><Alt>x']" "'sh -c \'xscreensaver-command -lock || ( ( xscreensaver & ) && sleep 1 && xscreensaver-command -lock )\''" # screen lock binding, xscreensaver to be set to be started via other script
