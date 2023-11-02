@@ -177,3 +177,65 @@ add_function 'm_ount' '
 
     udisksctl mount --block-device "${dev_path%.}" # removal of . at the end if it is there
 '
+
+add_function 'Pound4Kilo' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Converts metric kilograms to pounds, one parameter (real or integer number)"
+        return 0
+    fi
+
+    python -c "print($1/0.453)"
+'
+
+add_function 'Kilo4Pound' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Converts pounds to metric kilograms, one parameter (real or integer number)"
+        return 0
+    fi
+
+    python -c "print($1*0.453)"
+'
+
+add_function 'FInch4Meter' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Converts metric meters to feet and inches, one parameter (real or integer number)"
+        return 0
+    fi
+
+    python -c "f2m=0.3048;i2m=0.0254;f=int($1/f2m); i=($1-f*f2m)/i2m; print(str(f)+\"'\''\"+str(i)+\"\\\"\");print(str(f)+\"'\''\"+str(round(i))+\"\\\"\")"
+'
+
+add_function 'Meter4FInch' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Converts feet and inches to metric meters, two parameters: feet and inches (real or integer numbers)"
+        return 0
+    fi
+
+    python -c "f2m=0.3048;i2m=0.0254;print($1*0.3048+$2*0.0254)"
+'
+
+add_function 'Fahrenheit4Celsius' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Converts Celsius degrees to Fahrenheit scale, one parameter (real or integer number)"
+        return 0
+    fi
+    # f - Fahrenheit; c - Celsius; w - water; fr - freezing; bo - boiling
+    python -c "fwfr=32;fwbo=212;cwfr=0;cwbo=100; print(fwfr+($1-cwfr)*(fwfr-fwbo)/(cwfr-cwbo))"
+'
+
+add_function 'Celsius4Fahrenheit' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Converts Fahrenheit degrees to Celsius scale, one parameter (real or integer number)"
+        return 0
+    fi
+    # f - Fahrenheit; c - Celsius; w - water; fr - freezing; bo - boiling
+    python -c "fwfr=32;fwbo=212;cwfr=0;cwbo=100; print(cwfr+($1-fwfr)*(cwfr-cwbo)/(fwfr-fwbo))"
+'
+add_function 'BMI' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Body Mass Index, two parameters: kilos and meters (real or integer numbers)"
+        return 0
+    fi
+
+    python -c "print($1/$2/$2)"
+'
