@@ -175,7 +175,7 @@ add_function 'm_ount' '
         dev_path="$(udisksctl unlock --block-device "${dev_path}" | awk '\''{ print $4 }'\'')" # e.g. unlocked /dev/sdc1  as /dev/dm-1.
     fi
 
-    udisksctl mount --block-device "${dev_path%.}" # removal of . at the end if it is there
+    udisksctl mount --block-device "${dev_path%.}" --options ro,noatime # removal of . at the end if it is there
 '
 
 add_function 'Pound4Kilo' '
