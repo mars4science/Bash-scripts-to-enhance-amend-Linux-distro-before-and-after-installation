@@ -195,6 +195,41 @@ add_function 'Kilo4Pound' '
 
     python -c "print($1*0.453)"
 '
+add_function 'Liter4Gallon' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Converts gallons to liters (qubic decimeters), one parameter (real or integer number)"
+        return 0
+    fi
+
+    python -c "print($1*0.0254**3*231*1000)"
+'
+
+add_function 'Gallon4Liter' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Converts liters (qubic decimeters) to gallons, one parameter (real or integer number)"
+        return 0
+    fi
+
+    python -c "print($1/0.0254**3/231/1000)"
+'
+
+add_function 'Liter4Oz' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Converts US customary fluid ounce (oz, 1/128 of a gallon) to liters (qubic decimeters), one parameter (real or integer number)"
+        return 0
+    fi
+    gallons=`Liter4Gallon $1`
+    python -c "print($gallons/128)"
+'
+
+add_function 'Oz4Liter' '
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "Converts liters (qubic decimeters) to US customary fluid ounce (oz, 1/128 of a gallon), one parameter (real or integer number)"
+        return 0
+    fi
+    gallons=`Gallon4Liter $1`
+    python -c "print($gallons*128)"
+'
 
 add_function 'FInch4Meter' '
     if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
