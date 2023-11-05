@@ -63,6 +63,7 @@ $dir_name/fox_tabs_get.sh install
 $dir_name/git_clone.sh install
 $dir_name/git_compact.sh install
 $dir_name/get_software_path.sh install
+$dir_name/man_pages_search.sh install
 
 $dir_name/w_browser.sh install # add script to the system
 # next on the first run is expected to copy archive with secondary browser from $software_path_root/... to location given by get_software_path.sh

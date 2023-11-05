@@ -93,6 +93,7 @@ Scripts added to /usr/local/bin:
 - `k_iwix` runs kiwix appimage with some variables set as a workaround to libGL error 
 - `git_clone` clones specific git repo with mirror option then amends config to make cloned repo look as regular
 - `git_compact` compacts repo with `git switch --orphan empty_long_name`
+- `man_pages_search` Searches sources files of the system reference manual pages for containing all arguments as literal strings (case insensitive) in any order (aka --global-apropos but for multiple arguments as `man` application itself for some reason seems to have no such option)
 
 Other minor tweaks, including:
 
