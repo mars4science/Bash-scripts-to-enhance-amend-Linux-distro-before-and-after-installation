@@ -461,8 +461,8 @@ fi
 # --- generate new iso image ---
 
 # check if enough memory is still available for the image
-fs_size=0 # in MB
-for f in fin/casper/*.squashfs ; do fs_size=$(( fs_size + $(stat --printf="%s" $f)/1048576 )) ; done
+# fs_size=0; for f in fin/casper/*.squashfs ; do fs_size=$(( fs_size + $(stat --printf="%s" $f)/1048576 )) ; done # previous code
+fs_size=$(2>/dev/null du --summarize --block-size=1M fin | tail --lines=1 | awk '{print $1}')
 
 # for tmpfs `df` can show more available space than available RAM, hence second check in the function
 check_free_memory(){
@@ -479,7 +479,7 @@ check_free_memory(){
 
 check_free_memory
 if [ $? -ne 0 ]; then
-    echo "Available memory is less than [110% of size of squashfs file(s) + 200 MB], might need more memory to complete iso file creation"
+    echo "Available memory is less than [110% of size of all file(s) for ISO + 200 MB], might need more memory to complete iso file creation"
     if [ "${delete_work_files_without_user_interaction}" = "false" ]; then
         echo "Press (y/Y) to delete working files in $work_path/fin_sq that made up squashfs filesystem file(s)"
         read -p "Any other key to open sub-shell to pause and maybe add more free memory manually"  -n 1 -r
@@ -497,7 +497,7 @@ fi
 
 check_free_memory
 if [ $? -ne 0 ]; then
-    echo "After deleting files available memory is still less than [110% of size of squashfs file(s) + 200 MB], might need more memory to complete iso file creation"
+    echo "After deleting files available memory is still less than [110% of size of all file(s) for ISO + 200 MB], might need more memory to complete iso file creation"
 # TODO if [ "$interactive_mode" = "true" ]; then
     echo "Press (a/A) to abort script after deleting all files in $work_path"
     read -p "Any other key to open sub-shell to pause and try to add more free memory manually"  -n 1 -r
