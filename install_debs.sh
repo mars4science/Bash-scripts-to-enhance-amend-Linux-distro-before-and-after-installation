@@ -81,20 +81,23 @@ if [ -d "${debian_archives}" ]; then
     { echo "deb [ allow-insecure=yes, trusted=yes ] file:${software_path_root}/debian_archives ${distribution} ${component}"; printf "${source_original}";} | sudo tee "${SOURCES_FILE}"
     echo -e "\n    Reading the package(s) index files from newly assigned sources is programmed in the code that follows this line\n"
     sudo apt-get update # reads index files (aka Package files by man page of dpkg-scanpackages), by observation noted it removes previous files of sources that are no longer in sources lists, so for restoring if strategy is "replace" need to backup those (done via "${INDEX_FILES_DIR}")
-    echo
 
 #
 # Installing deb files. Note: benchmarking installation of all-on-one-line vs. one-by-one showed ~4.5 minutes duration vs. ~7.5 minute duration - significant improvement; if dependencies are not fully satisfied to failsafe to one-by-one installation took only ~1 second
 #
-    # read packages names
+    # read packages names, remove in-line comments ('%' and/or '#') and blank spaces
     while read line; do
-        line="${line%%#*}" # remove commands from the end up to last from end #, also seems to allow to comment out whole lime
-        line="${line%% *}" # remove a blank, how to match one or more blanks I have not found
+        line="${line##%*}" # remove comments made via '%' symbol - remove symbols to last one if line starts with '%', seems to allow to comment out whole lime; difference with commenting with '#' because deb files themselves often contain '%', but not '#' (package names do not, but just in case); '%' option added because file that is read is as of 2023/11/09 called .list and text editor 'toggle comment' adds '%'
+        line="${line%%#*}" # remove comments made via '#' symbol - remove symbols from the end up to last (from end) '#', seems to allow to comment out whole line
+        line="${line%% *}" # remove a blank (just in case, and anything after it), how to match one or more blanks only I have not found
 
         if [ -n "${line}" ];then # allow for empty lines
             packages_list="${packages_list} ${line}"
         fi # empty line
     done < "${packages_to_install}" # reading lines of names of packages, before reading to variable was `cat filename | while read`, but piping creates a subshell and variable assignment happened there (using < fixed it)
+
+    echo -e "\n    Set of  ${packages_to_install}  debian packages to be installed next in a few seconds\n" | tee --append "${install_debs_log}"
+    sleep 2
 
     sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes ${packages_list} |& tee --append "${install_debs_log}" # packages_list NOT quoted to allow it to expand to indvividual words (packages)
 
