@@ -310,7 +310,11 @@ else
     mkdir --parents $work_path && cd $_
 fi
 
-read -p "Choose interactive mode (press 'i' key) to pause after installation/change of everything but before starting to pack them into new ISO and try to leave all work files intact (run the script again to delete); 'f' key to pause as for 'i' but detele working files along the way leaving only amended iso file; 'n' key NOT to pause and also delete work files leaving only amended ISO file without pausing for user input; any other key not to pause but leave work files:" -n 1 -r
+echo
+echo "Choose interactive mode (press 'i' key) to pause after installation/change of everything but before starting to pack them into new ISO and try to leave all work files intact (run the script again to delete)"
+echo "'f' key to pause as for 'i' but detele working files along the way leaving only amended iso file"
+echo "'n' key NOT to pause and also delete work files leaving only amended ISO file without pausing for user input"
+read -p "any other key NOT to pause but leave work files:" -n 1 -r
 echo  # (optional) move to a new line
 if [[ $REPLY =~ ^[Ii]$ ]]; then
     interactive_mode="true";
