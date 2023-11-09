@@ -87,7 +87,6 @@ $dir_name/to_iso_to_run_once_liveiso_boot/add_ramdisk_and_ramcache.sh
 
 $dir_name/disable_swap.sh
 $dir_name/display_backlight_control_setup.sh
-$dir_name/bash_functions_and_other_config.sh
 
 # enable packet forwarding for IPv4, IPv6
 $dir_name/networking_tweaks.sh
@@ -100,6 +99,8 @@ sleep 5 # pause n seconds
 $dir_name/install_debs.sh
 echo "===== This line is after install code, next in a few seconds going to continue ====="
 sleep 5 # pause n seconds
+
+$dir_name/bash_functions_and_other_config.sh # after installation of programs as makes aliases for some if installed
 
 # to be run after programs install
 $dir_name/tlp_config_battery.sh
@@ -129,7 +130,15 @@ sudo cp "${software_path_root}/color-profiles/"* /usr/share/color/icc/colord
 # change some text for some of the system reference manual pages to make them more easily found by apropos and for understanding; includes `updatedb` call to update database used by `locate` utility to find files.
 $dir_name/man_pages_edits.sh
 
-# to fix bug on X1 carbon gen 6 (seems not to fix the issue, maybe investigate further, for now resorted to using custom key bindings
+# to remake a dictd database configuration in case databased added manual w/out using package management system
+if [ x != x`which dictdconfig` ]; then sudo dictdconfig --write; fi
+
+# add info files to directory (in case any being added by copying)
+for info_f in "${software_path_root}"/to_root/usr/share/info/* ; do
+    sudo install-info /usr/share/info/"$(basename ${info_f})" /usr/share/info/dir
+done
+
+# to fix bug on X1 carbon gen 6 (seems not to fix the issue, maybe investigate further, for now resorted to using custom key bindings)
 $dir_name/systemd_on_resume_config.sh
 
 # for liveUSB customization via chroot only
