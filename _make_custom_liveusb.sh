@@ -27,7 +27,7 @@ locales=("fr_FR" "en_US" "de_DE") # first in array also used to set system inter
 
 # as after_original_distro_install.sh to be run in chrooted environment there is code to map (via mount) software_path_root to  path_to_software_in_chroot - where above mentioned script is written to look for software
 path_to_software_in_chroot="/tmp/path_for_mount_to_add_software_to_liveiso"
-liveiso_path_scripts_in_chroot=/usr/share/amendedliveiso-scripts
+liveiso_path_scripts_in_chroot=/usr/local/bin/amendedliveiso-scripts-etc
 liveiso_path_settings_in_chroot=/usr/share/amendedliveiso-settings
 liveiso_sources_in_chroot=/usr/src/amendedliveiso # to copy all scripts to have sources on resulting ISO
 work_path_in_chroot=/tmp # used by apt_get.sh
