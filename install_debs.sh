@@ -158,7 +158,7 @@ if [ -d "${separate_debian_packages}" ]; then
     # TODO: understand why there are errors during installation if list of folders with debs is ordered alphabetically (want to switch because consider it more convenient to ensure desired ordering). Part of the cause (hypothesis): Errors are due to diffeent ordering from order in which packages were added.
 fi
 
-if [ $(grep --quiet -i 'removed' "${install_debs_log}";echo $?) -eq 0 ]; then
+if [ $(grep --quiet --invert-match ', 0 removed' "${install_debs_log}" | grep --quiet -i 'removed' "${install_debs_log}";echo $?) -eq 0 ]; then
     echo -e "\n===== Unwanted removals potentially happened      =====" | 1>&2 sudo tee --append "${amend_errors_log}"
     echo -e "  === List below by grep, entries separated by --   ===\n" | 1>&2 sudo tee --append "${amend_errors_log}"
     grep -i -A 1 'removed' "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
