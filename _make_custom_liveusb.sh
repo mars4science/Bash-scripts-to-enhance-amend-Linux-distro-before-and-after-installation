@@ -406,13 +406,16 @@ if [ "${use_cgroup}" = 'true' ]; then
 fi
 
 # --- START of squashfs ---
+
+# Note: mksquashfs operation takes a lot of memory; in localities where memory seems a bit not enough to produce final result one is advised to try to lower limits (in 'if' statements) to split file system even further and split to smaller pieces
+
 un_mount_in_squashfs # if not unmounted adds e.g. /proc, which I think it not how liveUSB is made to work and it would make it less properly working
 echo "Time now is: $(date -Isec)"
 echo   Disk usage in MiB:
 du --block-size=1M --threshold=1 --total --summarize fin_sq/* 2>/dev/null
 echo
 sudo rm fin/casper/filesystem.squashfs # remove original for if [ ! -e ]
-if [ $(2>/dev/null du --summarize --block-size=1G "fin_sq" | tail --lines=1 | awk '{print $1}') -le 12 ]; then # maximum size is "rule of thumb" (to be finetuned, to get 4G max, based on past observations of ~34% in mksquashfs output) to estimate whether to attempt to fit all fs into one squashfs file (mksquashfs is by far the longest part of the script, so attempting to save time); `tail` added just in case
+if [ $(2>/dev/null du --summarize --block-size=1G "fin_sq" | tail --lines=1 | awk '{print $1}') -le 12 ]; then # maximum size is "rule of thumb" (to be finetuned, to get 4G max, based on past observations of ~34% in mksquashfs output for /usr/lib, ~40% for the rest) to estimate whether to attempt to fit all fs into one squashfs file (mksquashfs is by far the longest by time part of the script, so attempting to save time); `tail` added just in case
     time sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 # was? '-comp xz'; adding option '-processors 1' did NOT help much to solve issue of `mksquashfs` using resident menory in the size of ~3Gb (a lot, about size of file to be created by the command)
 
 # if larger than 4Gb, split system to two squashfs files (casper scripts of Linux Mint support that); usr/lib by experince is about half
@@ -423,16 +426,34 @@ fi
 
 if [ ! -e fin/casper/filesystem.squashfs ]; then
     # Below split to two files was initially implemented as moves of folders, however moves in overlay seems to take memory, also learned there is -no-strip option added in 2021 and of -e option usage from README (both are absent from man page)
-    cd fin_sq
-    time sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
-    cd ..
+    cd fin_sq # for -no-strip option
+    # if even /usr/lib might be too large (estimated squashfs size ~34% of uncompressed) - split in two
+    # as there are no redos in case of too large size here as opposed to one squashfs initial try, compare to 11Gb to increase chances to be on the safe side (du seems to round up, so 11 is anything larger than 10)
+    if [ $(2>/dev/null du --summarize --block-size=1G "usr/lib" | tail --lines=1 | awk '{print $1}') -ge 11 ]; then
+        time sudo mksquashfs usr/lib/x86_64-linux-gnu ../fin/casper/filesystem_usr-lib-x86_64-linux-gnu.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
 
-    # delete no longer needed files to free memory
-    if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
-        sudo rm --recursive fin_sq/usr/lib/*
+        if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
+            sudo rm --recursive usr/lib/x86_64-linux-gnu/*; fi # delete no longer needed files to free memory
+        ex_flag='-e'; ex_argument="usr/lib/x86_64-linux-gnu"
     fi
 
-    time sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -e "usr/lib"
+    time sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip ${ex_flag} ${ex_argument} # as e_* not quoted if not set will not be additional arguments
+
+    if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
+        sudo rm --recursive usr/lib/*; fi # delete no longer needed files to free memory
+
+    # if even sans /usr/lib estimated size might be too large, (estimated squashfs size ~40% of uncompressed)
+    # bash's arithmetic expression seems to round down, so 8Gb
+    if [ $((($(2>/dev/null du --summarize --block-size=1M "." | tail --lines=1 | awk '{print $1}')-$(2>/dev/null du --summarize --block-size=1M "usr/lib" | tail --lines=1 | awk '{print $1}'))/1024)) -ge 8 ]; then
+        time sudo mksquashfs usr/share ../fin/casper/filesystem_usr-share.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
+
+        if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
+            sudo rm --recursive usr/share/*; fi # delete no longer needed files to free memory
+        es_flag='-e'; es_argument="usr/share"
+    fi
+
+    cd ..
+    time sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -e "usr/lib" ${es_flag} ${es_argument} # as e_* not quoted if not set will not be additional arguments
 
 fi
 # --- END of squashfs ---
