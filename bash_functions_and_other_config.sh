@@ -2,6 +2,9 @@
 
 bashrc=/etc/bash.bashrc
 
+#
+# change prompt
+#
 grep 'bash prompt, LM original and setting it' "${bashrc}" 1>/dev/null
 if [ $? -ne 0 ]; then
     echo '' | sudo tee --append $bashrc
@@ -10,8 +13,36 @@ if [ $? -ne 0 ]; then
     echo 'PS1='\''\[\033[01;34m\]\w\[\033[00m\]\$ '\''' | sudo tee --append $bashrc
 fi
 
+#
+# add aliases
+#
 echo $'\n'"alias hi=history" | sudo tee --append "${bashrc}"
 
+add_dict_alias(){
+    if [ "$(dict -D | awk '{print $1}' | grep $2)" ] ; then
+        echo $'\n'"alias dict-$1=dict -d $2" | sudo tee --append "${bashrc}"
+    fi
+}
+
+if [ x != x`which dict` ]; then
+    add_dict_alias english-gcide gcide
+    add_dict_alias english-wordnet wn
+    add_dict_alias english-wiki wikt-en-en
+    add_dict_alias deutsche fd-deu-eng
+    add_dict_alias german fd-eng-deu
+    add_dict_alias français fd-fra-eng
+    add_dict_alias french fd-eng-fra
+    add_dict_alias wiki wikt-en-en
+fi
+
+#
+# add Readline Key Bindings:
+#
+echo $'\n'"bind '\"\C-h\": \"\`\C-a history -s \`2>&1 \C-j\"'" | sudo tee --append "${bashrc}" # add Ctrl-h - if command is entered and Ctrl-h pressed, '`' is to be added to end and then C-a causes cursor to move to beginning of the line and ' history -s `2>&1 ' to be added. Result is (per design) to save output of command to history (e.g. useful to copy 'not found, but can be installed with')
+
+#
+# add functions
+#
 add_function(){
     # remove previous version if in the file; $'\n' is line break in bash (using $'\' notation)
     sudo perl -0777 -pi -e "s/"$'\n'"$1().*?export -f $1"$'\n'$'\n'"//sg" "${bashrc}" # sg modifiers for perl regex: g - global, replace more than once; s - makes "." cross line boundaries. "?" needed to make regex lazy, otherwise greedy: selects up to past occurence of "export -f", not first
@@ -158,9 +189,10 @@ add_function 'git_merge' '
 '
 
 # mount via terminal
-add_function 'm_ount' '
-    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-        echo "Code for mounting block device (e.g. USB stick), takes as parameter string to match for block devices by type, label, path"
+add_function 'm_ount_options' '
+    if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]; then
+        if [ "$#" -eq 1 ]; then opt="with mount options as second parameter"; else opt="with mount options: ${2}"; fi
+        echo "Code for mounting block device (e.g. USB stick), takes as parameter string to match for block devices by type, label, path; with mount options: ${opt}"
         return 0
     fi
 
@@ -175,7 +207,16 @@ add_function 'm_ount' '
         dev_path="$(udisksctl unlock --block-device "${dev_path}" | awk '\''{ print $4 }'\'')" # e.g. unlocked /dev/sdc1  as /dev/dm-1.
     fi
 
-    udisksctl mount --block-device "${dev_path%.}" --options ro,noatime # removal of . at the end if it is there
+    echo "Mount options are: ${2}"
+    udisksctl mount --block-device "${dev_path%.}" --options "${2}" # removal of . at the end if it is there
+'
+
+add_function 'm_ount' '
+    m_ount_options "$1" "ro,noatime"
+'
+
+add_function 'm_ountw' '
+    m_ount_options "$1" "rw,noatime"
 '
 
 add_function 'Pound4Kilo' '

@@ -58,6 +58,18 @@ if [ $? -ne 0 ]; then
     printf "${text_to_add}" | tee --append "${file_to_change}"
 fi
 
+# remake dictd links for some long named dictionaries (namaly wikt*-date)
+dict_path="${software_path_root}"/to_root/usr/share/dictd/
+if [ -d "${dict_path}" ]; then
+    for f in "${dict_path}"/* ; do # remove previous links
+        if [ -h "${f}" ]; then rm "${f}"; fi
+    done
+    for f in "${dict_path}"/* ; do
+            f="$(basename ${f})"
+            ln --symbolic --relative "${dict_path}/${f}" "${dict_path}/${f%%-2*}.${f#*.}"
+    done
+fi
+
 # end of script
 exit
 
