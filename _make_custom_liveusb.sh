@@ -310,10 +310,21 @@ else
     mkdir --parents $work_path && cd $_
 fi
 
-read -p "Choose interactive mode (press i key) to pause at some points, otherwise run unattended (any other key), n key to also delete work files leaving only amended iso file without pausing for user input:" -n 1 -r
+read -p "Choose interactive mode (press 'i' key) to pause after installation/change of everything but before starting to pack them into new ISO and try to leave all work files intact (run the script again to delete); 'f' key to pause as for 'i' but detele working files along the way leaving only amended iso file; 'n' key NOT to pause and also delete work files leaving only amended ISO file without pausing for user input; any other key not to pause but leave work files:" -n 1 -r
 echo  # (optional) move to a new line
-if [[ $REPLY =~ ^[Ii]$ ]]; then interactive_mode="true"; else interactive_mode="false"; fi
-if [[ $REPLY =~ ^[Nn]$ ]]; then delete_work_files_without_user_interaction="true"; else delete_work_files_without_user_interaction="false"; fi
+if [[ $REPLY =~ ^[Ii]$ ]]; then
+    interactive_mode="true";
+    delete_work_files_without_user_interaction="false";
+elif [[ $REPLY =~ ^[Dd]$ ]]; then
+    interactive_mode="true";
+    delete_work_files_without_user_interaction="true";
+elif [[ $REPLY =~ ^[Nn]$ ]]; then
+    interactive_mode="false";
+    delete_work_files_without_user_interaction="true";
+else
+    interactive_mode="false";
+    delete_work_files_without_user_interaction="false";
+fi
 
 mkdir iso to temp fin initrd
 
@@ -408,10 +419,17 @@ fi
 
 if [ ! -e fin/casper/filesystem.squashfs ]; then
     # Below split to two files was initially implemented as moves of folders, however moves in overlay seems to take memory, also learned there is -no-strip option added in 2021 and of -e option usage from README (both are absent from man page)
-    time sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -e "usr/lib"
     cd fin_sq
     time sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
     cd ..
+
+    # delete no longer needed files to free memory
+    if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
+        sudo rm --recursive fin_sq/usr/lib/*
+    fi
+
+    time sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -e "usr/lib"
+
 fi
 # --- END of squashfs ---
 
@@ -437,12 +455,12 @@ check_free_memory(){
 check_free_memory
 if [ $? -ne 0 ]; then
     echo "Available memory is less than [110% of size of squashfs file(s) + 200 MB], might need more memory to complete iso file creation"
-    if [ "${interactive_mode}" = "true" ]; then
+    if [ "${delete_work_files_without_user_interaction}" = "false" ]; then
         echo "Press (y/Y) to delete working files in $work_path/fin_sq that made up squashfs filesystem file(s)"
         read -p "Any other key to open sub-shell to pause and maybe add more free memory manually"  -n 1 -r
         echo  # (optional) move to a new line
     fi
-    if [[ "${REPLY}" =~ ^[Yy]$ ]] || [ ! "${interactive_mode}" = "true" ] || [ "${delete_work_files_without_user_interaction}" = "true" ]; then
+    if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
         echo "  Next deleting working files in $work_path/fin_sq that made up squashfs filesystem file(s)"
         un_mount_in_squashfs
         sudo rm -R fin_sq/*
@@ -467,8 +485,7 @@ if [ $? -ne 0 ]; then
         if [ $Eval -ne 0 ]; then
             echo "Deleting contents unsuccessful (per return code);this script is written to end in $delay seconds"; sleep $delay; exit 1;
         fi
-        echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay;
-        exit
+        echo "Deleting contents successful (per return code); this script is written to continue in $delay second(s)"; sleep $delay; exit 2;
     else
         echo "Type "\""exit"\"" then press "\""Enter"\"" to continue the script"
         bash -i
@@ -505,6 +522,7 @@ ps --sort +pid -eo pid,stat,command | grep "$0" | head -1 | awk '{print $2}' | g
 if [ $? -eq 0 ]; then bash -i; fi
 
 exit
+
 
 -----"<Footnotes>"-----
 
