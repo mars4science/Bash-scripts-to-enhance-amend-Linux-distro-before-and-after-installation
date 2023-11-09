@@ -20,7 +20,7 @@ echo $'\n'"alias hi=history" | sudo tee --append "${bashrc}"
 
 add_dict_alias(){
     if [ "$(dict -D | awk '{print $1}' | grep $2)" ] ; then
-        echo $'\n'"alias dict-$1=dict -d $2" | sudo tee --append "${bashrc}"
+        echo $'\n'"alias 'dict-$1=dict -d $2'" | sudo tee --append "${bashrc}"
     fi
 }
 
