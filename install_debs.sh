@@ -25,7 +25,7 @@ trap 'exit_on_ctrl_c' SIGINT
 
 #
 # installing packages downloaded via apt-get with dependencies and where all deb package files are stored in one Debian archive
-
+#
 if [ -d "${debian_archives}" ]; then
 
     # does NOT work during liveISO amendment as source files are mounted read-only because of thoughts about safety
@@ -83,13 +83,29 @@ if [ -d "${debian_archives}" ]; then
     sudo apt-get update # reads index files (aka Package files by man page of dpkg-scanpackages), by observation noted it removes previous files of sources that are no longer in sources lists, so for restoring if strategy is "replace" need to backup those (done via "${INDEX_FILES_DIR}")
     echo
 
-    # read packages names and install
-    cat "${packages_to_install}" | \
+#
+# Installing deb files. Note: benchmarking installation of all-on-one-line vs. one-by-one showed ~4.5 minutes duration vs. ~7.5 minute duration - significant improvement; if dependencies are not fully satisfied to failsafe to one-by-one installation took only ~1 second
+#
+    # read packages names
     while read line; do
         line="${line%%#*}" # remove commands from the end up to last from end #, also seems to allow to comment out whole lime
         line="${line%% *}" # remove a blank, how to match one or more blanks I have not found
 
         if [ -n "${line}" ];then # allow for empty lines
+            packages_list="${packages_list} ${line}"
+        fi # empty line
+    done < "${packages_to_install}" # reading lines of names of packages, before reading to variable was `cat filename | while read`, but piping creates a subshell and variable assignment happened there (using < fixed it)
+
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes ${packages_list} |& tee --append "${install_debs_log}" # packages_list NOT quoted to allow it to expand to indvividual words (packages)
+
+    if [ ${PIPESTATUS[0]} -eq 0 ];then
+        echo -e "\n    set of  ${packages_list}  package(s) installed (at least seems like it)\n" | tee --append "${install_debs_log}"
+
+    else
+        echo -e "\n    ERROR:  set of  ${packages_list}  package(s) NOT installed (at least seems like it)\n\n    Next is coded to try to install packages separately\n"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
+
+        packages_array=(${packages_list})
+        for line in ${packages_array[@]}; do
             echo -e "    ${line}  to be installed next\n" | tee --append "${install_debs_log}"
             sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes "${line}" |& tee --append "${install_debs_log}" # --no-install-recommends deleted from the line as in apt_get recommended dependencies were added as were in the folders of deb files to install all files from
             # man bash: Each  command in a pipeline is executed as a separate process (i.e., in a subshell)
@@ -101,8 +117,8 @@ if [ -d "${debian_archives}" ]; then
                 echo "    ERROR:  $line  package NOT installed (at least seems like it)"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
                 echo | tee --append "${install_debs_log}"
             fi
-        fi # empty line
-    done # reading lines of names of packages
+        done # iterating over array
+    fi
 
     # restore original apt sources files
     if [ "${strategy_for_sources}" = "replace" ]; then
@@ -119,7 +135,7 @@ if [ -d "${debian_archives}" ]; then
         sudo apt-get update
         echo
     fi
-
+    sudo apt-get clean # seems deb files from local archive are not copied to apt cache, still just in case there will be downloads
 fi
 
 #
