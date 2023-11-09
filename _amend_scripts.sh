@@ -8,7 +8,7 @@
 # for skipping changing a variable one is adviced to try commenting out the line
 software_path_root="/media/data/LM1"
 base_version="21"
-distro_label="GNU-Linux_1.2_b${base_version}"
+distro_label="GNU-Linux_1.2_b${base_version}" # max 32 symbols as used for ISO volume ID (volume name or label) (`man genisoimage`), maybe some other rules apply
 original_iso='${software_path_root}'"/linuxmint-${base_version}-cinnamon-64bit.iso" # ' here as contains $
 new_legacy_menu_title="GNU/Linux Cinnamon OS based on LM ${base_version} 64-bit (legacy boot)"
 work_path="/media/disk1/work2"

@@ -10,7 +10,7 @@
 # Note 3: It's been noted `unmkinitramfs` somehow does not work correcty if scripts are run on a system based on distro different from the one of original ISO file (noted for LM 21 / 20), it affects changing initramfs (functionality can be turned on/off via change_initramfs control variable).
 
 # ---- parameters ---- #
-distro_label="GNU-Linux_1.64_b21" # arbitrary string, not sure script written to process space and bash-special symbols as author envisioned
+distro_label="GNU-Linux_1.64_b21" # max 32 symbols as used for ISO volume ID (volume name or label) (`man genisoimage`), maybe some other rules apply
 
 software_path_root=/media/ramdisk/LM # the script is written to look for software to take from there
 original_iso="${software_path_root}"/linuxmint-21-cinnamon-64bit.iso # the script is written to look there for original ISO
