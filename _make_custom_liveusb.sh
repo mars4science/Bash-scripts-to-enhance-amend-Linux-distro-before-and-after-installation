@@ -35,6 +35,7 @@ use_cgroup='true' # to limit CPU usage during CPU intensive tasks of long durati
 cgroup="gr1"
 cpu_max_chroot="500000 1000000" # limit for whole CPU, write quota and period (valid values in the range of 1000 to 1000000) in microseconds, for  performance reasons could be better to use larger periods). Total CPU time in the system equals period multiplied by number of cores/processors
 cpu_max_mksquashfs="1500000 1000000"
+limit_sq_total=12; limit_sq_usr_lib=10; limit_sq_total_sans_usr_lib=7 # limits in Gb of sizes to compress into squashfs, if above split into more squashfs files
 
 # ---- parameters end ---- #
 
@@ -415,7 +416,8 @@ echo   Disk usage in MiB:
 du --block-size=1M --threshold=1 --total --summarize fin_sq/* 2>/dev/null
 echo
 sudo rm fin/casper/filesystem.squashfs # remove original for if [ ! -e ]
-if [ $(2>/dev/null du --summarize --block-size=1G "fin_sq" | tail --lines=1 | awk '{print $1}') -le 12 ]; then # maximum size is "rule of thumb" (to be finetuned, to get 4G max, based on past observations of ~34% in mksquashfs output for /usr/lib, ~40% for the rest) to estimate whether to attempt to fit all fs into one squashfs file (mksquashfs is by far the longest by time part of the script, so attempting to save time); `tail` added just in case
+
+if [ $(2>/dev/null du --summarize --block-size=1G "fin_sq" | tail --lines=1 | awk '{print $1}') -le ${limit_sq_total} ]; then # maximum size is "rule of thumb" (to be finetuned, to get 4G max, based on past observations of ~34% in mksquashfs output for /usr/lib, ~40% for the rest) to estimate whether to attempt to fit all fs into one squashfs file (mksquashfs is by far the longest by time part of the script, so attempting to save time); `tail` added just in case
     time sudo mksquashfs fin_sq fin/casper/filesystem.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 # was? '-comp xz'; adding option '-processors 1' did NOT help much to solve issue of `mksquashfs` using resident menory in the size of ~3Gb (a lot, about size of file to be created by the command)
 
 # if larger than 4Gb, split system to two squashfs files (casper scripts of Linux Mint support that); usr/lib by experince is about half
@@ -429,7 +431,7 @@ if [ ! -e fin/casper/filesystem.squashfs ]; then
     cd fin_sq # for -no-strip option
     # if even /usr/lib might be too large (estimated squashfs size ~34% of uncompressed) - split in two
     # as there are no redos in case of too large size here as opposed to one squashfs initial try, compare to 11Gb to increase chances to be on the safe side (du seems to round up, so 11 is anything larger than 10)
-    if [ $(2>/dev/null du --summarize --block-size=1G "usr/lib" | tail --lines=1 | awk '{print $1}') -ge 11 ]; then
+    if [ $(2>/dev/null du --summarize --block-size=1G "usr/lib" | tail --lines=1 | awk '{print $1}') -gt ${limit_sq_usr_lib} ]; then
         time sudo mksquashfs usr/lib/x86_64-linux-gnu ../fin/casper/filesystem_usr-lib-x86_64-linux-gnu.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
 
         if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
@@ -446,7 +448,7 @@ if [ ! -e fin/casper/filesystem.squashfs ]; then
 
     # if even sans /usr/lib estimated size might be too large, (estimated squashfs size ~40% of uncompressed)
     # bash's arithmetic expression seems to round down, so 8Gb
-    if [ $((($(2>/dev/null du --summarize --block-size=1M "." | tail --lines=1 | awk '{print $1}')-$(2>/dev/null du --summarize --block-size=1M "usr/lib" | tail --lines=1 | awk '{print $1}'))/1024)) -ge 8 ]; then
+    if [ $((($(2>/dev/null du --summarize --block-size=1M "." | tail --lines=1 | awk '{print $1}')-$(2>/dev/null du --summarize --block-size=1M "usr/lib" | tail --lines=1 | awk '{print $1}'))/1024)) -gt ${limit_sq_total_sans_usr_lib} ]; then
         time sudo mksquashfs usr/share ../fin/casper/filesystem_usr-share.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
 
         if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
