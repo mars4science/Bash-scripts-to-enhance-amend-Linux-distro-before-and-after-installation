@@ -427,27 +427,25 @@ if [ $(2>/dev/null du --summarize --block-size=1G "fin_sq" | tail --lines=1 | aw
 fi
 
 if [ ! -e fin/casper/filesystem.squashfs ]; then
-    # Below split to two files was initially implemented as moves of folders, however moves in overlay seems to take memory, also learned there is -no-strip option added in 2021 and of -e option usage from README (both are absent from man page)
+    # Below split to two files was initially implemented as moves of folders, however moves in overlay seems to take memory, also learned there is -no-strip option added in 2021 and of -e option usage from README (both are absent from man page, but present in output of mksquashfs to standard error if run e.g. w/out arguments)
     cd fin_sq # for -no-strip option
     # if even /usr/lib might be too large (estimated squashfs size ~34% of uncompressed) - split in two
-    # as there are no redos in case of too large size here as opposed to one squashfs initial try, compare to 11Gb to increase chances to be on the safe side (du seems to round up, so 11 is anything larger than 10)
+    # as there are no redos in case of too large size here as opposed to one squashfs initial try, compare to less than 4Gb*3 to increase chances to be on the safe side (du seems to round up)
     if [ $(2>/dev/null du --summarize --block-size=1G "usr/lib" | tail --lines=1 | awk '{print $1}') -gt ${limit_sq_usr_lib} ]; then
         time sudo mksquashfs usr/lib/x86_64-linux-gnu ../fin/casper/filesystem_usr-lib-x86_64-linux-gnu.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
 
         if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
             sudo rm --recursive usr/lib/x86_64-linux-gnu/*; fi # delete no longer needed files to free memory
-        ex_flag='-e'; ex_argument="usr/lib/x86_64-linux-gnu"
+        ex_flag='-e'; ex_argument="x86_64-linux-gnu" # argument for exclude (-e) does not include leading directories (found out by try-and-error)
     fi
 
     time sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip ${ex_flag} ${ex_argument} # as e_* not quoted if not set will not be additional arguments
-
-# TODO in resultant ISO somehow filesystem_usr-lib.squashfs contained usr/lib/x86_64-linux-gnu (after presumably the script had been run with -no-strip "-e" "usr/lib/x86_64-linux-gnu"), maybe -no-strip cancels -e arguments; re-read README, try to find out the cause. / (root) had not contained neither "usr/lib" nor "usr/share", so passing -e via argument seems to work and multiple -e are effective
 
     if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
         sudo rm --recursive usr/lib/*; fi # delete no longer needed files to free memory
 
     # if even sans /usr/lib estimated size might be too large, (estimated squashfs size ~40% of uncompressed)
-    # bash's arithmetic expression seems to round down, so 8Gb
+    # bash's arithmetic expression seems to round down
     if [ $((($(2>/dev/null du --summarize --block-size=1M "." | tail --lines=1 | awk '{print $1}')-$(2>/dev/null du --summarize --block-size=1M "usr/lib" | tail --lines=1 | awk '{print $1}'))/1024)) -gt ${limit_sq_total_sans_usr_lib} ]; then
         time sudo mksquashfs usr/share ../fin/casper/filesystem_usr-share.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
 
