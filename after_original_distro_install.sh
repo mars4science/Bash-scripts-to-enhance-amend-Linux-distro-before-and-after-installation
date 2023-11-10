@@ -92,13 +92,13 @@ $dir_name/display_backlight_control_setup.sh
 $dir_name/networking_tweaks.sh
 
 echo "===== next in a few seconds going to install downloaded debian packages ====="
-sleep 5 # pause n seconds
+sleep 3 # pause n seconds
 
 # install programs
 # TO DO, TODO - test correctness
 $dir_name/install_debs.sh
 echo "===== This line is after install code, next in a few seconds going to continue ====="
-sleep 5 # pause n seconds
+sleep 3 # pause n seconds
 
 $dir_name/bash_functions_and_other_config.sh # after installation of programs as makes aliases for some if installed
 

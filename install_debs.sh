@@ -97,7 +97,7 @@ if [ -d "${debian_archives}" ]; then
     done < "${packages_to_install}" # reading lines of names of packages, before reading to variable was `cat filename | while read`, but piping creates a subshell and variable assignment happened there (using < fixed it)
 
     echo -e "\n    Set of  ${packages_list}  debian packages to be installed next in a few seconds\n" | tee --append "${install_debs_log}"
-    sleep 2
+    sleep 3
 
     sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes ${packages_list} |& tee --append "${install_debs_log}" # packages_list NOT quoted to allow it to expand to indvividual words (packages)
 
