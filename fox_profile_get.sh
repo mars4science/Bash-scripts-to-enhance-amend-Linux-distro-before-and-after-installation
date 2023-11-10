@@ -56,7 +56,7 @@ if [ -d $full_profile_path ]; then
         # rm -fr * # no dot (starting with .) files seen, so should be enough to delete all contents
         
         # --keep-newer-files --no-overwrite-dir : decided not to use for now
-        tar --extract --overwrite --file=$profile_archive
+        tar --extract --overwrite --warning=no-timestamp --file=$profile_archive
     fi
 
 else
@@ -65,7 +65,7 @@ else
 
     mkdir $profile_path && cd $_
 
-    tar --extract --file=$profile_archive 
+    tar --extract --warning=no-timestamp --file=$profile_archive
 
     # by trial and error:
     # profile should have word Profile, there should always be Profile0, 
