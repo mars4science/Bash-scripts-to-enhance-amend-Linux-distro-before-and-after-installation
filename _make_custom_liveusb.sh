@@ -439,6 +439,8 @@ if [ ! -e fin/casper/filesystem.squashfs ]; then
 
     time sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip ${ex_flag} ${ex_argument} # as e_* not quoted if not set will not be additional arguments
 
+# TODO in resultant ISO somehow filesystem_usr-lib.squashfs contained usr/lib/x86_64-linux-gnu (after presumably the script had been run with -no-strip "-e" "usr/lib/x86_64-linux-gnu"), maybe -no-strip cancels -e arguments; re-read README, try to find out the cause. / (root) had not contained neither "usr/lib" nor "usr/share", so passing -e via argument seems to work and multiple -e are effective
+
     if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
         sudo rm --recursive usr/lib/*; fi # delete no longer needed files to free memory
 
