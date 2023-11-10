@@ -433,14 +433,14 @@ if [ ! -e fin/casper/filesystem.squashfs ]; then
         time sudo mksquashfs usr/lib/x86_64-linux-gnu ../fin/casper/filesystem_usr-lib-x86_64-linux-gnu.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
 
         if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
-            sudo rm --recursive usr/lib/x86_64-linux-gnu; fi # delete no longer needed files to free memory
+            sudo rm --recursive usr/lib/x86_64-linux-gnu/*; fi # delete no longer needed files to free memory
         ex_flag='-e'; ex_argument="usr/lib/x86_64-linux-gnu"
     fi
 
     time sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip ${ex_flag} ${ex_argument} # as e_* not quoted if not set will not be additional arguments
 
     if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
-        sudo rm --recursive usr/lib; fi # delete no longer needed files to free memory
+        sudo rm --recursive usr/lib/*; fi # delete no longer needed files to free memory
 
     # if even sans /usr/lib estimated size might be too large, (estimated squashfs size ~40% of uncompressed)
     # bash's arithmetic expression seems to round down, so 8Gb
@@ -448,7 +448,7 @@ if [ ! -e fin/casper/filesystem.squashfs ]; then
         time sudo mksquashfs usr/share ../fin/casper/filesystem_usr-share.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip
 
         if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
-            sudo rm --recursive usr/share; fi # delete no longer needed files to free memory
+            sudo rm --recursive usr/share/*; fi # delete no longer needed files to free memory
         es_flag='-e'; es_argument="usr/share"
     fi
 
