@@ -35,7 +35,7 @@ use_cgroup='true' # to limit CPU usage during CPU intensive tasks of long durati
 cgroup="gr1"
 cpu_max_chroot="500000 1000000" # limit for whole CPU, write quota and period (valid values in the range of 1000 to 1000000) in microseconds, for  performance reasons could be better to use larger periods). Total CPU time in the system equals period multiplied by number of cores/processors
 cpu_max_mksquashfs="1500000 1000000"
-limit_sq_total=12; limit_sq_usr_lib=10; limit_sq_total_sans_usr_lib=7 # limits in Gb of sizes to compress into squashfs, if above split into more squashfs files
+limit_sq_total=0; limit_sq_usr_lib=0; limit_sq_total_sans_usr_lib=0 # limits in Gb of sizes to compress into squashfs, if above split into more squashfs files
 
 # ---- parameters end ---- #
 
@@ -439,7 +439,9 @@ if [ ! -e fin/casper/filesystem.squashfs ]; then
         ex_flag='-e'; ex_argument="x86_64-linux-gnu" # argument for exclude (-e) does not include leading directories (found out by try-and-error)
     fi
 
+set -x
     time sudo mksquashfs usr/lib ../fin/casper/filesystem_usr-lib.squashfs -noappend -b 32768 -comp zstd -Xcompression-level 22 -no-strip ${ex_flag} ${ex_argument} # as e_* not quoted if not set will not be additional arguments
+set +x
 
     if [ "${delete_work_files_without_user_interaction}" = "true" ]; then
         sudo rm --recursive usr/lib/*; fi # delete no longer needed files to free memory
