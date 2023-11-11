@@ -45,7 +45,7 @@ if [ -e "${commons_path}" ] ; then
       or echo -e 'package_unqualified_name"'[\\n'"package_unqualified_name] etc' | $script_name [-i | -d] [location_to_store] [folder with dpkg status file and apt sources location]
       -i means install right after downloaded.
       -d means download only to default path with default location of dpkg status file and apt sources.
-      -0 means download only to ${debs_cache_folder} with empty dpkg status file (with all dependencies) amd no substitution of apt sources
+      -0 means download only to ${debs_cache_folder} with empty dpkg status file (with all dependencies) amd no substitution of apt sources, several words (package names) can be passed from standard input in one run with with option.
       If dpkg status and/or apt sources not found at supplied location, substitution not done.\n"
     display_help "$help_message$common_help"
 else
@@ -318,7 +318,7 @@ while read line; do
     if [ -n "$line" ];then # allow for empty lines
 
         debs_storage_folder=$1/$line
-        if [ -d $debs_storage_folder ] ; then 
+        if [ -d "${debs_storage_folder}" ] ; then
             1>&2 echo "folder "\`"$debs_storage_folder"\`" exists already, not copying of deb files"
             install_local
         else
