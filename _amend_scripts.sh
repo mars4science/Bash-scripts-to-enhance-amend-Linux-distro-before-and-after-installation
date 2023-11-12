@@ -127,3 +127,9 @@ find . -name '*.sh' -execdir bash -c 'sed -i '\''s|Exiting $0 on error $err|  ER
 # Copy install_debs.log from /tmp somewhere
 perl -lne 's/^.*?(?=    )//s; for (split /    /) { print qq($1 $2\n) if /(.*?)  to be installed next.*?After this operation, (.*?) of additional disk space will be used./s }' -0777 <install_debs.log | grep ' ' > perl.txt
 # copy perl.txt to Calc
+
+# typical run
+clear;.temp/_amend_scripts.sh;date;stopfan 1;./_make_custom_liveusb.sh ;stopfan 0;date
+
+# monitor temperature and free memory during run
+clear;date;for (( i=1;i<10000;i++ )); do printf '%5d: ' $i;a=$(date '+%H:%M:%S');printf "$a ";t="$(sensors | grep -i package | awk '{ print "-<- "$4" ->-" }')";printf -- "$t ";free -wm | awk '/^Mem:/ { print "---"$8"---" }';sleep 60;done
