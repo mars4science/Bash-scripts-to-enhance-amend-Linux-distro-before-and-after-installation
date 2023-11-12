@@ -72,15 +72,36 @@ fi
 #   "DisableSystemAddonUpdate": true
 #   "GoToIntranetSiteForSingleWordEntryInAddressBar": true
 # "Preferences" allows to fix settings of preferences, by changing in about:preferences and checking for changes to ~/.mozilla/firefox/profile_name/prefs.js found out:
-#   "browser.startup.page": 3 - sets on Startup to open previous Windows and tabs
-#   "browser.newtabpage.enabled": false - sets new tabs to blank page
-#   "browser.zoom.full": false - sets to zoom only text (often web pages only rearrage themselves after zooming-in, not enlarge images)
-#   "browser.search.widget.inNavBar": true - separate search
+#   "browser.zoom.full": false - sets to zoom only text (often web pages only rearrage themselves after zooming-in, not enlarge images) - text only turned out to produce small text in large boxes (removed, let user change if needed, seems true by default)
 #   "pref.general.disable_button.default_browser": false, "browser.shell.checkDefaultBrowser": true - not sure what they do, had changed after clicked to make FF default browser
 ff_distribution_folder=$ff_toinstall_folder/distribution
 sudo mkdir --parents $ff_distribution_folder # --parents : no error if existing, make parent directories as needed
 
-echo '{"policies": {"DisableAppUpdate": true, "DontCheckDefaultBrowser": true, "DisableFirefoxStudies": true, "DisableTelemetry": true, "DisablePocket": true, "DisableFirefoxAccounts": true, "BackgroundAppUpdate": false, "AppAutoUpdate": false, "SanitizeOnShutdown": { "Cache": true }, "OverrideFirstRunPage": "", "Preferences": {"app.shield.optoutstudies.enabled": false, "browser.crashReports.unsubmittedCheck.autoSubmit2": false,
-"browser.safebrowsing.malware.enabled": false, "browser.safebrowsing.phishing.enabled": false, "browser.safebrowsing.downloads.enabled": false, "browser.safebrowsing.downloads.remote.block_potentially_unwanted": false, "browser.safebrowsing.downloads.remote.block_uncommon": false, "datareporting.healthreport.uploadEnabled": false, "browser.startup.homepage": "chrome://browser/content/blanktab.html", "browser.newtabpage.enabled": false, "browser.search.widget.inNavBar": true, "browser.zoom.full": false, "pref.general.disable_button.default_browser": false, "browser.startup.page": 3, "browser.shell.checkDefaultBrowser": true}}}' | 1>/dev/null sudo tee $ff_distribution_folder/policies.json
+echo '{"policies": {' \
+'"DisableAppUpdate": true,' \
+'"DontCheckDefaultBrowser": true,' \
+'"DisableFirefoxStudies": true,' \
+'"DisableTelemetry": true,' \
+'"DisablePocket": true,' \
+'"DisableFirefoxAccounts": true,' \
+'"BackgroundAppUpdate": false,' \
+'"AppAutoUpdate": false,' \
+'"SanitizeOnShutdown": { "Cache": true },' \
+'"OverrideFirstRunPage": "",' \
+'"Preferences": {' \
+'"app.shield.optoutstudies.enabled": false,' \
+'"browser.crashReports.unsubmittedCheck.autoSubmit2": false,' \
+'"browser.safebrowsing.malware.enabled": false,' \
+'"browser.safebrowsing.phishing.enabled": false,' \
+'"browser.safebrowsing.downloads.enabled": false,' \
+'"browser.safebrowsing.downloads.remote.block_potentially_unwanted": false,' \
+'"browser.safebrowsing.downloads.remote.block_uncommon": false,' \
+'"datareporting.healthreport.uploadEnabled": false,' \
+'"browser.startup.homepage": "chrome://browser/content/blanktab.html",' \ # homepage as blank page
+'"browser.newtabpage.enabled": false,' \ # new tabs as blank page
+'"browser.search.widget.inNavBar": true,' \ # separate search widget/window/line
+'"pref.general.disable_button.default_browser": false,' \
+'"browser.startup.page": 3,' \ # on startup to open previous windows and tabs
+'"browser.shell.checkDefaultBrowser": true}}}' | 1>/dev/null sudo tee $ff_distribution_folder/policies.json
 
 echo -e '[Preferences]\napp.update.enabled=false\nbrowser.shell.checkDefaultBrowser=false' | 1>/dev/null sudo tee $ff_distribution_folder/distribution.ini
