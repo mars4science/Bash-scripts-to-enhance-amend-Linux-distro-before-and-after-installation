@@ -312,10 +312,11 @@ else
 fi
 
 echo
-echo "Choose interactive mode (press 'i' key) to pause after installation/change of everything but before starting to pack them into new ISO and try to leave all work files intact (run the script again to delete)"
-echo "'f' key to pause as for 'i' but detele working files along the way leaving only amended iso file"
-echo "'n' key NOT to pause and also delete work files leaving only amended ISO file without pausing for user input"
-read -p "any other key NOT to pause but leave work files:" -n 1 -r
+echo "Choose mode:"
+echo "'i' key (interactive) to pause after installation/change of everything but before starting to pack them into new ISO and also try to preserve all work files intact (run the script again to delete)"
+echo "'d' key (delete) to pause as for 'i' but detele working files along the way leaving only amended iso file"
+echo "'r' key (result) NOT to pause and also delete work files leaving only amended ISO file without pausing for user input"
+read -p "'p' (preserve) NOT to pause but preserve work files (run the script again to delete):" -n 1 -r
 echo  # (optional) move to a new line
 if [[ $REPLY =~ ^[Ii]$ ]]; then
     interactive_mode="true";
@@ -323,12 +324,15 @@ if [[ $REPLY =~ ^[Ii]$ ]]; then
 elif [[ $REPLY =~ ^[Dd]$ ]]; then
     interactive_mode="true";
     delete_work_files_without_user_interaction="true";
-elif [[ $REPLY =~ ^[Nn]$ ]]; then
+elif [[ $REPLY =~ ^[Rr]$ ]]; then
     interactive_mode="false";
     delete_work_files_without_user_interaction="true";
-else
+elif [[ $REPLY =~ ^[Pp]$ ]]; then
     interactive_mode="false";
     delete_work_files_without_user_interaction="false";
+else
+    echo '  ERROR: invalid input, terminating...'
+    exit 1
 fi
 
 mkdir iso to temp fin initrd
