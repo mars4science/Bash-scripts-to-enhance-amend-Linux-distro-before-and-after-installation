@@ -39,7 +39,7 @@ fi
 #
 # add Readline Key Bindings:
 #
-echo $'\n'"bind '\"\C-h\": \"C-e\`\C-a history -s \`2>&1 \C-j\"'" | sudo tee --append "${bashrc}" # add Ctrl-h - if command is entered and Ctrl-h pressed, cursor to move to end of line (Ctrl-e/C-e), '`' is to be added to end and then C-a causes cursor to move to beginning of the line and ' history -s `2>&1 ' to be added. Result is (per design) to save output of command to history (e.g. useful to copy 'not found, but can be installed with'). C-j is mentioned as ^J on wikipedia page "Control_character" 
+echo $'\n'"bind '\"\C-h\": \"\C-e\`\\\"\C-a history -s \\\"\`2>&1 \C-j\"'" | sudo tee --append "${bashrc}" # add Ctrl-h - if command is entered and Ctrl-h pressed, cursor to move to end of line (Ctrl-e/C-e), '`' is to be added to end and then C-a causes cursor to move to beginning of the line and ' history -s `2>&1 ' to be added. Result is (per design) to save output of command to history (e.g. useful to copy 'not found, but can be installed with'). C-j is mentioned as ^J on wikipedia page "Control_character". `\C` seems to mean Ctrl. Command within `` is quoted (around ``) to prevent expantion when assigning to history
 
 #
 # add functions
