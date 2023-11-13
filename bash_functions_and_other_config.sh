@@ -16,6 +16,7 @@ fi
 #
 # add aliases
 #
+echo $'\n'"alias cpn=cp --no-clobber" | sudo tee --append "${bashrc}" # do not overwrite an existing file
 echo $'\n'"alias hi=history" | sudo tee --append "${bashrc}"
 
 add_dict_alias(){
