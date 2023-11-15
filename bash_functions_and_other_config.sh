@@ -34,7 +34,6 @@ if [ x != x`which dict` ]; then
     add_dict_alias german fd-eng-deu
     add_dict_alias français fd-fra-eng
     add_dict_alias french fd-eng-fra
-    add_dict_alias wiki wikt-en-en
 fi
 
 #
