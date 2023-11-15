@@ -20,7 +20,8 @@ echo $'\n'"alias 'cpn=cp --no-clobber'" | sudo tee --append "${bashrc}" # do not
 echo $'\n'"alias hi=history" | sudo tee --append "${bashrc}"
 
 add_dict_alias(){
-    if [ "$(dict -D | awk '{print $1}' | grep $2)" ] ; then
+#    if [ "$(dict -D | awk '{print $1}' | grep $2)" ] ; then
+    if [ "$(ls /usr/share/dictd | grep $2)" ] ; then # if run in chrooted dictd daemon still uses same database as before entering chroot, therefore check contents of default directory where databases are to be located (in accordance with dictd manpage)
         echo $'\n'"alias 'dict-$1=dict -d $2'" | sudo tee --append "${bashrc}"
     fi
 }
