@@ -97,11 +97,54 @@ echo '{"policies": {' \
 '"browser.safebrowsing.downloads.remote.block_potentially_unwanted": false,' \
 '"browser.safebrowsing.downloads.remote.block_uncommon": false,' \
 '"datareporting.healthreport.uploadEnabled": false,' \
-'"browser.startup.homepage": "chrome://browser/content/blanktab.html",' \ # homepage as blank page
-'"browser.newtabpage.enabled": false,' \ # new tabs as blank page
-'"browser.search.widget.inNavBar": true,' \ # separate search widget/window/line
+'"browser.startup.homepage": "chrome://browser/content/blanktab.html",'`# homepage as blank page` \
+'"browser.newtabpage.enabled": false,'`# new tabs as blank page` \
+'"browser.search.widget.inNavBar": true,'`# separate search widget/window/line` \
 '"pref.general.disable_button.default_browser": false,' \
-'"browser.startup.page": 3,' \ # on startup to open previous windows and tabs
+'"browser.startup.page": 3,'`# on startup to open previous windows and tabs` \
 '"browser.shell.checkDefaultBrowser": true}}}' | 1>/dev/null sudo tee $ff_distribution_folder/policies.json
 
 echo -e '[Preferences]\napp.update.enabled=false\nbrowser.shell.checkDefaultBrowser=false' | 1>/dev/null sudo tee $ff_distribution_folder/distribution.ini
+
+# To set preferences create two files
+# Note: `lockPref` instead of `pref` has been observed to lock preferences for the user, not only set defaults 
+#   `defaultPref` is written to set default, not clear what is the difference from just `pref` (maybe if user resets to defaults - if this functionality exists?)
+#   even with `defaultPref`, setting was still shown with `Show only modified preferences` in about:config
+ff_actual_config_preferences_file="amended_mozilla.cfg"
+ff_config_preferences_file="path_to_amended_actual_config_preferences_file.js" # local-settings.js
+ff_preferences_folder="${ff_toinstall_folder}/defaults/pref"
+sudo mkdir --parents "${ff_preferences_folder}" # just in case, had been already there
+
+echo '// The file have been made based on SE post with non-Mozilla official linked page quoted and trial and error'$'\n'\
+'// obscure could be something related to RET-13 ecoding'$'\n'\
+'pref("general.config.obscure_value", 0);'$'\n'\
+'// file where pref settings to be added as some settings work from current file but some do not (if the former setting in cfg takes precedence)'$'\n'\
+'pref("general.config.filename", "'"${ff_actual_config_preferences_file}"'");' | 1>/dev/null sudo tee "${ff_preferences_folder}/${ff_config_preferences_file}"
+
+echo '// First line seems to be ignored by parser'$'\n'\
+'// The file have been made based on SE post with non-Mozilla official linked page quoted and trial and error'$'\n'\
+'pref("browser.aboutConfig.showWarning", false);'$'\n'\
+'// default colors for background and text (to actually try to set dark theme, at least for local files without CSS styles)'$'\n'\
+'pref("browser.display.background_color", "#000000");'$'\n'\
+'pref("browser.display.foreground_color", "#FFFFFF");' | 1>/dev/null sudo tee "${ff_toinstall_folder}/${ff_actual_config_preferences_file}"
+
+exit
+#
+# Notes:
+#
+To change colors in HTML one can use CSS, like:
+
+<style>
+    h1 {
+        color: red;
+    }
+    body {
+        color: blue;
+        background-color: #000000;
+    }
+</style>
+
+Adding that in the beginning of html file or in separate file (e.g. a.css) and adding (somewhere? at the beginning?) of html file a reference:
+
+<link rel="stylesheet" href="a.css" /> <!-- Imports Stylesheets -->
+
