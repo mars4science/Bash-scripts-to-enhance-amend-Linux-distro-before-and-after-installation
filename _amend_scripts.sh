@@ -1,7 +1,5 @@
 # support script to avoid saving and commiting regular but temporarily changes to scripts
-
-# change label, original ISO file, keyboard layout languages, etc., add bash fuctions and prepare for reduced set of debs to install (note: symbolic linking does not work on exFAT)
-
+# change label, original ISO file, keyboard layout languages, etc., add bash fuctions
 # edit, check path to debs and run from repo's folder
 # P.S. at the end some useful code [2]
 
@@ -15,7 +13,7 @@ work_path="/media/disk1/work2"
 user_name="user2"
 locales='("en_US" "de_DE")' # note: string here whereas array in the file to edit
 cgroup="gr2" # see [1] for example of usage (in addition of moving process into a group)
-cpu_max_mksquashfs="1100000 1000000"
+cpu_max_mksquashfs="1200000 1000000"
 
 # ----------------------------------------------------------- #
 
@@ -58,7 +56,7 @@ if [ $? -ne 0 ]; then
     printf "${text_to_add}" | tee --append "${file_to_change}"
 fi
 
-# remake dictd links for some long named dictionaries (namaly wikt*-date)
+# remake dictd links for some long named dictionaries (namely wikt*-date)
 dict_path="${software_path_root}"/to_root/usr/share/dictd/
 if [ -d "${dict_path}" ]; then
     for f in "${dict_path}"/* ; do # remove previous links
@@ -90,6 +88,7 @@ set +x
 
 
 # Not run as of 2023/10/12
+# prepare for reduced set of debs to install (note: symbolic linking does not work on exFAT)
 # make debs_virt folder in not there yet (if v pressed); make links to folder with all debs and rename to debs what's needed
 read -p "Choose set of debs: press v key to select reduced set of debs to install, otherwise any other key:" -n 1 -r
 echo  # (optional) move to a new line
