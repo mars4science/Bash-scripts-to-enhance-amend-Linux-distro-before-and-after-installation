@@ -248,6 +248,9 @@ gsettings set org.cinnamon.theme name 'Mint-Y-Dark'
 gsettings set org.x.editor.preferences.editor scheme 'cobalt'
 gsettings set org.x.editor.preferences.editor display-line-numbers false # AFAIK false by default, however added as could be useful to set to true for somebody
 
+# change theme for gedit to Cobalt (for dark Cinnamon theme)
+gsettings set org.gnome.gedit.preferences.editor scheme 'cobalt'
+
 exit # ------------- THE END, footnotes follow ------------------ #
 
 
