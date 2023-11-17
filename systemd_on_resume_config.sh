@@ -113,3 +113,15 @@ esac'
 
 file_name=suspended_datetime
 add_file_to_systemd_system-sleep
+
+# to turn fan off - does not work for some reason; TODO: test hypothesis that fan is reset after post) during resume; TODO: find out why seems to be NO "resume.target" in systemd
+file_contents='#!/bin/sh
+
+case $1 in
+  pre) ;;
+  post)
+    stopfan ;;
+esac'
+
+file_name=fan_stopfan
+add_file_to_systemd_system-sleep
