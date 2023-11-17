@@ -64,27 +64,34 @@ fi
 edit_line(){
     if [ -n "${3}" ]; then
         if [[ $(grep "^${2}=" "${1}") ]]; then # true if grep finds
-            sudo sed --in-place "s/${2}=.*/${2}=${3}/" "${1}"
+            sudo sed --in-place "s|${2}=.*|${2}=${3}|" "${1}"
         else
             echo -e "\n${2}=${3}" | sudo tee --append "${1}"
         fi
     fi
 }
 
-# parameters: desktop name short, keywords, [comments]
 edit_desktop_file(){
-    path_to_edit="/usr/share/applications/${1}.desktop"
+    if [ "${1}" == "${1%.desktop}" ]; then
+        path_to_edit="${1}.desktop"; else path_to_edit="${1}";fi
+    path_to_edit="/usr/share/applications/${path_to_edit}"
     if [ -e "${path_to_edit}" ]; then
         edit_line "${path_to_edit}" "Keywords" "${2}"
         edit_line "${path_to_edit}" "Comment" "${3}"
+        edit_line "${path_to_edit}" "MimeType" "${4}"
+        edit_line "${path_to_edit}" "Name" "${5}"
     fi
 }
-
+# parameters: desktop file name SHORT (sans .desktop suffix) or FULL (with .desktop suffix), [keywords], [comments], [MimeType], [Name]
+# empty string meaning not change/add this position; strings not to include '|' as used as delimiter by sed
 edit_desktop_file "libreoffice-calc" "Tables;Accounting;Stats;OpenDocument Spreadsheet;Chart;Calculator;Microsoft Excel;Microsoft Works;OpenOffice" # LibreOffice Calc
 edit_desktop_file "virt-manager" "Emulators;Virtualization;KVM;QEMU;vmm" # Virtual Machines Manager
 edit_desktop_file "kazam" "capture;screenshot;screencast;videorecord;desktop recording" # Kazam (screen capture)
 edit_desktop_file "com.github.maoschanz.drawing" "image;picture;photo;paint;draw;Paint;Sketch;Pencil" # Drawing
 edit_desktop_file "dwww" "documentation;information;manual;help" "Browse, search documentation files in /usr/share/doc, man pages" # Debian Documentation Browser
+edit_desktop_file "io.github.Hexchat" "IM;Chat;IRC;messaging;message" "Chat with other people online; Internet Relay Chat"
+edit_desktop_file "org.gnome.gedit" "" "" "application/x-shellscript;text/plain;" "Gnome Text Editor" # edit MimeType and Name for gedit
+
 
 ## change how dwww is executed (add check for apache status)
 path_to_edit=/usr/share/applications/dwww.desktop
