@@ -17,6 +17,7 @@ fi
 
 ln -s /media/ramdisk /home/$(id -u -n)/"RAM disk"
 ln -s /media/zramdisk /home/$(id -u -n)/"RAM compressed"
+ln -s /media/$(id -u -n) /home/$(id -u -n)/"Media"
 
 # ----- MOUNT .CACHE TO DEDICATED TMPFS ----- #
 
