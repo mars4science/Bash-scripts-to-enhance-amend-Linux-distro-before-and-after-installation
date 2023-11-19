@@ -202,6 +202,10 @@ add_key "'Screen lock'" "['<Super><Alt>x']" "'sh -c \'xscreensaver-command -lock
 add_key "'Help'" "['F1']" "'notify-send \'NoNo help in GUI available, some info via man pages\''" "'yelp'" # GUI help app (not included in the distro: to be istalled) replaces opening Linux Mint web page on F1 press
 add_key "'Air fan(s) off'" "['<Super><Alt>z']" "'stopfan'"
 
+if [ -n "`which xcalib`" ]; then
+    add_key "'Invert colors on display'" "['<Super><Alt>c']" "'xcalib -invert -alter'" # invert colors on (primary?) display TODO what if several monitors are connected?
+fi
+
 ##### end of keyboard bindings #####
 #
 
