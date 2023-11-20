@@ -203,7 +203,7 @@ add_key "'Help'" "['F1']" "'notify-send \'NoNo help in GUI available, some info 
 add_key "'Air fan(s) off'" "['<Super><Alt>z']" "'stopfan'"
 
 if [ -n "`which xcalib`" ]; then
-    add_key "'Invert colors on display'" "['<Super><Alt>c']" "'xcalib -invert -alter'" # invert colors on (primary?) display TODO what if several monitors are connected?
+    add_key "'Invert colors on display'" "['<Super><Alt>c']" "'xcalib -invert -alter'" # invert colors on all connected displays/monitors
 fi
 
 ##### end of keyboard bindings #####
