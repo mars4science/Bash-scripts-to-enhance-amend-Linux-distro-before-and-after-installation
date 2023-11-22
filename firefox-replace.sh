@@ -124,9 +124,10 @@ echo '// The file have been made based on SE post with non-Mozilla official link
 echo '// First line seems to be ignored by parser'$'\n'\
 '// The file have been made based on SE post with non-Mozilla official linked page quoted and trial and error'$'\n'\
 'pref("browser.aboutConfig.showWarning", false);'$'\n'\
-'// default colors for background and text (to actually try to set dark theme, at least for local files without CSS styles)'$'\n'\
-'pref("browser.display.background_color", "#000000");'$'\n'\
-'pref("browser.display.foreground_color", "#FFFFFF");' | 1>/dev/null sudo tee "${ff_toinstall_folder}/${ff_actual_config_preferences_file}"
+'// default colors for background and text (tried to actually try to set dark theme, at least for local files without CSS styles, but found out many sites set only either background or foreground resulting in same color if back is black and text is white - therefore decided to set as slightly different to original defaults to identify such sites)'$'\n'\
+'pref("browser.display.background_color", "#FFF0FF");'$'\n'\
+'pref("browser.display.foreground_color", "#800000");' \
+| 1>/dev/null sudo tee "${ff_toinstall_folder}/${ff_actual_config_preferences_file}"
 
 exit
 #
