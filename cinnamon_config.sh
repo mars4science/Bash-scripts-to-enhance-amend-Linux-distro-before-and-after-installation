@@ -112,6 +112,17 @@ if [[ -e "$path_to_edit" ]]; then
 
 fi
 
+# Add themes for custom keybinding to toggle dark/light
+link_theme(){
+    if [ ! -d "${1}/${2}" ]; then
+        sudo ln --relative --symbolic "${1}/${3}" "${1}/${2}"; fi # make link ${2};
+}
+# Noted Mint-Y appearance changed from LM 21 to 21.2 from yellowish to greenish, so now attemping to use more "specifc" themes, on 21.2 result of 'Mint-Y-Dark-Teal' is interesting even as there seems to be no such theme available for choosing in GUI
+link_theme /usr/share/themes 'A-Dark' 'Mint-Y-Dark-Blue'
+link_theme /usr/share/icons 'A-Dark' 'Mint-X'
+link_theme /usr/share/themes 'A-Light' 'Mint-X'
+link_theme /usr/share/icons 'A-Light' 'Mint-X'
+
 exit
 
 # Notes:
