@@ -170,7 +170,7 @@ if [ ! -e "$(get_install_path.sh)/${key_script_name}" ]; then
 fi
 add_key "'To reverse keybindings custom list'" "['<Super><Alt>r']" "'${key_script_name}'"
 
-# around {print $1} single quotes need NOT be quoted for bash as within double quotes, but to be 1) outside of single quotes for sh (' -> '\''), 2) backslash used for (1) be escaped for GVariant, using unicode \u005c works for GVariant, alternatively \\\\, 3) all resultant single quotes to be quoted for GVariant (' -> \')
+# around {print $1} single quotes need NOT be quoted for bash as within double quotes, but as they are  1) inside single quotes for sh (' -> '\''), 2) backslash used for step 1 to be escaped for GVariant, using unicode \u005c works for GVariant, alternatively \\\\ (4 because each of two \ is escaped for outer double quotes; \u - no escaping as u after \ hence \ has no special meaning), 3) all resultant single quotes to be quoted for GVariant (' -> \')
 # $ to be quoted (e.g. via backslash) as within double quotes for bash
 add_key "'Display #1 rotate normal'" "['<Super><Alt>Up']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1) --rotate normal\''"
 add_key "'Display #1 rotate left'" "['<Super><Alt>Left']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1) --rotate left\''"
@@ -243,10 +243,14 @@ gsettings set org.cinnamon.desktop.background picture-uri 'file://'"$desktop_bac
 # UPDATE: setting not helping for some reason TODO: understand why
 gsettings set org.mate.applications-browser exec 'mozilla' # Default browser for URLs (to try to cancel firefox prompt to make it default at the first run)
 
-# change theme for Cinnamon
-gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark'
-gsettings set org.cinnamon.desktop.interface icon-theme 'Mint-Y-Dark-Teal' # noted Mint-Y appearance changed from LM 21 to 21.2 from yellowish to greenish, so now attemping to use more "specifc" themes, on 21.2 result of 'Mint-Y-Dark-Teal' is interesting even as there seems to be no such theme available for choosing in GUI
-gsettings set org.cinnamon.theme name 'Mint-Y-Dark'
+
+# change theme (colors mostly if not only) for Cinnamon
+gsettings set org.cinnamon.theme name 'A-Dark' # Cinnamon panel, menu (aka Desktop in GUI, from /usr/share/themes)
+gsettings set org.cinnamon.desktop.interface gtk-theme 'A-Dark' # background, text, upper panel of applications, e.g. Files, Terminal (aka Applications in GUI, from /usr/share/themes)
+gsettings set org.cinnamon.desktop.interface icon-theme 'A-Dark' # icons only (aka Icons in GUI, from /usr/share/icons)
+# `gsettings get org.cinnamon.theme name` have returned single quoted string. Signle quote to quote/escape 1) for innner sh (' -> '\''), then 2) for GVariant (escape \, so \ becomes \\; but no need to escape single quotes as doubles are used for GVariant here) and 3) for outer single quotes for bash (' -> '\''); 4) extra empty pairs of '' removed as redundant
+add_key "'Toggle dark/light theme'" "['<Super><Alt>v']" '"sh -c '\''if [ \"$(gsettings get org.cinnamon.theme name)\" = \"'\''\\'\'\''A-Dark'\''\\'\'\''\" ]; then a_theme=\"A-Light\"; else a_theme=\"A-Dark\"; fi; gsettings set org.cinnamon.theme name \"${a_theme}\";gsettings set org.cinnamon.desktop.interface gtk-theme \"${a_theme}\";gsettings set org.cinnamon.desktop.interface icon-theme \"${a_theme}\"'\'\"
+
 
 # change theme for xed to Cobalt (for dark Cinnamon theme)
 gsettings set org.x.editor.preferences.editor scheme 'cobalt'
