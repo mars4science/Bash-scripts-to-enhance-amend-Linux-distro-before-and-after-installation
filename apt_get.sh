@@ -344,7 +344,8 @@ while read line; do
                     if [ $? -eq 0 ];then
                         1>&2 echo "    Package(s) related to  ${line}  on the current system downloaded to ${debs_cache_folder} (at least seems like it)"
                     else
-                        echo "Package(s) needed to upgrade ones related to  $line  on the current system are NOT downloaded (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
+                        echo "    Package(s) needed to upgrade ones related to  $line  on the current system are NOT downloaded (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
+                        echo "  Next  apt clean  is coded to clear cache"
                         sudo apt-get clean # cleaning even if all_dependencies (-0 parameter on command line)
                     fi
                     substitute_status_and_sources
@@ -358,7 +359,8 @@ while read line; do
                     install_local
                 fi
             else
-                echo "Package  $line  is NOT downloaded, downloaded deb files were not copied from cache to specified location (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
+                echo "  Package  $line  is NOT downloaded, downloaded deb files were not copied from cache to specified location (at least seems like it)" | 1>&2 sudo tee --append $errors_apt_get
+                        echo "  Next  apt clean  is coded to clear cache"
                 sudo apt-get clean # cleaning even if all_dependencies (-0 parameter on command line)
             fi # download success check
         fi # existense of folder
