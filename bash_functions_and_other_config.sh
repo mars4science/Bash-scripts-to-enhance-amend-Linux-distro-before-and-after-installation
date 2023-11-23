@@ -87,10 +87,10 @@ add_function 'e_ject' '
     dev_path="$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep --ignore-case "$1" | awk '\''{ print $2 }'\'')"
     dev_mount="$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep --ignore-case "$1" | awk '\''{ print $3 }'\'')"
 
-    # unmounting
+    # unmounting; "umount" failed for btrfs on extended partition with "error finding object for block device 0:56", so changed to "udisksctl unmount"
     for (( i=1; i < ${attempts}; i++ )); do
         if [ -n "$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep "${dev_path}" | awk '\''{print $3}'\'')"  ] ; then # dev_path seems unique, dev_mount can be empty already
-            umount "${dev_mount}" && echo "${dev_mount} unmounted" && break
+            udisksctl unmount --block-device "${dev_path}" && echo "${dev_path} unmounted (detached) from ${dev_mount}" && break
         else
             echo "${dev_path} not mounted"; break
         fi
