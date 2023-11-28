@@ -25,7 +25,7 @@ script_path="$(dirname "$(realpath "$0")")" # need to read $0 before folder chan
 change_variable(){
     par="$1" # needed for using "an exclamation point (!)" to introduce "a level of indirection" (see man bash). '!$1' does not work because positional parameter is just number w/out '$' however indirection uses variable name and number is not valid variable name
 #    if [ "x${!par}" != "x" ] ; then sed -i 's|^'"${par}"'=.*#|'"${par}"'="'"${!par}"'" #|' "${file_to_change}";fi # worked only if line to edit contains comment symbol
-    if [ "x${!par}" != "x" ] ; then perl -i -pe 's!^'"${par}"'=.*?(#| #|\n)!'"${par}"'="'"${!par/$/\\$}"'"$1!' "${file_to_change}";fi # '?' for lazy matching, '/$/\\$' to escape possible '$' - make literal symbol, '^' - start of line
+    if [ "x${!par}" != "x" ] ; then perl -i -pe 's!^'"${par}"'=.*?(#| #|\n)!'"${par}"'="'"${!par/$/\\$}"'"$1!' "${file_to_change}";fi # '?' for lazy matching, '/$/\\$' to escape possible '$' in text to replace with by making literal symbol (as for perl $ in text to replace with signals regex group), '^' - start of line
 }
 
 file_to_change="_make_custom_liveusb.sh"
