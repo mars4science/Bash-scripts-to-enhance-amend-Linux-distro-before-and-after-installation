@@ -92,6 +92,11 @@ edit_desktop_file "dwww" "documentation;information;manual;help" "Browse, search
 edit_desktop_file "io.github.Hexchat" "IM;Chat;IRC;messaging;message" "Chat with other people online; Internet Relay Chat"
 edit_desktop_file "org.gnome.gedit" "" "" "application/x-shellscript;text/plain;" "Gnome Text Editor" # edit MimeType and Name for gedit
 
+# edit Foliate, Exec=, adding bandaid (G_SLICE=always-malloc); TODO try to fix the bug (one in comment text added to the desktop file)
+path_to_edit=/usr/share/applications/com.github.johnfactotum.Foliate.desktop
+if [ -e "$path_to_edit" ]; then
+    perl -i -pe 's!^Exec=(.*?)\n!# Adding bandaid (G_SLICE=always-malloc) against error that was happening after some seconds and actions (paging, etc.) after ebooks had been opened: '\''***MEMORY ERROR***: com.github.johnfactotum.Foliate[process_number]: GSlice: assertion failed: sinfo->n_allocated > 0\n# Aborted (core dumped)'\'' (seen at the end when running the app with --verbose flag) and resulted in output of '\''Segmentation fault (core dumped)'\'' when run without the flag\nExec=sh -c "G_SLICE=always-malloc $1"\n!g' "${path_to_edit}" # perl: '?' for lazy matching, '^' - start of line, g at the end for global replacement (noted Foliate.desktop had two `Exec=` lines); Desktop Entry Specification: 'Quoting must be done by enclosing the argument between double quotes', hence double quotes for argument after 'sh -c'
+fi
 
 ## change how dwww is executed (add check for apache status)
 path_to_edit=/usr/share/applications/dwww.desktop
