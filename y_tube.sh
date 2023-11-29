@@ -16,16 +16,22 @@ source "$(dirname "$(realpath "$0")")"/common_arguments_to_scripts.sh
 help_message="  Calls yt-dlp $params [formats in accordance with h|l] [other parameters] URL
   To prioritize video quality use args l for 720 quality or lower and h for 1080p quality.
 (h: $format_params_h) (l: $format_params_h)
+  If -p option added, then after download renames downloaded files adding the prefix with hyphen (prefix - )
   Other parameters given on command line are passed to yt-dlp.
-  Usage: $script_name [h|l] [other parameters] URL\n"
+  Usage: $script_name [h|l] [-p prefix_to_add] [other parameters] URL\n"
 display_help "$help_message$common_help"
 # ====== #
 
 params_add=""
-case $1 in
-    "h" ) params_add="$format_params_h" ; shift ;;
-    "l" ) params_add="$format_params_l" ; shift ;;
-esac
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        "h" ) params_add="$format_params_h" ; shift ; false ;;
+        "l" ) params_add="$format_params_l" ; shift ; false ;;
+        "-p" ) shift ; prefix="${1} - " ; shift ; false ;;
+    esac
+    if [ $? -eq 0 ]; then break; fi # to end `while` loop if no argument matched (`false` added to other patterns' lists to return 1)
+done
+
 #    set -x # bash option "Print commands and their arguments as they are executed"
 yt-dlp $params $params_add $@
 #    set +x
@@ -41,7 +47,7 @@ video_id=$(echo "$URL" | awk 'BEGIN { FS = "=" } { print $2 }')
 # deleting subtitle files that are empty - w/out words (only timestamps), 2023/07 noted there are those like "de" when "de-en" were introduced.
 
 # but need to check if any matching files present, otherwise * is not expanded by shell.
-ls *"$video_id"*vtt &>/dev/null
+ls *"${video_id}"*vtt &>/dev/null
 if [ $? -ne 0 ] ; then exit 3 ; fi
 
 # for f in $(ls | grep "$video_id" | grep vtt) ; do # makes many parts of file names as separate f
@@ -75,6 +81,12 @@ find . -name "*$video_id*.en[-.][ev][nt]*" -exec sh -c 'if [ $# -eq 2 ] ; then c
 
 # make "en" default (picking first from sorted by name I guess) for mpv
 find . -name "*$video_id*.en.vtt" -exec bash -c 'mv "${1}" "${1/.en.vtt/.En.vtt}"' bash {} \; # [2]
+
+# rename if prefix has been supplied
+if [ -n "${prefix}" ]; then
+    rename "s|^|${prefix}|" *"${video_id}"*
+fi
+
 
 exit
 
