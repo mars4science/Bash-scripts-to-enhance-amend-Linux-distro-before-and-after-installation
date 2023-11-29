@@ -42,7 +42,7 @@ common_help="Also for "\""$script_name update"\"" programmed response is updatin
 if [[ ! $# -eq 0 && $1 = "install" ]]; then
   sudo cp $script_path $install_path
   sudo chmod o+x $install_path
-  sudo ln --force -s $install_path/$script_name.sh $install_path/$script_name # --force : remove existing destination files
+  sudo ln --force --symbolic --relative $install_path/$script_name.sh $install_path/$script_name # --force : remove existing destination files
   echo copied script $script_path to $install_path, to run use $script_name with or w/out .sh suffix
   exit
   # setuid bit is prohibited for scripts
