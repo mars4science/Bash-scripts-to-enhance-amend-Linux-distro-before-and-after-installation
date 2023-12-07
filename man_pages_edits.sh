@@ -33,16 +33,20 @@ while read -r line; do
   if [ $i -eq 3 ] ; then 
     i=0
     otext="$line"
-# printf "%s\n%s\n%s\n" $page $itext $otext
-    if [ $(locate "/${page}." "${man_section}" gz | wc -l) -ne 1 ] ;  then
-      echo "    ERROR: it seems locate cannot find unique gz archive of ${page} in ${man_section}, skipping"  | sudo tee --append "${amend_log}" # after adding "/" and "." to ${page} multiples are not expected to happen, only no one found
-      continue # to next cycle of while
-    fi
+
+    qty_found=$(locate "/${page}." "${man_section}" gz | wc -l)
+    if [ ${qty_found} -ge 2 ] ;  then
+      echo "    ERROR: it seems locate found multiple gz archives of ${page} in ${man_section}, skipping"  | sudo tee --append "${amend_log}" # after adding "/" and "." to ${page} multiples are not expected to happen, only no one found, checks in case will happen again
+      continue; fi # to next cycle of while
+
+    if [ ${qty_found} -eq 0 ] ;  then
+      echo "    WARNING: it seems locate cannot find (unique) gz archive of ${page} in ${man_section}, skipping"
+      continue; fi # to next cycle of while
+
     man_page_gzip=$(locate "/${page}." "${man_section}" gz)
     if [ $(gzip --list "${man_page_gzip}" | wc -l) -ne 2 ] ; then
       echo "    ERROR: it seems ${man_page_gzip} contains more than 1 file, skipping"  | sudo tee --append "${amend_log}"
-      continue # to next cycle of while
-    fi
+      continue; fi # to next cycle of while
 
     man_page=$(gzip --list "${man_page_gzip}" | tail --lines=1 | awk '{print $4}')
     sudo gzip --keep --uncompress "${man_page_gzip}" # using --keep to keep input (original) file
@@ -86,4 +90,3 @@ while read -r line; do
 done < "${man_pages_edits}"
 
 1>/dev/null sudo mandb --create # --create option forces mandb to delete previous databases and re-create them from scratch, and implies --no-purge
-
