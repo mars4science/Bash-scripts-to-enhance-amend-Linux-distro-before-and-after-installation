@@ -3,7 +3,7 @@
 # 2023/07 List produced by `yt-dlp --list-subs URL` contained certain subtitles but on download they did not contain useful info, therefore adding language codes encountered and filtering out empty later
 # "--format-sort ext" helped to select "--prefer-free-formats" over "quality" (see "Filtering Formats" in README of yt-dlp)
 # inverestingly, when parameter --write-sub was added before --write-auto-sub, for a youtube video that contained both subs and autosubs both en and en-en were same and contained which were subs per youtube interface. W/out --write-sub en-en contained subs, en contained auto-generated subs. Often auto-generated are better now.
-params=" --prefer-free-formats --format-sort ext --write-info-json --write-description --write-auto-sub --sub-langs en-en,en,fr,fr-en,fr-en-US,de,de-en,de-en-US,ru,ru-en,ru-en-US,uk,uk-en,uk-en-US " # from 2023/07 translations from English are codes as ??-en
+params=" --prefer-free-formats --format-sort ext --write-info-json --write-description --write-auto-sub --sub-langs en-en,en,fr,fr-en,fr-en-US,de,de-en,de-en-US,ru,ru-en,ru-en-US,uk,uk-en,uk-en-US,en-GB " # from 2023/07 translations from English are codes as ??-en
 
 # see yt-dlp README for syntax, h looks for up to 1200p no less than 800p horizontal, trying for <=30 fps 1) merged, then 2) separate video+audio then drop fps constraint
 # l looks for up to 800p no less than 600p horizontal, trying for <=30 fps 1) merged, then 2) separate video+audio then 3) drop minimum horizontal constraint
@@ -63,18 +63,17 @@ for f in *"$video_id"*vtt  ; do
 done
 
 # rename subtitle files for loading by mpv (e.g. suffix de-en.vtt to de.vtt)
-for f in *"$video_id"*-en.vtt ; do
-    f1="${f/-en.vtt/.vtt}"
-    if [ ! -e "${f1}" ] && [ -e "${f}" ] ; then
-        mv "${f}" "${f1}"
-    fi
-done
-for f in *"$video_id"*-en-US.vtt ; do
-    f1="${f/-en-US.vtt/.vtt}"
-    if [ ! -e "${f1}" ] && [ -e "${f}" ] ; then
-        mv "${f}" "${f1}"
-    fi
-done
+remove_subs_suffix(){
+    for f in *"$video_id"*"${1}".vtt ; do
+        f1="${f/${1}.vtt/.vtt}"
+        if [ ! -e "${f1}" ] && [ -e "${f}" ] ; then
+            mv "${f}" "${f1}"
+        fi
+    done
+}
+remove_subs_suffix "-en"
+remove_subs_suffix "-en-US"
+remove_subs_suffix "-GB"
 
 # delete duplicate subtitles (i.e. en and en-en), works if only two files found; ! string comparison seems to be needing escape in bash
 find . -name "*$video_id*.en[-.][ev][nt]*" -exec sh -c 'if [ $# -eq 2 ] ; then cmp --quiet "${1}" "${2}" && if [ "${1}" \< "${2}" ] ; then rm "${1}" ; else rm "${2}" ; fi ; fi' sh {} + # [2]
