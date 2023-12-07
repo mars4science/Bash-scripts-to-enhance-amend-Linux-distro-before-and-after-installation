@@ -41,11 +41,17 @@ if [ -e "${commons_path}" ] ; then
       If called w/out any parameters, default parameters are used: -i $default_local_debs $default_local_apt_dpkg_folder
 
       Example: $script_name -i /media/alex/usb/LM_20.2/debs /home/alex/Documents/apt_dpkg_state
-      usage: $script_name [-i | -d ] [location_to_store] [folder with dpkg status file (dpkg_orig_status e.g. copied from /var/lib/dpkg/status) and apt sources locations, (sources.list file and sources.list.d folder, e.g. copied from /etc/apt)] < filename
-      or echo -e 'package_unqualified_name"'[\\n'"package_unqualified_name] etc' | $script_name [-i | -d] [location_to_store] [folder with dpkg status file and apt sources location]
-      -i means install right after downloaded.
-      -d means download only to default path with default location of dpkg status file and apt sources.
-      -0 means download only to ${debs_cache_folder} with empty dpkg status file (with all dependencies) amd no substitution of apt sources, several words (package names) can be passed from standard input in one run with with option.
+      usage: $script_name [-i|-d] [location_to_store] [folder with dpkg status file (dpkg_orig_status e.g. copied from /var/lib/dpkg/status) and apt sources locations, (sources.list file and sources.list.d folder, e.g. copied from /etc/apt)] < filename
+     OR:
+      echo -e 'package_unqualified_name"'[\\n'"package_unqualified_name] etc' | $script_name [-i|-d] [location_to_store] [folder with dpkg status file and apt sources location]
+     OR:
+      echo -e 'package_unqualified_name"'[\\n'"package_unqualified_name] etc' | $script_name -0
+     OR:
+      $script_name cp
+      -i means: download, install right after downloaded.
+      -d means: download only; to default path with default location of dpkg status file and apt sources.
+      -0 means: download only; to ${debs_cache_folder} with empty dpkg status file (with all dependencies) amd no substitution of apt sources.
+      cp means: copy deb files from ${debs_cache_folder} to current folder location.
       If dpkg status and/or apt sources not found at supplied location, substitution not done.\n"
     display_help "$help_message$common_help"
 else
@@ -83,6 +89,9 @@ if [ $# -eq 1 ]
     elif [ $1 = "printpath" ]
       then
         printf "%s" $default_local_debs
+        exit
+    elif [ $1 = "cp" ]; then
+        cp --no-clobber "${debs_cache_folder}"/*.deb .
         exit
     fi
 fi
