@@ -14,6 +14,9 @@ user_name="user2"
 locales='("en_US" "de_DE")' # note: string here whereas array in the file to edit
 cgroup="gr2" # see [1] for example of usage (in addition of moving process into a group)
 cpu_max_mksquashfs="1200000 1000000"
+# applications to add
+path_to_apps="//_toadd" # within software_path_root; double `/` instead of single for usage in bash pattern substitution
+apps_to_add=("kiwix" "kdenlive" "Kdenlive" "krita" "Krita" "jExifToolGUI") # doc files are named starting with Upper case letter, the rest with lower one, therefore list both variants
 
 # ----------------------------------------------------------- #
 
@@ -68,9 +71,19 @@ if [ -d "${dict_path}" ]; then
     done
 fi
 
+#
+# add applications
+#
+# remove previous links, two locations for now
+find "${software_path_root}/to_root" -type l -execdir rm '{}' +
+find "${software_path_root}/bin" -type l -execdir rm '{}' +
+# add each
+for app in "${apps_to_add[@]}"; do
+    find "${software_path_root}/${path_to_apps}" -name "${app}"* -exec bash -c 'ln --symbolic -T ${1} ${1/'"${path_to_apps}"'/}' bash {} \;
+done
+
 # end of script
 exit
-
 
 ###########################################
 

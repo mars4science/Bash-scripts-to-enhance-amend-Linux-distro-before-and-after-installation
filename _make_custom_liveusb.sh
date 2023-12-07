@@ -103,9 +103,9 @@ change_squash() {
     # sudo cp --recursive "${software_path_root}"/settings/* $settings_to_copy_to
     sudo rsync -rlptD "${software_path_root}"/settings/ $settings_to_copy_to # replaced cp because IIRecalledC * expansion does not include dot prefixed files
 
-    sudo rsync -rlptD --omit-dir-times "${software_path_root}"/to_root/ "$work_path/fin_sq" # copy what needs to be copied additionally to appropriate places along with paths
+    sudo rsync -rLptD --omit-dir-times "${software_path_root}"/to_root/ "$work_path/fin_sq" # copy what needs to be copied additionally to appropriate places along with paths; -L: transform symlinks into referent file/dir
 
-   sudo rsync -rlptD --omit-dir-times "${software_path_root}"/to_iso_root/ "$work_path/fin" # copy to location to be available in /cdrom after boot
+   sudo rsync -rLptD --omit-dir-times "${software_path_root}"/to_iso_root/ "$work_path/fin" # copy to location to be available in /cdrom after boot; -L: transform symlinks into referent file/dir
 
     # in case debs are not installed right at this script run time copy stopfan to be able to turn fan off after ISO boot
     sudo cp "${software_path_root}"/bin/stopfan $work_path/fin_sq/usr/local/bin
