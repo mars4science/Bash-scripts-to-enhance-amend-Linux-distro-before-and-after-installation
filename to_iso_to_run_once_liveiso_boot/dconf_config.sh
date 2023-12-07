@@ -170,8 +170,8 @@ if [ ! -e "$(get_install_path.sh)/${key_script_name}" ]; then
 fi
 add_key "'To reverse keybindings custom list'" "['<Super><Alt>r']" "'${key_script_name}'"
 
-# around {print $1} single quotes need NOT be quoted for bash as within double quotes, but as they are  1) inside single quotes for sh (' -> '\''), 2) backslash used for step 1 to be escaped for GVariant, using unicode \u005c works for GVariant, alternatively \\\\ (4 because each of two \ is escaped for outer double quotes; \u - no escaping as u after \ hence \ has no special meaning), 3) all resultant single quotes to be quoted for GVariant (' -> \')
-# $ to be quoted (e.g. via backslash) as within double quotes for bash
+# around {print $1} single quotes need NOT be quoted for bash as within double quotes, but as they are 1) inside single quotes for sh (' -> '\''), 2) backslash used quoting for step 1 to be escaped for GVariant, using unicode \u005c works for GVariant, alternatively \\\\ (4 because each of two \ is escaped for outer double quotes; \u - no escaping as u after \ hence \ has no special meaning), 3) all resultant single quotes to be quoted for GVariant (' -> \')
+# $ to be quoted (e.g. via backslash) as within double quotes for bash; `\u005c connected` (prefix: escaped space) does not select `disconnected`
 add_key "'Display #1 rotate normal'" "['<Super><Alt>Up']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1) --rotate normal\''"
 add_key "'Display #1 rotate left'" "['<Super><Alt>Left']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1) --rotate left\''"
 add_key "'Display #1 rotate right'" "['<Super><Alt>Right']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1) --rotate right\''"
@@ -182,11 +182,19 @@ add_key "'Display #2 rotate left'" "['<Shift><Super><Alt>Left']" "'sh -c \'xrand
 add_key "'Display #2 rotate right'" "['<Shift><Super><Alt>Right']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1) --rotate right\''"
 add_key "'Display #2 rotate upsidedown'" "['<Shift><Super><Alt>Down']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1) --rotate inverted\''"
 
+# set custom monitor brightness adjustments via backlight
+add_key "'Brightness up'" "['<Alt>MonBrightnessUp']" "'night +1'"
+add_key "'Brightness down'" "['<Alt>MonBrightnessDown']" "'night -1'"
+
+# further decrease brighness software (xrandr) way
+add_key "'Display #1 descrease brightness software way 2x'" "['<Super><Alt>MonBrightnessDown']" "'sh -c \'display=\$(xrandr --query | grep \u005c connected | awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1); brightness=\$(xrandr --query --verbose | grep -A 10 \${display} | grep -i Brightness | awk \'\u005c\'\'{print \$2}\'\u005c\'\'); xrandr --output \${display} --brightness \$(python -c \"print(\${brightness}/2)\")\''"
+add_key "'Display #1 increase brightness software way 2x'" "['<Super><Alt>MonBrightnessUp']" "'sh -c \'display=\$(xrandr --query | grep \u005c connected | awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=1); brightness=\$(xrandr --query --verbose | grep -A 10 \${display} | grep -i Brightness | awk \'\u005c\'\'{print \$2}\'\u005c\'\'); xrandr --output \${display} --brightness \$(python -c \"print(min(1,\${brightness}*2))\")\''"
+
+add_key "'Display #2 descrease brightness software way 2x'" "['<Shift><Super><Alt>MonBrightnessDown']" "'sh -c \'display=\$(xrandr --query | grep \u005c connected | awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1); brightness=\$(xrandr --query --verbose | grep -A 10 \${display} | grep -i Brightness | awk \'\u005c\'\'{print \$2}\'\u005c\'\'); xrandr --output \${display} --brightness \$(python -c \"print(\${brightness}/2)\")\''"
+add_key "'Display #2 increase brightness software way 2x'" "['<Shift><Super><Alt>MonBrightnessUp']" "'sh -c \'display=\$(xrandr --query | grep \u005c connected | awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1); brightness=\$(xrandr --query --verbose | grep -A 10 \${display} | grep -i Brightness | awk \'\u005c\'\'{print \$2}\'\u005c\'\'); xrandr --output \${display} --brightness \$(python -c \"print(min(1,\${brightness}*2))\")\''"
+
 add_key "'Volume Up'" "['<Primary>AudioRaiseVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ +6dB'" # set key to up volume above 100% by increasing voltage 2x (+6dB doubles voltage according to wiki page)
 add_key "'Volume Down'" "['<Primary>AudioLowerVolume']" "'pactl set-sink-volume @DEFAULT_SINK@ -6dB'" # set key to lower volume by decreasing voltage 2x (-6dB halves voltage according to wiki page)
-
-add_key "'Brightness up'" "['<Alt>MonBrightnessUp']" "'night +1'" # set custom monitor brightness adjustments
-add_key "'Brightness down'" "['<Alt>MonBrightnessDown']" "'night -1'"
 
 add_key "'Up text scaling 1.1 times'" "['<Primary><Shift><Alt>x']" '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*1.1)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
 add_key "'Up text scaling 0.9 times'" "['<Primary><Shift><Alt>z']" '"sh -c '\''f=$(gsettings get org.cinnamon.desktop.interface text-scaling-factor);fnew=$(printf \"print(${f}*0.9)\" | python); gsettings set org.cinnamon.desktop.interface text-scaling-factor ${fnew}'\'\"
