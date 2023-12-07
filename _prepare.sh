@@ -79,7 +79,7 @@ find "${software_path_root}/to_root" -type l -execdir rm '{}' +
 find "${software_path_root}/bin" -type l -execdir rm '{}' +
 # add each
 for app in "${apps_to_add[@]}"; do
-    find "${software_path_root}/${path_to_apps}" -name "${app}"* -exec bash -c 'ln --symbolic -T ${1} ${1/'"${path_to_apps}"'/}' bash {} \;
+    find "${software_path_root}/${path_to_apps}" -name "${app}"* -exec bash -c 'ln --symbolic --relative -T ${1} ${1/'"${path_to_apps}"'/}' bash {} \;
 done
 
 # end of script
