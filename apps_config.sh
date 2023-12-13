@@ -11,9 +11,9 @@ else
     file_contents='hwdec=vaapi
 
 sub-font-size=45
-sub-color=0.0/1.0/1.0/0.2
-sub-border-size=5
-sub-border-color=0.0/0.0/0.0/0.3
+sub-color=0.0/0.0/1.0/0.3
+sub-border-size=3
+sub-border-color=0.0/1.0/0.0/0.3
 sub-pos=70
 
 no-audio-display # to disable displaying of cover art when playing audio files (e.g. works for mp3)
@@ -58,21 +58,42 @@ Shift+DOWN no-osd seek 60 exact
 a cycle audio-pitch-correction # set "a" key to enable/disable scaletempo/scaletempo2 pitch correction for sound
 
 # various combinations with "add sub-color" to gradually change part of RGB/transparency failed to produce desired result
-ALT+3 set sub-color 1.0/0.0/0.0/0.7
-ALT+4 set sub-color 0.0/1.0/0.0/0.7
-ALT+5 set sub-color 0.0/0.0/1.0/0.7
-ALT+6 set sub-color 1.0/1.0/0.0/0.7
-ALT+7 set sub-color 0.0/1.0/1.0/0.7
-ALT+8 set sub-color 1.0/0.0/1.0/0.7
-ALT+9 set sub-color 1.0/1.0/1.0/0.7
+ALT+3 set sub-color 1.0/0.0/0.0/0.7;set sub-border-color 0.0/1.0/1.0/0.7
+ALT+e set sub-color 1.0/0.0/0.0/0.7;set sub-border-color 0.0/1.0/0.0/0.7
+ALT+d set sub-color 1.0/0.0/0.0/0.7;set sub-border-color 0.0/0.0/1.0/0.7
 
-ALT+# set sub-color 1.0/0.0/0.0/0.2
-ALT+$ set sub-color 0.0/1.0/0.0/0.2
-ALT+% set sub-color 0.0/0.0/1.0/0.2
-ALT+^ set sub-color 1.0/1.0/0.0/0.2
-ALT+& set sub-color 0.0/1.0/1.0/0.2
-ALT+* set sub-color 1.0/0.0/1.0/0.2
-ALT+( set sub-color 1.0/1.0/1.0/0.2'
+ALT+4 set sub-color 0.0/1.0/0.0/0.7;set sub-border-color 1.0/0.0/1.0/0.7
+ALT+r set sub-color 0.0/1.0/0.0/0.7;set sub-border-color 0.0/0.0/1.0/0.7
+ALT+f set sub-color 0.0/1.0/0.0/0.7;set sub-border-color 1.0/0.0/0.0/0.7
+
+ALT+5 set sub-color 0.0/0.0/1.0/0.7;set sub-border-color 1.0/1.0/0.0/0.7
+ALT+t set sub-color 0.0/0.0/1.0/0.7;set sub-border-color 0.0/1.0/0.0/0.7
+ALT+g set sub-color 0.0/0.0/1.0/0.7;set sub-border-color 1.0/0.0/0.0/0.7
+
+ALT+6 set sub-color 1.0/1.0/0.0/0.7;set sub-border-color 0.0/0.0/1.0/0.7
+ALT+7 set sub-color 0.0/1.0/1.0/0.7;set sub-border-color 1.0/0.0/0.0/0.7
+ALT+8 set sub-color 1.0/0.0/1.0/0.7;set sub-border-color 0.0/1.0/0.0/0.7
+ALT+9 set sub-color 1.0/1.0/1.0/0.7;set sub-border-color 0.0/0.0/0.0/0.7
+ALT+o set sub-color 0.0/0.0/0.0/0.7;set sub-border-color 1.0/1.0/1.0/0.7
+
+
+ALT+# set sub-color 1.0/0.0/0.0/0.3;set sub-border-color 0.0/1.0/1.0/0.3
+ALT+E set sub-color 1.0/0.0/0.0/0.3;set sub-border-color 0.0/1.0/0.0/0.3
+ALT+D set sub-color 1.0/0.0/0.0/0.3;set sub-border-color 0.0/0.0/1.0/0.3
+
+ALT+$ set sub-color 0.0/1.0/0.0/0.3;set sub-border-color 1.0/0.0/1.0/0.3
+ALT+R set sub-color 0.0/1.0/0.0/0.3;set sub-border-color 0.0/0.0/1.0/0.3
+ALT+F set sub-color 0.0/1.0/0.0/0.3;set sub-border-color 1.0/0.0/0.0/0.3
+
+ALT+% set sub-color 0.0/0.0/1.0/0.3;set sub-border-color 1.0/1.0/0.0/0.3
+ALT+T set sub-color 0.0/0.0/1.0/0.3;set sub-border-color 0.0/1.0/0.0/0.3
+ALT+G set sub-color 0.0/0.0/1.0/0.3;set sub-border-color 1.0/0.0/0.0/0.3
+
+ALT+^ set sub-color 1.0/1.0/0.0/0.3;set sub-border-color 0.0/0.0/1.0/0.3
+ALT+& set sub-color 0.0/1.0/1.0/0.3;set sub-border-color 1.0/0.0/0.0/0.3
+ALT+* set sub-color 1.0/0.0/1.0/0.3;set sub-border-color 0.0/1.0/0.0/0.3
+ALT+( set sub-color 1.0/1.0/1.0/0.3;set sub-border-color 0.0/0.0/0.0/0.3
+ALT+O set sub-color 0.0/0.0/0.0/0.3;set sub-border-color 1.0/1.0/1.0/0.3'
     echo "${file_contents}" | 1>/dev/null sudo tee "${file_fully_qualified_name}"
 fi
 
