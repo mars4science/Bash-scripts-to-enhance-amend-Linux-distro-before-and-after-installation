@@ -34,6 +34,8 @@ sudo mv /tmp/.X11-unix /tmp/..X11-unix
 sudo rm --force --recursive /tmp/* /tmp/.[!.]*
 sudo mv /tmp/..X11-unix /tmp/.X11-unix
 
+sudo apt-get clean # just in case too
+
 # end Windows (wine) processes after deleting Windows disks (~./wine)
 # often there are none, so 2>/dev/null to prevent an error displayed
 ps -e -f | grep '\.exe$' | grep ' [C|Z]:\\' | awk '{print $2}' | 2>/dev/null xargs kill
