@@ -105,10 +105,10 @@ file_contents='#!/bin/sh
 
 case $1 in
   pre)
-    date --iso-8601=seconds | tee /tmp/amendediso_suspended_datetime.txt
+    date --iso-8601=seconds | tee --append /tmp/amendediso_suspended_datetime.txt
     ;;
   post)
-    date --iso-8601=seconds | tee --append /tmp/amendediso_suspended_datetime.txt ;;
+    echo "$(date --iso-8601=seconds) resumed" | tee --append /tmp/amendediso_suspended_datetime.txt ;;
 esac'
 
 file_name=suspended_datetime
