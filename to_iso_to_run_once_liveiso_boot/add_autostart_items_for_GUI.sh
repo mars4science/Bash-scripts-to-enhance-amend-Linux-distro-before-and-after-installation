@@ -51,6 +51,19 @@ Hidden=false
 X-GNOME-Autostart-Delay=0
 EOF
 
+# to mute sound (if not muted already) when xscreensaver blanks or locks the screen
+tee $autostart_dir/sound.mute.xscreensaver.desktop << EOF
+[Desktop Entry]
+Name=fonts.scaling.set
+Comment=No description
+Type=Application
+Exec=liveiso_path_scripts_root/xscreensaver_sound_mute.pl
+X-GNOME-Autostart-enabled=true
+NoDisplay=false
+Hidden=false
+X-GNOME-Autostart-Delay=0
+EOF
+
 # Seems to be no need to make desktop files executable in autostart, works w/out it but just in case:
 chmod a+x $autostart_dir/*
 
