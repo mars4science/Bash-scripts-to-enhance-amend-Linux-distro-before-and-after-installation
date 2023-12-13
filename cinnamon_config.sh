@@ -91,6 +91,7 @@ edit_desktop_file "com.github.maoschanz.drawing" "image;picture;photo;paint;draw
 edit_desktop_file "dwww" "documentation;information;manual;help" "Browse, search documentation files in /usr/share/doc, man pages" # Debian Documentation Browser
 edit_desktop_file "io.github.Hexchat" "IM;Chat;IRC;messaging;message" "Chat with other people online; Internet Relay Chat"
 edit_desktop_file "org.gnome.gedit" "" "" "application/x-shellscript;text/plain;" "Gnome Text Editor" # edit MimeType and Name for gedit
+edit_desktop_file "org.gnome.Evince" "" "" "" "Evince Document Viewer" # edit Name
 
 # edit Foliate, Exec=, adding bandaid (G_SLICE=always-malloc); TODO try to fix the bug (one in comment text added to the desktop file)
 path_to_edit=/usr/share/applications/com.github.johnfactotum.Foliate.desktop
