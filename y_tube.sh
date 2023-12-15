@@ -43,6 +43,9 @@ fi
 
 URL=${!#} # ! bash's indirect substitution, get last positional parameter
 video_id=$(echo "$URL" | awk 'BEGIN { FS = "=" } { print $2 }')
+if [ -z "${video_id}" ]; then # for "shorts" type of videos URL is in different format
+    video_id=$(echo "$URL" | awk 'BEGIN { FS = "/" } { print $5 }')
+fi
 
 # deleting subtitle files that are empty - w/out words (only timestamps), 2023/07 noted there are those like "de" when "de-en" were introduced.
 
