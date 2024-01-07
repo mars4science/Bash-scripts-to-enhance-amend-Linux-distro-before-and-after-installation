@@ -80,16 +80,16 @@ add_function 'e_ject' '
         return 0
     fi
 
-    mounts="$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep --ignore-case "$1" | wc -l)"
+    mounts="$(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | wc -l)"
     if [ "${mounts}" -ge 2 ]; then echo "ERROR: Two or more block devices matched, please pass more specific parameter"; return 1; fi
     if [ "${mounts}" -eq 0 ]; then echo "ERROR: No block devices contaning phrase [$1] found"; return 1; fi
-    dev_name="$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
-    dev_path="$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep --ignore-case "$1" | awk '\''{ print $2 }'\'')"
-    dev_mount="$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep --ignore-case "$1" | awk '\''{ print $3 }'\'')"
+    dev_name=" $(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    dev_path=" $(lsblk --paths --output PATH,PKNAME,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    dev_mount="$(lsblk --paths --output MOUNTPOINT,PKNAME,PATH,FSTYPE,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
 
     # unmounting; "umount" failed for btrfs on extended partition with "error finding object for block device 0:56", so changed to "udisksctl unmount"
     for (( i=1; i < ${attempts}; i++ )); do
-        if [ -n "$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep "${dev_path}" | awk '\''{print $3}'\'')"  ] ; then # dev_path seems unique, dev_mount can be empty already
+        if [ -n "$(lsblk --paths --output MOUNTPOINT,PATH | grep "${dev_path}" | awk '\''{print $1}'\'')"  ] ; then # dev_path seems unique, so filter by it then check if dev_mount not empty already (no need to unmount if empty)
             udisksctl unmount --block-device "${dev_path}" && echo "${dev_path} unmounted (detached) from ${dev_mount}" && break
         else
             echo "${dev_path} not mounted"; break
@@ -101,10 +101,10 @@ add_function 'e_ject' '
         return 1
     fi
 
-    # unlocking luks
+    # locking cypto (luks)
     for (( i=1; i < ${attempts}; i++ )); do
-        if [ "$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep "${dev_path}" | grep --quiet --ignore-case "luks"; echo $?)" -eq 0 ]; then
-            dev="${dev_name}" # as for luks PKNAME contains partition name whereas for non-luks PKNAME contains whole device, PATH contains partition
+        if [ "$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep "${dev_path}" | grep --quiet --ignore-case "luks"; echo $?)" -eq 0 ]; then # not fool-proof against output having luks word in it even if it is not unlocked luks partition; TODO:think about it
+            dev="${dev_name}" # as for luks PKNAME contains partition name whereas for non-luks PKNAME contains whole device (usually, but not always, for e.g. loop partition table type there is only one partition and so no parent partion, so PKNAME is empty), PATH contains partition
             udisksctl lock --block-device "${dev_name}" && break # no need for sudo, instead of: sudo cryptsetup close "${dev_path}"
         else
             dev="${dev_path}"
@@ -198,12 +198,12 @@ add_function 'm_ount_options' '
         return 0
     fi
 
-    mounts="$(lsblk --paths --output PKNAME,FSTYPE,PATH,LABEL | grep --ignore-case "$1" | wc -l)"
+    mounts="$(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | wc -l)"
     if [ "${mounts}" -ge 2 ]; then echo "ERROR: Two or more block devices matched, please pass more specific parameter"; return 1; fi
     if [ "${mounts}" -eq 0 ]; then echo "ERROR: No block devices contaning phrase [$1] found"; return 1; fi
 
-    dev_type="$(lsblk --paths --output PKNAME,FSTYPE,PATH,LABEL | grep --ignore-case "$1" | awk '\''{ print $2 }'\'')"
-    dev_path="$(lsblk --paths --output PKNAME,FSTYPE,PATH,LABEL | grep --ignore-case "$1" | awk '\''{ print $3 }'\'')"
+    dev_type="$(lsblk --paths --output FSTYPE,PKNAME,PATH,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    dev_path="$(lsblk --paths --output PATH,FSTYPE,PKNAME,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
 
     if [ "${dev_type}" != "${dev_type/crypto/cryptofound}" ]; then # type contains word crypto
         dev_path="$(udisksctl unlock --block-device "${dev_path}" | awk '\''{ print $4 }'\'')" # e.g. unlocked /dev/sdc1  as /dev/dm-1.
