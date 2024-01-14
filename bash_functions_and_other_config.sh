@@ -317,3 +317,13 @@ add_function 'BMI' '
 
     python -c "print($1/$2/$2)"
 '
+add_function 'logs_off' '
+    sudo journalctl --vacuum-time=1s # delete archive log files
+    sudo systemctl stop systemd-journald*
+    sudo rm -r /var/log/*
+    sudo find /run/log -name system.journal -exec dd if=/dev/zero of={} count=0 bs=1 \; # detele current log file
+    sudo dmesg --clear
+'
+add_function 'logs_on' '
+    sudo systemctl start systemd-journald.service
+'
