@@ -73,19 +73,19 @@ add_function(){
 
 add_function 'e_ject' '
 
-    attempts=5
+    local attempts=5
 
     if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
         echo "Code for powering off removable block device (e.g. USB stick), takes as parameter string to match for mount points and/or block devices"
         return 0
     fi
 
-    mounts="$(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | wc -l)"
+    local mounts="$(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | wc -l)"
     if [ "${mounts}" -ge 2 ]; then echo "ERROR: Two or more block devices matched, please pass more specific parameter"; return 1; fi
     if [ "${mounts}" -eq 0 ]; then echo "ERROR: No block devices contaning phrase [$1] found"; return 1; fi
-    dev_name="$(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
-    dev_path="$(lsblk --paths --output PATH,PKNAME,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
-    dev_mount="$(lsblk --paths --output MOUNTPOINT,PKNAME,PATH,FSTYPE,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    local dev_name="$(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    local dev_path="$(lsblk --paths --output PATH,PKNAME,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    local dev_mount="$(lsblk --paths --output MOUNTPOINT,PKNAME,PATH,FSTYPE,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
 
     # unmounting; "umount" failed for btrfs on extended partition with "error finding object for block device 0:56", so changed to "udisksctl unmount"
     for (( i=1; i < ${attempts}; i++ )); do
@@ -104,10 +104,10 @@ add_function 'e_ject' '
     # locking cypto (luks)
     for (( i=1; i < ${attempts}; i++ )); do
         if [ "$(lsblk --paths --output PKNAME,PATH,MOUNTPOINT | grep "${dev_path}" | grep --quiet --ignore-case "luks"; echo $?)" -eq 0 ]; then # not fool-proof against output having luks word in it even if it is not unlocked luks partition; TODO:think about it
-            dev="${dev_name}" # as for luks PKNAME contains partition name whereas for non-luks PKNAME contains whole device (usually, but not always, for e.g. loop partition table type there is only one partition and so no parent partion, so PKNAME is empty), PATH contains partition
+            local dev="${dev_name}" # as for luks PKNAME contains partition name whereas for non-luks PKNAME contains whole device (usually, but not always, for e.g. loop partition table type there is only one partition and so no parent partion, so PKNAME is empty), PATH contains partition
             udisksctl lock --block-device "${dev_name}" && break # no need for sudo, instead of: sudo cryptsetup close "${dev_path}"
         else
-            dev="${dev_path}"
+            local dev="${dev_path}"
             echo "${dev_path} not locked"
             break
         fi
@@ -137,7 +137,7 @@ add_function 'e_ject' '
 
 # command to remount ro
 add_function 'mntro' '
-    dev=$(mount | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')
+    local dev=$(mount | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')
     echo $dev | grep " " # check if space is present, then two or more lines were selected
     if [ $? -eq 0 ]; then echo "Two or more mounts matched, please pass more specific parameter"; return; fi
     if [ -z $dev ]; then echo "No mounts contaning phrase [$1] found"; return; fi
@@ -146,7 +146,7 @@ add_function 'mntro' '
 
 # command to remount rw
 add_function 'mntrw' '
-    dev=$(mount | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')
+    local dev=$(mount | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')
     echo $dev | grep " " # check if space is present, then two or more lines were selected
     if [ $? -eq 0 ]; then echo "Two or more mounts matched, please pass more specific parameter"; return; fi
     if [ -z $dev ]; then echo "No mounts contaning phrase [$1] found"; return; fi
@@ -170,7 +170,7 @@ add_function 'git_pull' '
     echo "- pulling (fast-forward only) all tracked branches from [origin] remote; assumes names of local branches and corresponding branches on remote are same (to push all branches: git push --all <remote repository>)"
     if [ "x$1" = "x" ]; then set -- "origin"; fi
     git fetch $1 || return 1
-    current_branch=$(git branch | grep "*" | sed "s/[ *]*//") # getting name of current branch via asterisk
+    local current_branch=$(git branch | grep "*" | sed "s/[ *]*//") # getting name of current branch via asterisk
     for branch in $(git branch | sed "s/[ *]*//") ; do # remove spaces and asterisk
         git checkout $branch && git fetch $1 $branch && git merge --ff-only FETCH_HEAD
     done
@@ -182,7 +182,7 @@ add_function 'git_pull' '
 add_function 'git_merge' '
     echo "- merging (fast-forward only) current branch into all other local branches"
     1>/dev/null git branch || return 1 # return in case was run not in valid git repo
-    current_branch=$(git branch | grep "*" | sed "s/[ *]*//") # getting name of current branch via asterisk
+    local current_branch=$(git branch | grep "*" | sed "s/[ *]*//") # getting name of current branch via asterisk
     for branch in $(git branch | sed "s/[ *]*//") ; do # remove spaces and asterisk
         if [ $branch != $current_branch ] ; then git checkout $branch && git merge --ff-only $current_branch; fi
     done
@@ -198,12 +198,12 @@ add_function 'm_ount_options' '
         return 0
     fi
 
-    mounts="$(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | wc -l)"
+    local mounts="$(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | wc -l)"
     if [ "${mounts}" -ge 2 ]; then echo "ERROR: Two or more block devices matched, please pass more specific parameter"; return 1; fi
     if [ "${mounts}" -eq 0 ]; then echo "ERROR: No block devices contaning phrase [$1] found"; return 1; fi
 
-    dev_type="$(lsblk --paths --output FSTYPE,PKNAME,PATH,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
-    dev_path="$(lsblk --paths --output PATH,FSTYPE,PKNAME,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    local dev_type="$(lsblk --paths --output FSTYPE,PKNAME,PATH,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    local dev_path="$(lsblk --paths --output PATH,FSTYPE,PKNAME,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
 
     if [ "${dev_type}" != "${dev_type/crypto/cryptofound}" ]; then # type contains word crypto
         dev_path="$(udisksctl unlock --block-device "${dev_path}" | awk '\''{ print $4 }'\'')" # e.g. unlocked /dev/sdc1  as /dev/dm-1.
@@ -261,7 +261,7 @@ add_function 'Liter4Oz' '
         echo "Converts US customary fluid ounce (oz, 1/128 of a gallon) to liters (qubic decimeters), one parameter (real or integer number)"
         return 0
     fi
-    gallons=`Liter4Gallon $1`
+    local gallons=`Liter4Gallon $1`
     python -c "print($gallons/128)"
 '
 
@@ -270,7 +270,7 @@ add_function 'Oz4Liter' '
         echo "Converts liters (qubic decimeters) to US customary fluid ounce (oz, 1/128 of a gallon), one parameter (real or integer number)"
         return 0
     fi
-    gallons=`Gallon4Liter $1`
+    local gallons=`Gallon4Liter $1`
     python -c "print($gallons*128)"
 '
 
