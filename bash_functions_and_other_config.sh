@@ -83,8 +83,8 @@ add_function 'e_ject' '
     mounts="$(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | wc -l)"
     if [ "${mounts}" -ge 2 ]; then echo "ERROR: Two or more block devices matched, please pass more specific parameter"; return 1; fi
     if [ "${mounts}" -eq 0 ]; then echo "ERROR: No block devices contaning phrase [$1] found"; return 1; fi
-    dev_name=" $(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
-    dev_path=" $(lsblk --paths --output PATH,PKNAME,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    dev_name="$(lsblk --paths --output PKNAME,PATH,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
+    dev_path="$(lsblk --paths --output PATH,PKNAME,FSTYPE,MOUNTPOINT,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
     dev_mount="$(lsblk --paths --output MOUNTPOINT,PKNAME,PATH,FSTYPE,LABEL | grep --ignore-case "$1" | awk '\''{ print $1 }'\'')"
 
     # unmounting; "umount" failed for btrfs on extended partition with "error finding object for block device 0:56", so changed to "udisksctl unmount"
