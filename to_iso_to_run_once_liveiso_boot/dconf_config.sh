@@ -182,6 +182,9 @@ add_key "'Display #2 rotate left'" "['<Shift><Super><Alt>Left']" "'sh -c \'xrand
 add_key "'Display #2 rotate right'" "['<Shift><Super><Alt>Right']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1) --rotate right\''"
 add_key "'Display #2 rotate upsidedown'" "['<Shift><Super><Alt>Down']" "'sh -c \'xrandr --output \$(xrandr -q|grep -v disconnected|grep connected|awk \'\u005c\'\'{print \$1}\'\u005c\'\' | head --lines=2 | tail --lines=1) --rotate inverted\''"
 
+# toggle primary display on/off (useful e.g. in case of more than one display)
+add_key "'Primary display on/off'" "['<Super><Alt>d']" "'sh -c \'display=\$(xrandr --query | grep primary | awk \'\u005c\'\'{print \$1}\'\u005c\'\'); if xrandr --listactivemonitors | grep \${display}; then xrandr --output \${display} --off; else xrandr --output \${display} --auto; fi\''"
+
 # set custom monitor brightness adjustments via backlight
 add_key "'Brightness up'" "['<Alt>MonBrightnessUp']" "'night +1'"
 add_key "'Brightness down'" "['<Alt>MonBrightnessDown']" "'night -1'"
