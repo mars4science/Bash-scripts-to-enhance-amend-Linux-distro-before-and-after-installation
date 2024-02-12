@@ -31,6 +31,9 @@ git config --bool core.bare false
 sed --in-place -- "s|fetch = +refs/\*:refs/\*|fetch = +refs/heads/*:refs/remotes/origin/*|" .git/config
 sed --in-place -- "/mirror = true/d" .git/config
 
+current_branch=$(git branch | grep "*" | sed "s/[ *]*//")
+git checkout $current_branch |& grep --invert-match "Already" # after cloning of a repo as bare, no branch is checked out (no files except git internals), therefore checkout now, skipping displaying message that git was already on that branch
+
 if [ $# -eq 2 ]; then cd -; fi  # change directory back from "$2"
 
 # ??? decided not to do that after answer to my question on SO that it is not supported, may use git-archive, git-branch w/out it to extract parts of the tree
