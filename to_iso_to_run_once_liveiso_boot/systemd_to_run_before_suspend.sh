@@ -6,7 +6,7 @@
 sudo --user=mint sh -c '
 if [ -z "$(xscreensaver-command --time | grep locked)" ]; then
     xscreensaver-command --suspend
-    xscreensaver-command --deactivate
+    # xscreensaver-command --deactivate # commented out to check if removal will fix freezing of some laptops when lid is closed
 else
     echo -e "\n Already locked"
     return 0; fi
