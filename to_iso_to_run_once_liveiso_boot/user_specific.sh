@@ -28,6 +28,9 @@ $dir_name/sqlitebrowser_setup.sh
 # for our old printer (TODO fix printer to enable color output)
 $dir_name/printer_color_as_gray.sh
 
+if [ $(night read | tail -n1 | awk '{print $4}') -eq $(night read | head -n1 | awk '{print $4}') ]; then
+    night -1;night -1;fi # if current brightness of display backlight is same as maximum, reduce by two logarithmic levels
+
 # now color profile added only for T480s 
 # TODO seems does not work by running by systemd on boot WantedBy=multi-user.target -> find out other way to run on boot
 # $dir_name/set_color_profile.sh
