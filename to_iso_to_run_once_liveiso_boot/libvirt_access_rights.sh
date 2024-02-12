@@ -1,5 +1,7 @@
 #!/bin/bash
 
+grep --quiet libvirt /etc/group || exit # exit the script if no 'libvirt' group (hint that virt-manager/qemu packages are not installed)
+
 # script to be invoked from run_at_boot_liveusb.sh with parameter, after_original_distro_install.sh w/out
 if [ $# -eq 0 ]; then user_name=$(id -un); else user_name=$1; fi
 
