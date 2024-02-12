@@ -43,16 +43,14 @@ ALT+k add sub-scale +0.1
 ALT+j add sub-scale -0.1
 
 ## Seek units are in seconds, but note that these are limited by keyframes
-RIGHT no-osd seek  3 exact
-LEFT  no-osd seek -1 exact
-#UP    seek  60
-#DOWN  seek -60
 # Do smaller, always exact (non-keyframe-limited), seeks with shift.
 # Don'\''t show them on the OSD (no-osd).
-Shift+RIGHT no-osd seek  5 exact
-Shift+LEFT  no-osd seek -5 exact
-Shift+UP    no-osd seek  -60 exact
-Shift+DOWN no-osd seek 60 exact
+RIGHT no-osd seek  3 exact
+LEFT  no-osd seek -3 exact
+Shift+RIGHT no-osd seek  1 exact
+Shift+LEFT  no-osd seek -1 exact
+Ctrl+UP    no-osd seek  10 exact
+Ctrl+DOWN no-osd seek -10 exact
 
 / quit # set / key to quit player
 a cycle audio-pitch-correction # set "a" key to enable/disable scaletempo/scaletempo2 pitch correction for sound
