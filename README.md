@@ -39,7 +39,7 @@ $work_path should have sufficient free space, now around several Gb, if fails du
 
 #### This script (+ scripts it is written to call) expects to find in path set by $software_path_root for parts of it functionality:
 
-- debs - folders with debs, one folder for one application to install (via `apt_get.sh`)
+- debs - folders with debs, one folder for one application to install (via `install_debs.sh`, which in turn uses `apt_get.sh`)
 - settings - transmission folder as in user home, .xscreensaver as in user home, background.jpg to set as background
 - bin - executables to add to path hardcoded in `get_install_path.sh` (now it is /usr/local/bin), including `night` - logarithmic control of brightness (linked to be called via custom keyboard binding), `stopfan` - stop fan of thinkpads (both see my other repo), youtube-dlp, yt-dlp
 - bin/appimages - appimages to be added to path hardcoded in `get_install_path.sh`
@@ -94,6 +94,7 @@ Scripts added to /usr/local/bin:
 - `git_clone` clones specific git repo with mirror option then amends config to make cloned repo look as regular
 - `git_compact` compacts repo with `git switch --orphan empty_long_name`
 - `man_pages_search` Searches sources files of the system reference manual pages for containing all arguments as literal strings (case insensitive) in any order (aka --global-apropos but for multiple arguments as `man` application itself for some reason seems to have no such option)
+- `apt_sources_replace.sh`, `apt_sources_restore.sh` - replace and restore apt sources and index files, e.g. for install from local debian archive
 
 Other minor tweaks, including:
 
