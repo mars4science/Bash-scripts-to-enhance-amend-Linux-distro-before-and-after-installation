@@ -39,7 +39,8 @@ $work_path should have sufficient free space, now around several Gb, if fails du
 
 #### This script (+ scripts it is written to call) expects to find in path set by $software_path_root for parts of it functionality:
 
-- debs - folders with debs, one folder for one application to install (via `install_debs.sh`, which in turn uses `apt_get.sh`)
+- debs - folders with debs, one folder for one application to install (via `install_debs.sh`, which in turn uses `apt_sources_replace.sh`, `apt_sources_restore.sh` and `apt_get.sh`)
+- debian_archive - folder as proper debian archive, one containing folders with debs and `Packages` files (see `man apt-get`, `man dpkg`). `Packages` files may be created with `apt_sources_replace.sh`, which creates them in Dir::Etc folder (usually `/etc/apt`)
 - settings - transmission folder as in user home, .xscreensaver as in user home, background.jpg to set as background
 - bin - executables to add to path hardcoded in `get_install_path.sh` (now it is /usr/local/bin), including `night` - logarithmic control of brightness (linked to be called via custom keyboard binding), `stopfan` - stop fan of thinkpads (both see my other repo), youtube-dlp, yt-dlp
 - bin/appimages - appimages to be added to path hardcoded in `get_install_path.sh`
@@ -131,6 +132,8 @@ Other minor tweaks, including:
     - `after_original_distro_install.sh`
     - `apt_get.sh`
     - `install_debs.sh`
+    - `apt_sources_replace.sh`
+    - `apt_sources_restore.sh`
     - `_make_custom_liveusb.sh`
 - set variables listed at the beginning of _make_custom_liveusb.sh, see more detailed descriptions in the beginning of README.
     - distro_label - "arbirary string with no special symbols, no spaces"

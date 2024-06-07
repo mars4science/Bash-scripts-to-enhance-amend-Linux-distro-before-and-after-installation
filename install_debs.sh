@@ -28,117 +28,53 @@ trap 'exit_on_ctrl_c' SIGINT
 #
 if [ -d "${debian_archives}" ]; then
 
-    # does NOT work during liveISO amendment as source files are mounted read-only because of thoughts about safety
-    # can still serve as guide to run manually
-    # creates package index files used by `apt-get update` (in the code below)
-    if [ ! -d "${debian_archives}/dists/${distribution}/${component}/binary-amd64" ]; then
-        cd "${debian_archives}"
-        mkdir --parents "./dists/${distribution}/${component}/binary-amd64"
-        mkdir --parents "./dists/${distribution}/${component}/binary-i386"
-        dpkg-scanpackages --multiversion . > "./dists/${distribution}/${component}/binary-amd64/Packages"
-        cp "./dists/${distribution}/${component}/binary-amd64/Packages" "./dists/${distribution}/${component}/binary-i386/Packages"
-        cd - # change directory back
+    # setup apt sources to point to local Debian archive
+    apt_sources_replace.sh
+    if [ $? -eq 0 ]; then
+
+        # Installing deb files. Note: benchmarking installation of all-on-one-line vs. one-by-one showed ~4.5 minutes duration vs. ~7.5 minute duration - significant improvement; if dependencies are not fully satisfied to failsafe to one-by-one installation took only ~1 second
+
+        # read packages names, remove in-line comments ('%' and/or '#') and blank spaces
+        while read line; do
+            line="${line##%*}" # remove comments made via '%' symbol - remove symbols to last one if line starts with '%', seems to allow to comment out whole lime; difference with commenting with '#' because deb files themselves often contain '%', but not '#' (package names do not, but just in case); '%' option added because file that is read is as of 2023/11/09 called .list and text editor 'toggle comment' adds '%'
+            line="${line%%#*}" # remove comments made via '#' symbol - remove symbols from the end up to last (from end) '#', seems to allow to comment out whole line
+            line="${line%% *}" # remove a blank (just in case, and anything after it), how to match one or more blanks only I have not found
+
+            if [ -n "${line}" ];then # allow for empty lines
+                packages_list="${packages_list} ${line}"
+            fi # empty line
+        done < "${packages_to_install}" # reading lines of names of packages, before reading to variable was `cat filename | while read`, but piping creates a subshell and variable assignment happened there (using < fixed it)
+
+        echo -e "\n    Set of  ${packages_list}  debian packages to be installed next in a few seconds\n" | tee --append "${install_debs_log}"
+        sleep 3
+
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes ${packages_list} |& tee --append "${install_debs_log}" # packages_list NOT quoted to allow it to expand to indvividual words (packages)
+
+        if [ ${PIPESTATUS[0]} -eq 0 ];then
+            echo -e "\n    set of  ${packages_list}  package(s) installed (at least seems like it)\n" | tee --append "${install_debs_log}"
+
+        else
+            echo -e "\n    ERROR:  set of  ${packages_list}  package(s) NOT installed (at least seems like it)\n\n    Next is coded to try to install packages separately\n"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
+
+            packages_array=(${packages_list})
+            for line in ${packages_array[@]}; do
+                echo -e "    ${line}  to be installed next\n" | tee --append "${install_debs_log}"
+                sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes "${line}" |& tee --append "${install_debs_log}" # --no-install-recommends deleted from the line as in apt_get recommended dependencies were added as were in the folders of deb files to install all files from
+                # man bash: Each  command in a pipeline is executed as a separate process (i.e., in a subshell)
+                # pipeline works similarly in e.g. sh, however PIPESTATUS array is Bash-specific, solution is different for sh
+                if [ ${PIPESTATUS[0]} -eq 0 ];then
+                    echo -e "\n    $line  package installed (at least seems like it)\n" | tee --append "${install_debs_log}"
+                else
+                    echo | tee --append "${install_debs_log}"
+                    echo "    ERROR:  $line  package NOT installed (at least seems like it)"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
+                    echo | tee --append "${install_debs_log}"
+                fi
+            done # iterating over array
+        fi
+
+        # restore original apt sources files
+        apt_sources_restore.sh
     fi
-
-    # Note: seems apt/dpkg files location paths are stable: /var/lib/dpkg/status, /etc/apt/sources.list, single file /etc/apt/sources.list.d/official-package-repositories.list, but made hopefully more future proof
-    eval $(apt-config shell STATUS_FILE Dir::State::status) # full path, just in case, line from apt_get
-    eval $(apt-config shell ETC_DIR Dir::Etc) # assigned variable to "etc/apt"
-    eval $(apt-config shell SOURCES_FILE Dir::Etc::sourcelist) # only last part of path, assigned variable to "sources.list"
-    eval $(apt-config shell SOURCES_DIR Dir::Etc::sourceparts) # only last part of path, assigned variable to "sources.list.d"
-
-    # man apt.conf: The Dir::State section pertains to local state information
-    eval $(apt-config shell STATE_DIR Dir::State) # assigned variable to "var/lib/apt"
-    eval $(apt-config shell LISTS_DIR Dir::State::Lists) # only past part of path, assigned variable to "lists/"; lists is the directory to place downloaded package lists in
-    eval $(apt-config shell PREFS_DIR Dir::Etc::PreferencesParts) # only past part of path
-
-    SOURCES_FILE="/${ETC_DIR}/${SOURCES_FILE}"
-    SOURCES_DIR="/${ETC_DIR}/${SOURCES_DIR%/}" # just in case for the future
-    INDEX_FILES_DIR="/${STATE_DIR}/${LISTS_DIR%/}" # remove ending "/" (for mv to .bak)
-    PREFS_FILE_ADD="/${ETC_DIR}/${PREFS_DIR}/amended_iso.pref"
-
-    # replace original apt sources files or add one line with local archive
-    if [ "${strategy_for_sources}" = "replace" ]; then
-        sudo mv "${INDEX_FILES_DIR}" "${INDEX_FILES_DIR}".bak
-        sudo mkdir "${INDEX_FILES_DIR}"
-
-        sudo mv "${SOURCES_DIR}" "${SOURCES_DIR}".bak
-        sudo mkdir "${SOURCES_DIR}"
-
-        source_original=""
-    elif [ "${strategy_for_sources}" = "add" ]; then
-        source_original="$(cat ${SOURCES_FILE})"
-
-        # set priority for local archive (via expectedly unique "component") as higher than linuxmint's official repositories (Pin-Priority: 700). Usage details: `man apt_preferences(5)`
-        # TODO: check if possible to allow downgrades for individual packages and how
-        # TODO: understand effect of "release" on next line
-        echo -e "Package: *\nPin: release c=${component}\nPin-Priority: 900" | sudo tee "${PREFS_FILE_ADD}"
-    else
-        echo "    ERROR:  '${strategy_for_sources}' value for strategy_for_sources w/out code to process it (at least seems like it), next line is programmed to abort $0 script"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
-        return 1
-    fi
-
-    sudo cp "${SOURCES_FILE}" "${SOURCES_FILE}".bak
-    { echo "deb [ allow-insecure=yes, trusted=yes ] file:${software_path_root}/debian_archives ${distribution} ${component}"; printf "${source_original}";} | sudo tee "${SOURCES_FILE}"
-    echo -e "\n    Reading the package(s) index files from newly assigned sources is programmed in the code that follows this line\n"
-    sudo apt-get update # reads index files (aka Package files by man page of dpkg-scanpackages), by observation noted it removes previous files of sources that are no longer in sources lists, so for restoring if strategy is "replace" need to backup those (done via "${INDEX_FILES_DIR}")
-
-#
-# Installing deb files. Note: benchmarking installation of all-on-one-line vs. one-by-one showed ~4.5 minutes duration vs. ~7.5 minute duration - significant improvement; if dependencies are not fully satisfied to failsafe to one-by-one installation took only ~1 second
-#
-    # read packages names, remove in-line comments ('%' and/or '#') and blank spaces
-    while read line; do
-        line="${line##%*}" # remove comments made via '%' symbol - remove symbols to last one if line starts with '%', seems to allow to comment out whole lime; difference with commenting with '#' because deb files themselves often contain '%', but not '#' (package names do not, but just in case); '%' option added because file that is read is as of 2023/11/09 called .list and text editor 'toggle comment' adds '%'
-        line="${line%%#*}" # remove comments made via '#' symbol - remove symbols from the end up to last (from end) '#', seems to allow to comment out whole line
-        line="${line%% *}" # remove a blank (just in case, and anything after it), how to match one or more blanks only I have not found
-
-        if [ -n "${line}" ];then # allow for empty lines
-            packages_list="${packages_list} ${line}"
-        fi # empty line
-    done < "${packages_to_install}" # reading lines of names of packages, before reading to variable was `cat filename | while read`, but piping creates a subshell and variable assignment happened there (using < fixed it)
-
-    echo -e "\n    Set of  ${packages_list}  debian packages to be installed next in a few seconds\n" | tee --append "${install_debs_log}"
-    sleep 3
-
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes ${packages_list} |& tee --append "${install_debs_log}" # packages_list NOT quoted to allow it to expand to indvividual words (packages)
-
-    if [ ${PIPESTATUS[0]} -eq 0 ];then
-        echo -e "\n    set of  ${packages_list}  package(s) installed (at least seems like it)\n" | tee --append "${install_debs_log}"
-
-    else
-        echo -e "\n    ERROR:  set of  ${packages_list}  package(s) NOT installed (at least seems like it)\n\n    Next is coded to try to install packages separately\n"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
-
-        packages_array=(${packages_list})
-        for line in ${packages_array[@]}; do
-            echo -e "    ${line}  to be installed next\n" | tee --append "${install_debs_log}"
-            sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes "${line}" |& tee --append "${install_debs_log}" # --no-install-recommends deleted from the line as in apt_get recommended dependencies were added as were in the folders of deb files to install all files from
-            # man bash: Each  command in a pipeline is executed as a separate process (i.e., in a subshell)
-            # pipeline works similarly in e.g. sh, however PIPESTATUS array is Bash-specific, solution is different for sh
-            if [ ${PIPESTATUS[0]} -eq 0 ];then
-                echo -e "\n    $line  package installed (at least seems like it)\n" | tee --append "${install_debs_log}"
-            else
-                echo | tee --append "${install_debs_log}"
-                echo "    ERROR:  $line  package NOT installed (at least seems like it)"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
-                echo | tee --append "${install_debs_log}"
-            fi
-        done # iterating over array
-    fi
-
-    # restore original apt sources files
-    if [ "${strategy_for_sources}" = "replace" ]; then
-        sudo rm --force --recursive "${INDEX_FILES_DIR}" # that one is expected to be non-empty, but filled via `apt-get update`
-        sudo mv "${INDEX_FILES_DIR}".bak "${INDEX_FILES_DIR}"
-        sudo rmdir "${SOURCES_DIR}"
-        sudo mv "${SOURCES_DIR}".bak "${SOURCES_DIR}"
-    fi
-    sudo mv --force "${SOURCES_FILE}".bak "${SOURCES_FILE}"
-
-    if [ "${strategy_for_sources}" = "add" ]; then
-        sudo rm "${PREFS_FILE_ADD}"
-        echo -e "  A command on next line (apt-get update) is to remove apt state index files for temporary added local Debian archive. Errors in output are expected if there is no internet connection and in practice had not resulted in failed restoring of initial apt state (in particular of index files).\n"
-        sudo apt-get update
-        echo
-    fi
-    sudo apt-get clean # seems deb files from local archive are not copied to apt cache, still just in case there will be downloads
 fi
 
 #
