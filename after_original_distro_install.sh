@@ -66,6 +66,7 @@ $dir_name/get_software_path.sh install
 $dir_name/man_pages_search.sh install
 $dir_name/apt_sources_replace.sh install
 $dir_name/apt_sources_restore.sh install
+$dir_name/download_debs.sh install
 
 $dir_name/w_browser.sh install # add script to the system
 # next on the first run is expected to copy archive with secondary browser from $software_path_root/... to location given by get_software_path.sh
