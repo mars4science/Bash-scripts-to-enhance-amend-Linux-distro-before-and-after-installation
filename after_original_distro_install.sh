@@ -144,6 +144,9 @@ done
 # to fix bug on X1 carbon gen 6 (seems not to fix the issue, maybe investigate further, for now resorted to using custom key bindings)
 $dir_name/systemd_on_resume_config.sh
 
+# save installation logs from volatile part of filesystem to permanent one
+cp -r "${work_path}"/*.log "${liveiso_path_sources_root}"
+
 # for liveUSB customization via chroot only
 if [ $running_system = "false" ]; then
     # setup systemd service to configure user liveUSB account: "mint" (dconf, bashrc, etc) after systemd start but before user login
