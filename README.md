@@ -41,21 +41,21 @@ $work_path should have sufficient free space, now around several Gb, if fails du
 
 - `debs` - folders with debs, one folder for one application to install (via `install_debs.sh`, which in turn uses `apt_sources_replace.sh`, `apt_sources_restore.sh` and `apt_get.sh`)
 - `debian_archive` - folder as proper debian archive, one containing folders with debs and `Packages` files (see `man apt-get`, `man dpkg`). `Packages` files may be created with `apt_sources_replace.sh`, which creates them in Dir::Etc folder (usually `/etc/apt`), also used by `install_debs.sh`. For download of deb files `download_debs.sh` may be used.
-- settings - transmission folder as in user home, .xscreensaver as in user home, background.jpg to set as background
-- bin - executables to add to path hardcoded in `get_install_path.sh` (now it is /usr/local/bin), including `night` - logarithmic control of brightness (linked to be called via custom keyboard binding), `stopfan` - stop fan of thinkpads (both see my other repo), youtube-dlp, yt-dlp
-- bin/appimages - appimages to be added to path hardcoded in `get_install_path.sh`
-- bin/desktops - desktop files used to display items in Cinnamon menu to be added
-- bin/icons - icons for desktop files to be added
-- bin/the_rest - contains executables to add to path hardcoded in `get_install_path.sh`
-- color-profiles - contains specific profile to fix IMO incorrect color of a specific ThinkPad model (used by `set_color_profile.sh`)
-- /cinnamon/applets/[to_add|to_add_and_activate] - applets to be added (via `cinnamon_add_software.sh`), also adding some to panel (activate) and amending settings of some (via `cinnamon_config.sh`)
-- wine-gecko,
-- wine-mono - folders with downloaded archives that are put on ISO by `install_wine-gecko.sh`, `install_wine-mono.sh`, on websites of those were found relatioships between vesions of wine and their in tables, in mentined scripts several matches for recent versions are coded.
-- *-browser-* files - most recent selected and added (tar or zip archives of web browsers expected, used by `w_browser.sh`)
-- firefox-*.tar.bz2 files - most recent selected and added
-- files.py, files_functions.py - scripts to add from my other repo (used for removing duplicates, sync, and some other tasks with files) to path hardcoded in `get_install_path.sh`
-- man_pages_edits.txt - list of changes to the system reference manual pages
-- apt_dpkg_state with dpkg_orig_status (dpkg status file) and sources.list and sources.list.d (apt sources) - used by `apt_get.sh` to install files in debs folder mentioned above (expected debs were downloaded with those files via `apt_get.sh` earlier) - TODO: think about getting them from original ISO
+- `settings` - transmission folder as in user home, .xscreensaver as in user home, background.jpg to set as background
+- `bin` - executables to add to path hardcoded in `get_install_path.sh` (now it is /usr/local/bin), including `night` - logarithmic control of brightness (linked to be called via custom keyboard binding), `stopfan` - stop fan of thinkpads (both see my other repo), youtube-dlp, yt-dlp
+- `bin/appimages` - appimages to be added to path hardcoded in `get_install_path.sh`
+- `bin/desktops` - desktop files used to display items in Cinnamon menu to be added
+- `bin/icons` - icons for desktop files to be added
+- `bin/the_rest` - contains executables to add to path hardcoded in `get_install_path.sh`
+- `color-profiles` - contains specific profile to fix IMO incorrect color of a specific ThinkPad model (used by `set_color_profile.sh`)
+- `/cinnamon/applets/`[to_add|to_add_and_activate] - applets to be added (via `cinnamon_add_software.sh`), also adding some to panel (activate) and amending settings of some (via `cinnamon_config.sh`)
+- `wine-gecko`,
+- `wine-mono` - folders with downloaded archives that are put on ISO by `install_wine-gecko.sh`, `install_wine-mono.sh`, on websites of those were found relatioships between vesions of wine and their in tables, in mentined scripts several matches for recent versions are coded.
+- `*-browser-*` files - most recent selected and added (tar or zip archives of web browsers expected, used by `w_browser.sh`)
+- `firefox-*.tar.bz2` files - most recent selected and added
+- `files.py`, `files_functions.py` - scripts to add from my other repo (used for removing duplicates, sync, and some other tasks with files) to path hardcoded in `get_install_path.sh`
+- `man_pages_edits.txt` - list of changes to the system reference manual pages
+- `apt_dpkg_state` with dpkg_orig_status (dpkg status file) and sources.list and sources.list.d (apt sources) - used by `apt_get.sh` to install files in debs folder mentioned above (expected debs were downloaded with those files via `apt_get.sh` earlier) - TODO: think about getting them from original ISO
 
 #### List of changes programmed to be made by _make_custom_liveusb.sh:
 
@@ -95,8 +95,8 @@ Scripts added to /usr/local/bin:
 - `git_clone` clones specific git repo with mirror option then amends config to make cloned repo look as regular
 - `git_compact` compacts repo with `git switch --orphan empty_long_name`
 - `man_pages_search` Searches sources files of the system reference manual pages for containing all arguments as literal strings (case insensitive) in any order (aka --global-apropos but for multiple arguments as `man` application itself for some reason seems to have no such option)
-- `apt_sources_replace.sh`, `apt_sources_restore.sh` - replace and restore apt sources and index files, e.g. for install from local debian archive
-- `download_debs.sh` - to download set of debian packages with default dependencies in one go to apt cache, based on list of packages in a file. One may try to use `apt_get cp` to copy from cache to current folder afterwards
+- `apt_sources_replace`, `apt_sources_restore` - replace and restore apt sources and index files, e.g. for install from local debian archive
+- `download_debs` - to download set of debian packages with default dependencies in one go to apt cache, based on list of packages in a file. One may try to use `apt_get cp` to copy from cache to current folder afterwardsy
 
 Other minor tweaks, including:
 
