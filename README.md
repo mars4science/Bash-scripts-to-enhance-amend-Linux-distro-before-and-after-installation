@@ -126,6 +126,12 @@ Other minor tweaks, including:
 - `_rename_based_on_meta.sh` - standalone script using ffmpeg
 - `_r_sync.sh` – not finalized try on using rsync to synchronize two folders both ways (see code and comments in the script how it works)
 
+#### _prepare.sh
+
+- to (temporarily) amend `_make_custom_liveusb.sh` (variables mostly) and `bash_functions_and_other_config.sh`
+- to make some changes to contents of $software_path_root about what applications (e.g. AppImage files) to install
+
+
 ### Examples
 
 #### Example 1 (to only add some software done with `apt-install` of deb files)

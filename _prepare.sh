@@ -13,9 +13,10 @@ work_path="/media/disk1/work2"
 user_name="user2"
 locales='("en_US" "de_DE")' # note: string here whereas array in the file to edit
 cgroup="gr2" # see [1] for example of usage (in addition of moving process into a group)
+cpu_max_chroot="500000 1000000" # limit for whole CPU, write quota and period (valid values in the range of 1000 to 1000000) in microseconds, for  performance reasons could be better to use larger periods). Total CPU time in the system equals period multiplied by number of cores/processors
 cpu_max_mksquashfs="1200000 1000000"
 # applications to add
-path_to_apps="//_toadd" # within software_path_root; double `/` instead of single for usage in bash pattern substitution
+path_to_apps="//_to_add" # within software_path_root; double `/` instead of single for usage in bash pattern substitution
 apps_to_add=("kiwix" "kdenlive" "Kdenlive" "krita" "Krita" "jExifToolGUI") # doc files are named starting with Upper case letter, the rest with lower one, therefore list both variants
 
 # ----------------------------------------------------------- #
@@ -38,6 +39,7 @@ change_variable original_iso
 change_variable work_path
 change_variable new_legacy_menu_title
 change_variable cgroup
+change_variable cpu_max_chroot
 change_variable cpu_max_mksquashfs
 change_variable user_name
 
@@ -79,12 +81,14 @@ find "${software_path_root}/to_root" -type l -execdir rm '{}' +
 find "${software_path_root}/bin" -type l -execdir rm '{}' +
 # add each
 for app in "${apps_to_add[@]}"; do
-    find "${software_path_root}/${path_to_apps}" -name "${app}"* -exec bash -c 'ln --symbolic --relative -T ${1} ${1/'"${path_to_apps}"'/}' bash {} \;
+    find "${software_path_root}/${path_to_apps}" -name "${app}"* -exec bash -c 'link_name="${1/'"${path_to_apps}"'/}"; mkdir --parents  "$(dirname ${link_name})";ln --symbolic --relative -T "${1}" "${link_name}"' bash {} \; # ${parameter/pattern/string} Pattern substitution - here used to remove extra part of path
 done
 
 # end of script
 exit
 
+###########################################
+# Notes, useful code
 ###########################################
 
 # [1]
@@ -128,7 +132,7 @@ else
 fi
 
 
-# [2] Notes, useful code
+# [2]
 
 # Useful to change something in all scripts
 find . -name '*.sh' -execdir bash -c 'sed -i '\''s|Exiting $0 on error $err|  ERROR: Exiting $0 on error $err|'\'' "$0"' "{}" \;
