@@ -19,7 +19,10 @@ add_line (){
 }
 
 # new way for ramdisk
-add_line 'tmpfs /media/ramdisk tmpfs size=100%,x-mount.mkdir,noatime 0 0'
+available_ram=$(free -wb | awk '/^Mem:/ { print $8 }')
+total_ram=$(free -wb | awk '/^Mem:/ { print $2 }')
+ram_to_deduct=1610612736 # 1.5 GiB
+add_line 'tmpfs /media/ramdisk tmpfs size='$((100*(available_ram-ram_to_deduct)/total_ram))'%,x-mount.mkdir,noatime 0 0'
 
 # adding zramdisk via mount helper resulted in disk visible after boot, but not opening, so comment out /dev/zram0
 # echo '/dev/zram0 /media/zramdisk zramdisk x-systemd.automount,x-mount.mkdir,discard,noatime,dev,suid,exec 0 0' | sudo tee --append /etc/fstab
