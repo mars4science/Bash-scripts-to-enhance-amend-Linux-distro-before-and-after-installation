@@ -33,7 +33,8 @@ else
     source_path=$("$(dirname "$(realpath "$0")")"/get_source_path.sh)/$script_name.sh
 fi
 
-common_help="Also for "\""$script_name update"\"" programmed response is updating script itself from "\""$source_path"\""\n"
+common_help="Also for "\""$script_name update"\"" programmed response is updating script itself from "\""$source_path"\"",
+  and for "\""$script_name install"\"" programmed response is installing (if not installed) from "\""$0"\"".\n"
 
 # need to install and update it, so next line would stands in the way
 # if [ $script_name = "common_arguments_to_scripts" ]; then echo "common_arguments_to_scripts.sh is not supposed to be run on its own, exiting"; exit 1; fi
