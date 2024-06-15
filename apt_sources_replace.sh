@@ -34,7 +34,7 @@ fi
 
 if [ ! -d "${debian_archives}" ]; then
     echo "    ERROR:  no such folder: ${debian_archives}"  | tee --append "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}"
-    return 1
+    exit 1
 fi
 
 # Note: seems apt/dpkg files location paths are stable: /var/lib/dpkg/status, /etc/apt/sources.list, single file /etc/apt/sources.list.d/official-package-repositories.list, but made hopefully more future proof
