@@ -96,9 +96,12 @@ fi
 
 if [ $(grep --invert-match ', 0 removed' "${install_debs_log}" | grep --quiet --ignore-case 'removed' ;echo $?) -eq 0 ]; then
     echo -e "\n===== Unwanted removals potentially happened      =====" | 1>&2 sudo tee --append "${amend_errors_log}"
-    echo -e "  === List below by grep, entries separated by --   ===\n" | 1>&2 sudo tee --append "${amend_errors_log}"
-    grep --invert-match ', 0 removed' "${install_debs_log}" | grep --ignore-case -A 1 'removed' | 1>&2 sudo tee --append "${amend_errors_log}"
-    echo -e "\n===== See  ${install_debs_log}  for details       =====\n" | 1>&2 sudo tee --append "${amend_errors_log}"
+    echo -e "  === List of packages below    ===" | 1>&2 sudo tee --append "${amend_errors_log}"
+    # grep --invert-match ', 0 removed' "${install_debs_log}" | grep --ignore-case -A 1 'removed' | 1>&2 sudo tee --append "${amend_errors_log}" # replaced with below perl as could be several lines of debs if many
+
+    # searches for parts of file starting with 'REMOVED:' and ending with 'The following', replaces with what's in between and then replaces all after last matched part (assuming it starts with ' NEW packages') with line break. TODO: find out if just selection can be printed in perl, but via substitution operator
+    perl -0777 -p -e 's/.*?REMOVED:(.*?)The following/\1/sig;s/ NEW packages.*/\n/si' "${install_debs_log}" | 1>&2 sudo tee --append "${amend_errors_log}" # si modifiers for perl regex: s - makes "." cross line boundaries (alternatively [/s/S] in place of .), i - makes case-insensitive, "?" needed to make regex lazy, otherwise greedy: selects up to past occurence of "export -f", not first (`man perlre`); for -0777 -p -e see `man perlrun`
+    echo -e "===== See  ${install_debs_log}  for details       =====\n" | 1>&2 sudo tee --append "${amend_errors_log}"
 fi
 
 exit
