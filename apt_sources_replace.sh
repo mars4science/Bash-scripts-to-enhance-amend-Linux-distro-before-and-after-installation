@@ -19,7 +19,7 @@ if [ -e "${commons_path}" ] ; then
     help_message="  The Script is written to update apt sources to set of packages from the location: ${debian_archives} or from path given as argument to the script\n"
     display_help "$help_message$common_help"
 else
-    if [ "x$1" = "xinstall" ] ; then echo "apt_get not going to be installed due to not locating common_arguments_to_scripts.sh"; exit 1; fi
+    if [ "x$1" = "xinstall" ] ; then echo "$(basename $(realpath ${0})) is not going to be installed due to not locating common_arguments_to_scripts.sh"; exit 1; fi
 fi
 
 # ===== #

@@ -55,7 +55,7 @@ if [ -e "${commons_path}" ] ; then
       If dpkg status and/or apt sources not found at supplied location, substitution not done.\n"
     display_help "$help_message$common_help"
 else
-    if [ "x$1" = "xinstall" ] ; then echo "apt_get not going to be installed due to not locating common_arguments_to_scripts.sh"; exit 1; fi
+    if [ "x$1" = "xinstall" ] ; then echo "$(basename $(realpath ${0})) is not going to be installed due to not locating common_arguments_to_scripts.sh"; exit 1; fi
 fi
 
 # ===== #
