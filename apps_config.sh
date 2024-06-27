@@ -8,7 +8,10 @@ if [ ! -e "${app_conf_folder}" ] ; then
 else
     # overwrite previous settings (no --append) as script may be run not one time
     file_fully_qualified_name="${app_conf_folder}"/mpv.conf
-    file_contents='hwdec=vaapi
+    file_contents='hwdec=auto-safe # was =vaapi, changed per `man mpv`
+x11-bypass-compositor=no # or =newer; set to avoid switching of resolutions (and resulting delay) when Cinnamon is in fractional scaling mode, because when bypassing is enabled, mpv uses native resolution even in fractional scaling display mode, whereas compositor (which manages off-screen buffer for window manager) in fractional display mode uses scaled resolution; I have not noticed performance/quality issues with playing videos when set to =no; default is =fs-only (fs-only asks the window manager to disable the compositor only in fullscreen mode)
+
+# audio-stream-silence=yes # when pausing playback, audio is not stopped, and silence is played while paused. Cash-grab consumer audio hardware (such as A/V receivers) often ignore initial audio sent over HDMI. This can happen every time audio over HDMI is stopped and resumed.
 
 sub-font-size=45
 sub-color=0.0/0.0/1.0/0.3
