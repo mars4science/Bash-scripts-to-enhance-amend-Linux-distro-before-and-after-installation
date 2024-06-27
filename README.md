@@ -130,6 +130,7 @@ Other minor tweaks, including:
 
 - to (temporarily) amend `_make_custom_liveusb.sh` (variables mostly) and `bash_functions_and_other_config.sh`
 - to make some changes to contents of $software_path_root about what applications (e.g. AppImage files) to install
+- takes files from addditional directory (folder in root of $software_path_root, parameter in `_prepare.sh`) and adds to other locations within $software_path_root
 
 
 ### Examples
