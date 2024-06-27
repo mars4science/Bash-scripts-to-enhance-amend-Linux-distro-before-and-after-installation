@@ -4,8 +4,7 @@
 
 if [ "x${software_path_root}" = "x" ] ; then software_path_root=/media/$(id -un)/usb/LM ; fi
 
-# sudo cp --no-clobber "$software_path_root"/bin/the_rest/* "$(get_install_path.sh)" # expected to have exec bit set in
- "$software_path_root", not setting here
+# sudo cp --no-clobber "$software_path_root"/bin/the_rest/* "$(get_install_path.sh)" # expected to have exec bit set in "$software_path_root", not setting here
 sudo rsync -a --chmod=Fa+x "$software_path_root"/bin/the_rest/* "$(get_install_path.sh)"
 
 # copy apps in form of AppImage to disk and menu (to list of All Applications), follow symbolic links
